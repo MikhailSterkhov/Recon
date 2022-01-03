@@ -6,9 +6,9 @@ public interface ChannelListener {
 
     void onInactive(ContextHandler contextHandler);
 
-    void onServerBind(RemoteChannel remoteChannel);
+    void onNewClientActive(RemoteChannel remoteChannel, ContextHandler contextHandler);
 
-    void onClientConnected(RemoteChannel remoteChannel, ContextHandler contextHandler);
+    void onClientInactive(RemoteChannel remoteChannel, ContextHandler contextHandler);
 
     void onRead(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Input buffer);
 

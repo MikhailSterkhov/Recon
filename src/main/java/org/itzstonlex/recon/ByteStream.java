@@ -39,6 +39,8 @@ public interface ByteStream {
         String readString();
 
         <R extends ByteSerializable<?>> R readObject(Supplier<R> instance);
+
+        void reset();
     }
 
     interface Output {
@@ -60,6 +62,8 @@ public interface ByteStream {
         void writeString(String value);
 
         void writeObject(ByteSerializable<?> value);
+
+        void reset();
 
         byte[] toByteArray();
     }

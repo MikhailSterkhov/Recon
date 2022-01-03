@@ -3,25 +3,27 @@
 # RECON
 
  <div style="letter-spacing: 3px">
- 
- #### Protocol & Connection Library
- 
+
+#### Protocol & Connection Library
+
    <div style="color: red">
       The Library in development... <br> For contact me see "Feedback" 
    </div>
- 
+
  </div>
 
 ---
 </div>
 
 ### Feedback
+
 + **[Discord Server](https://discord.gg/GmT9pUy8af)**
 + **[VKontakte Page](https://vk.com/itzstonlex)**
 
 ---
 
 ## Use & Installation
+
 soon...
 
 ---
@@ -29,16 +31,17 @@ soon...
 ## How to create remote connection?
 
 Create a server connection:
+
 ```java
-import org.itzstonlex.recon.side.server.Server;
+import org.itzstonlex.recon.side.Server;
 
 public class ServerConnection {
-    
+
     public static final int BIND_PORT = 1010;
 
     public void launchApplication() {
         Server server = new Server();
-        
+
         server.bindLocal(BIND_PORT);
     }
 
@@ -51,8 +54,9 @@ public class ServerConnection {
 ```
 
 Create a client connection:
+
 ```java
-import org.itzstonlex.recon.side.client.Client;
+import org.itzstonlex.recon.side.Client;
 
 public class ClientConnection {
 
@@ -60,7 +64,7 @@ public class ClientConnection {
 
     public void launchApplication() {
         Client client = new Client();
-        
+
         client.connectLocal(CONNECT_PORT);
     }
 
@@ -77,6 +81,7 @@ public class ClientConnection {
 ## Events Listening
 
 For server example:
+
 ```java
 import org.itzstonlex.recon.ContextHandler;
 import org.itzstonlex.recon.RemoteChannel;
@@ -95,7 +100,7 @@ public class ConnectionListener extends ChannelListenerAdapter {
         System.out.println("[Server] Connection is closed!");
     }
 
-    
+
     @Override
     public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {
         throwable.printStackTrace();
@@ -104,6 +109,7 @@ public class ConnectionListener extends ChannelListenerAdapter {
 ```
 
 Before add the listener to connection:
+
 ```java
 Server server = new Server();
 
@@ -116,24 +122,87 @@ server.bindLocal(1010);
 ## Bytes Write
 
 Create a bytes-buffer:
+
 ```java
 ByteStream.Output output = BufferFactory.createPooledOutput();
 ```
 
 Put a data as bytes:
+
 ```java
 output.writeString("ItzStonlex");
 output.writeBoolean(true);
 ```
 
 And write to connection channel:
+
 ```java
 server.channel().write(output);
 ```
 
 Method `RemoteChannel#write(ByteStream.Output)` write a bytes to all connected channels
 
+
+Sending bytes can be intercepted using `OutgoingByteHandler#onRead()`
+
+For example:
+
+```java
+import org.itzstonlex.recon.ByteStream;
+import org.itzstonlex.recon.ContextHandler;
+import org.itzstonlex.recon.RemoteChannel;
+import org.itzstonlex.recon.factory.BufferFactory;
+import org.itzstonlex.recon.handler.OutgoingByteHandler;
+
+import java.util.Arrays;
+
+public class WriteHandler extends OutgoingByteHandler {
+
+    @Override
+    public void onWrite(RemoteChannel remoteChannel, ContextHandler contextHandler, 
+                        ByteStream.Output buffer) {
+        
+        byte[] bytes = buffer.toByteArray();
+
+        // ...handle write bytes
+        remoteChannel.logger().info("onWrite: [bytes]:" + Arrays.toString(bytes));
+    }
+}
+```
+
 ---
 
 ## Bytes Read
-soon...
+
+Reading bytes is handled through `IncomingByteHandler#onRead()`
+
+For example:
+
+```java
+import org.itzstonlex.recon.ByteStream;
+import org.itzstonlex.recon.ContextHandler;
+import org.itzstonlex.recon.RemoteChannel;
+import org.itzstonlex.recon.factory.BufferFactory;
+import org.itzstonlex.recon.handler.IncomingByteHandler;
+
+import java.util.Arrays;
+
+public class ReadHandler extends IncomingByteHandler {
+
+    @Override
+    public void onRead(RemoteChannel remoteChannel, ContextHandler contextHandler, 
+                       ByteStream.Input buffer) {
+        
+        byte[] bytes = BufferFactory.transformOutput(buffer)
+                .toByteArray();
+
+        // ...read or handle bytes
+        remoteChannel.logger().info("onRead: [bytes]:" + Arrays.toString(bytes));
+    }
+}
+```
+
+Register handler to connection:
+```java
+
+```

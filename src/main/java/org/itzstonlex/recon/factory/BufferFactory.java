@@ -19,17 +19,18 @@ public final class BufferFactory {
         return BYTESTREAM.newInput(bytes);
     }
 
-    public static ByteStream.Output transform(byte[] bytes) {
+    public static ByteStream.Output transformOutput(byte[] bytes) {
         return BYTESTREAM.transform(bytes);
     }
 
-    public static ByteStream.Output transform(ByteStream.Input input) {
+    public static ByteStream.Output transformOutput(ByteStream.Input input) {
         return BYTESTREAM.transform(input);
     }
 
     public static ByteStream.Output createPooledOutput() {
         return BYTESTREAM.newOutput();
     }
+
 
     private static class PooledOutput
             implements ByteStream.Output {
@@ -107,10 +108,14 @@ public final class BufferFactory {
         }
 
         @Override
+        public void reset() {
+            this.storage = new byte[0];
+        }
+
+        @Override
         public byte[] toByteArray() {
             return storage;
         }
-
     }
 
     private static class PooledInput
@@ -154,8 +159,8 @@ public final class BufferFactory {
                 if (numRead > 5) {
                     throw new BufferReadError("VarInt is too big");
                 }
-            } while ((read & 128) == 128);
 
+            } while ((read & 128) == 128);
             return result;
         }
 
@@ -209,6 +214,10 @@ public final class BufferFactory {
             return instance;
         }
 
+        @Override
+        public void reset() {
+            this.storage = new byte[0];
+        }
     }
 
     private static class PooledBuffer
@@ -233,7 +242,6 @@ public final class BufferFactory {
         public Output newOutput() {
             return new PooledOutput();
         }
-
     }
 
 }

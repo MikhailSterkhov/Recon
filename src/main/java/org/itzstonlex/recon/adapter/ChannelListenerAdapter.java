@@ -1,12 +1,23 @@
 package org.itzstonlex.recon.adapter;
 
-import org.itzstonlex.recon.ByteStream;
-import org.itzstonlex.recon.ChannelListener;
-import org.itzstonlex.recon.ContextHandler;
-import org.itzstonlex.recon.RemoteChannel;
+import org.itzstonlex.recon.*;
 
 public abstract class ChannelListenerAdapter
         implements ChannelListener {
+
+    protected final RemoteConnection connection;
+
+    public ChannelListenerAdapter(RemoteConnection connection) {
+        this.connection = connection;
+    }
+
+    public ChannelListenerAdapter() {
+        this(null);
+    }
+
+    public RemoteConnection getConnection() {
+        return connection;
+    }
 
     @Override
     public void onActive(ContextHandler contextHandler) {
@@ -17,11 +28,11 @@ public abstract class ChannelListenerAdapter
     }
 
     @Override
-    public void onServerBind(RemoteChannel remoteChannel) {
+    public void onNewClientActive(RemoteChannel remoteChannel, ContextHandler contextHandler) {
     }
 
     @Override
-    public void onClientConnected(RemoteChannel remoteChannel, ContextHandler contextHandler) {
+    public void onClientInactive(RemoteChannel remoteChannel, ContextHandler contextHandler) {
     }
 
     @Override

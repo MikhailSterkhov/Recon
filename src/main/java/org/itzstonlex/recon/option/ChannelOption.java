@@ -1,5 +1,7 @@
 package org.itzstonlex.recon.option;
 
+import org.itzstonlex.recon.error.SocketSetOptionError;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,13 +10,27 @@ import java.net.StandardSocketOptions;
 
 public class ChannelOption {
 
-    Type type;
-    Object value;
+    public static ChannelOption of(Type type, Object value) {
+        return new ChannelOption(type, value);
+    }
 
-    public ChannelOption(Type type, Object value) {
+    public static ChannelOption nullable(Type type) {
+        return new ChannelOption(type, null);
+    }
+
+
+    private final Type type;
+    private Object value;
+
+    private ChannelOption(Type type, Object value) {
         this.type = type;
         this.value = value;
     }
+
+    public void setValue(Object value) {
+        this.value = value;
+    }
+
 
     public void apply(ServerSocket serverSocket) {
         type.apply(serverSocket, value);
@@ -25,7 +41,7 @@ public class ChannelOption {
     }
 
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings("all")
     public enum Type {
 
         SO_BROADCAST(StandardSocketOptions.SO_BROADCAST),
@@ -52,7 +68,7 @@ public class ChannelOption {
                 serverSocket.setOption(impl, value);
             }
             catch (IOException exception) {
-                exception.printStackTrace();
+                throw new SocketSetOptionError(exception);
             }
         }
 
@@ -61,7 +77,7 @@ public class ChannelOption {
                 socket.setOption(impl, value);
             }
             catch (IOException exception) {
-                exception.printStackTrace();
+                throw new SocketSetOptionError(exception);
             }
         }
     }

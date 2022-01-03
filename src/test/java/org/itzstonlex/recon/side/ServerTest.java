@@ -3,46 +3,68 @@ package org.itzstonlex.recon.side;
 import org.itzstonlex.recon.ByteStream;
 import org.itzstonlex.recon.ContextHandler;
 import org.itzstonlex.recon.RemoteChannel;
+import org.itzstonlex.recon.RemoteConnection;
 import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
 import org.itzstonlex.recon.factory.BufferFactory;
-import org.itzstonlex.recon.side.server.Server;
+import org.itzstonlex.recon.handler.PacketHandler;
 
 public class ServerTest {
 
     public static void main(String[] args) {
-        Server server = new Server();
-
-        server.addListener(new ConnectionListener());
-        server.bindLocal(1010);
-
-        server.channel().write(createPacket());
+        ServerTest serverTest = new ServerTest();
+        serverTest.launchApplication(new Server());
     }
 
-    public static ByteStream.Output createPacket() {
-        ByteStream.Output output = BufferFactory.createPooledOutput();
+    public void launchApplication(Server server) {
+        server.bindLocal(1010, config -> {
 
-        output.writeString("ItzStonlex");
-        output.writeBoolean(true);
+            config.pipeline().putLast("connection-listener", new ConnectionListener(server));
+            config.pipeline().putAfter("connection-listener", "packet-handler", new PacketHandler());
 
-        return output;
+            server.logger().info("[ChannelInitializer]: Init Channel " + config.address());
+        });
     }
 
     public static class ConnectionListener extends ChannelListenerAdapter {
 
+        public ConnectionListener(RemoteConnection connection) {
+            super(connection);
+        }
+
         @Override
         public void onActive(ContextHandler contextHandler) {
-            System.out.println("[Server] Connection was success bind on "
+            connection.logger().info("[Server] Connection was success bind on "
                     + contextHandler.channel().address());
         }
 
         @Override
         public void onInactive(ContextHandler contextHandler) {
-            System.out.println("[Server] Connection is closed!");
+            connection.logger().info("[Server] Connection is closed!");
+        }
+
+        @Override
+        public void onNewClientActive(RemoteChannel remoteChannel, ContextHandler contextHandler) {
+            connection.logger().info("New client connection: " + remoteChannel.address());
+
+            // Write a test bytes.
+            ByteStream.Output output = BufferFactory.createPooledOutput();
+
+            output.writeString("ItzStonlex");
+            output.writeBoolean(true);
+
+            remoteChannel.write(output);
+        }
+
+        @Override
+        public void onClientInactive(RemoteChannel remoteChannel, ContextHandler contextHandler) {
+            connection.logger().info("Client connection " + remoteChannel.address() + " was disconnected");
         }
 
         @Override
         public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {
-            super.onExceptionCaught(remoteChannel, throwable);
+            connection.logger().severe(throwable.getMessage());
+
+            throwable.printStackTrace();
         }
     }
 
