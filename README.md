@@ -229,6 +229,7 @@ public class ReadHandler extends IncomingByteHandler {
 `ReadHandler` and `WriteHandler` are registered exactly the same way 
 through the `ChannelPipeline`, like all other event handlers 
 for channels, because they inherit the `ChannelListener` interface
+
 ---
 
 ## Client Reconnection
