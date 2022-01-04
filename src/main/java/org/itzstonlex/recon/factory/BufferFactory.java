@@ -141,6 +141,16 @@ public final class BufferFactory {
         }
 
         @Override
+        public byte array(int index) {
+            return storage[index];
+        }
+
+        @Override
+        public byte[] array() {
+            return storage;
+        }
+
+        @Override
         public byte readByte() {
             return read(1)[0];
         }

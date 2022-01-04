@@ -6,6 +6,7 @@ import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
 import org.itzstonlex.recon.factory.BufferFactory;
 import org.itzstonlex.recon.handler.IncomingByteHandler;
+import org.itzstonlex.recon.side.Client;
 import org.itzstonlex.recon.util.FastRecon;
 
 import java.util.Arrays;
@@ -13,9 +14,13 @@ import java.util.Arrays;
 public class ConnectionBuilderTest {
 
     public static void main(String[] args) {
-        FastRecon.newLocalConnection(1000)
+        Client client = FastRecon.newLocalConnection(1000)
+                .client_setTimeout(5000)
+
                 .pipeline_addLast("read-handler", new ReadHandler())
-                .asServer();
+                .pipeline_addLast("connection-handler", new ConnectionListener())
+
+                .asClient();
     }
 
     public static class ConnectionListener extends ChannelListenerAdapter {
@@ -25,7 +30,7 @@ public class ConnectionBuilderTest {
         }
 
         @Override
-        public void onActive(ContextHandler contextHandler) {
+        public void onThreadActive(ContextHandler contextHandler) {
             contextHandler.channel().logger().info("Server was success bind on " + contextHandler.channel().address());
         }
     }

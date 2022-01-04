@@ -8,12 +8,13 @@ public class PacketHandler extends IncomingByteHandler {
 
     @Override
     public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {
-        super.onExceptionCaught(remoteChannel, throwable);
     }
 
     @Override
-    public void onRead(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Input buffer) {
+    public void onRead(RemoteChannel remoteChannel, ContextHandler contextHandler,
+                       ByteStream.Input buffer) {
 
+        remoteChannel.logger().info("PacketHandler#onRead()");
     }
 
 }

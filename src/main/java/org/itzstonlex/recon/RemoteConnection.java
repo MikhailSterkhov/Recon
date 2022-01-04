@@ -16,6 +16,8 @@ public interface RemoteConnection {
 
     RemoteChannel channel();
 
+    ChannelOption[] options();
+
     void setOption(ChannelOption channelOption);
 
     void shutdown() throws IOException;
@@ -36,6 +38,8 @@ public interface RemoteConnection {
     }
 
     interface Connector {
+
+        int timeout();
 
         RemoteChannel connectLocal(int port);
 

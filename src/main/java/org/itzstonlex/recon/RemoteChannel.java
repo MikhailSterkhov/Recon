@@ -23,6 +23,8 @@ public interface RemoteChannel extends Closeable {
 
     void flush();
 
+    void forceOpen();
+
     boolean isClosed();
 
 }

@@ -1,11 +1,6 @@
 package org.itzstonlex.recon.util;
 
-import org.itzstonlex.recon.error.SocketThreadError;
-import org.itzstonlex.recon.factory.ContextFactory;
-
-import java.io.IOException;
 import java.io.InputStream;
-import java.net.Socket;
 
 public final class InputUtils {
 
@@ -28,21 +23,6 @@ public final class InputUtils {
         catch (Exception exception) {
             return new byte[0];
         }
-    }
-
-    public static boolean isClosed(Socket socket) {
-        try {
-            if (!socket.getKeepAlive()) {
-
-                socket.setKeepAlive(true);
-                socket.getInputStream().read();
-            }
-        }
-        catch (IOException exception) {
-            return true;
-        }
-
-        return false;
     }
 
 }

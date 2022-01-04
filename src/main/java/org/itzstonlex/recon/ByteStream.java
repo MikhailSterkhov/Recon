@@ -18,6 +18,10 @@ public interface ByteStream {
 
         int size();
 
+        byte array(int index);
+
+        byte[] array();
+
         byte[] read(int length);
 
         byte readByte();

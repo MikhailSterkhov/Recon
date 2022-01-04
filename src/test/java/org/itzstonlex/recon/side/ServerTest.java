@@ -32,18 +32,18 @@ public class ServerTest {
         }
 
         @Override
-        public void onActive(ContextHandler contextHandler) {
+        public void onThreadActive(ContextHandler contextHandler) {
             connection.logger().info("[Server] Connection was success bind on "
                     + contextHandler.channel().address());
         }
 
         @Override
-        public void onInactive(ContextHandler contextHandler) {
+        public void onClosed(ContextHandler contextHandler) {
             connection.logger().info("[Server] Connection is closed!");
         }
 
         @Override
-        public void onNewClientActive(RemoteChannel remoteChannel, ContextHandler contextHandler) {
+        public void onClientConnected(RemoteChannel remoteChannel, ContextHandler contextHandler) {
             connection.logger().info("New client connection: " + remoteChannel.address());
 
             // Write a test bytes.
@@ -56,7 +56,7 @@ public class ServerTest {
         }
 
         @Override
-        public void onClientInactive(RemoteChannel remoteChannel, ContextHandler contextHandler) {
+        public void onClientClosed(RemoteChannel remoteChannel, ContextHandler contextHandler) {
             connection.logger().info("Client connection " + remoteChannel.address() + " was disconnected");
         }
 

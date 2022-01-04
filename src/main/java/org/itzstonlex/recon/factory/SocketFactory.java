@@ -7,7 +7,6 @@ import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.concurrent.Executors;
 
 public final class SocketFactory {
 
@@ -19,14 +18,8 @@ public final class SocketFactory {
                 channelOption.apply(serverSocket);
             }
 
-            Executors.newCachedThreadPool().submit(() -> {
-                try {
-                    serverSocket.bind(address);
-                }
-                catch (IOException exception) {
-                    throw new ReconRuntimeError(exception);
-                }
-            });
+            InetSocketAddress resolvedAddress = new InetSocketAddress(address.getHostString(), address.getPort());
+            serverSocket.bind(resolvedAddress);
 
             return serverSocket;
         }
@@ -44,14 +37,12 @@ public final class SocketFactory {
                 channelOption.apply(socket);
             }
 
-            Executors.newCachedThreadPool().submit(() -> {
-                try {
-                    socket.connect(address, timeout);
-                }
-                catch (IOException exception) {
-                    throw new ReconRuntimeError(exception);
-                }
-            });
+            try {
+                InetSocketAddress resolvedAddress = new InetSocketAddress(address.getHostString(), address.getPort());
+                socket.connect(resolvedAddress, timeout);
+            }
+            catch (IOException ignored) {
+            }
 
             return socket;
         }

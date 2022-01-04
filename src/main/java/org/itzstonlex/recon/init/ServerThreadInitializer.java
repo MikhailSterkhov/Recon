@@ -10,12 +10,13 @@ import org.itzstonlex.recon.option.ChannelOption;
 import org.itzstonlex.recon.side.Client;
 import org.itzstonlex.recon.util.InputUtils;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -58,61 +59,97 @@ public final class ServerThreadInitializer
 
     private void detectNewConnections(ServerSocket serverSocket) {
         newConnectionsExecutor.execute(() -> {
-            while (!data.channel.isClosed()) {
 
+            while (!data.channel.isClosed()) {
                 if (!serverSocket.isBound()) {
                     continue;
                 }
 
-                try (Socket accept = serverSocket.accept()) {
-
+                try {
+                    Socket accept = serverSocket.accept();
                     RemoteChannel clientChannel = newClientChannel((InetSocketAddress) accept.getRemoteSocketAddress());
-                    connected.put(accept, clientChannel);
 
-                    executeEvent(channelListener -> channelListener.onNewClientActive(clientChannel,
+                    connected.put(accept, clientChannel);
+                    addSocketToAutoInactiveDetect(accept, clientChannel);
+
+                    executeEvent(channelListener -> channelListener.onClientConnected(clientChannel,
                             ContextFactory.createSuccessEventContext(clientChannel, channelListener)
                     ));
-                }
-                catch (Exception exception) {
+
+                } catch (Exception exception) {
                     executeEvent(channelListener -> channelListener.onExceptionCaught(data.channel, new SocketThreadError(exception)));
                 }
             }
         });
     }
 
-    private void detectInactiveConnections(Set<Socket> clientSockets) {
-        // ...
+    private int readBuf;
+    private void addSocketToAutoInactiveDetect(Socket socket, RemoteChannel channel) {
+        channel.connection().getThread().execute(() -> {
+            try {
+                readBuf = socket.getInputStream().read();
+            }
+            catch (Exception ignored) {
+                try {
+                    disconnectChannel(socket);
+                }
+                catch (Exception exception) {
+                    executeEvent(channelListener -> channelListener.onExceptionCaught(channel, new SocketThreadError(exception)));
+                }
+            }
+        });
     }
 
-    private void detectIncomingStream(Socket clientSocket, RemoteChannel clientChannel)
+    private void disconnectChannel(Socket socket)
+    throws Exception {
+        RemoteChannel channel = connected.remove(socket);
+
+        if (channel == null) {
+            return;
+        }
+
+        executeEvent(channelListener -> channelListener.onClientClosed(channel,
+                ContextFactory.createSuccessEventContext(channel, channelListener)
+        ));
+
+        channel.close();
+        socket.close();
+    }
+
+    private void detectIncomingStream(Socket socket, RemoteChannel clientChannel)
     throws Exception {
 
-        InputStream receivedBytes = clientSocket.getInputStream();
-
-        if (!InputUtils.isEmpty(receivedBytes)) {
-            ByteStream.Input buffer = BufferFactory.createPooledInput(
-                    InputUtils.toByteArray(receivedBytes)
-            );
-
-            if (buffer.size() <= 0) {
-                return;
-            }
-
-            executeEvent(channelListener -> channelListener.onRead(clientChannel,
-                    ContextFactory.createSuccessEventContext(clientChannel, channelListener),
-                    buffer
-            ));
-
-            buffer.reset();
+        InputStream inputStream = socket.getInputStream();
+        if (InputUtils.isEmpty(inputStream)) {
+            return;
         }
+
+        // Push buf read value.
+        ByteStream.Output transformer = BufferFactory.createPooledOutput();
+
+        if (readBuf >= 0) {
+            transformer.writeByte((byte) readBuf);
+        }
+
+        transformer.write(InputUtils.toByteArray(inputStream));
+        readBuf = -1;
+
+        // Read bytes handle.
+        ByteStream.Input buffer = BufferFactory.createPooledInput(
+                transformer.toByteArray()
+        );
+
+        executeEvent(channelListener -> channelListener.onRead(clientChannel,
+                ContextFactory.createSuccessEventContext(clientChannel, channelListener),
+                buffer
+        ));
     }
 
-    private void detectOutgoingStream(Socket clientSocket, RemoteChannel clientChannel)
+    private void detectOutgoingStream(Socket socket, RemoteChannel clientChannel)
     throws Exception {
 
         ByteStream.Output buffer = clientChannel.buffer();
-
-        if (buffer == null || buffer.toByteArray().length <= 0) {
+        if (buffer == null) {
             return;
         }
 
@@ -121,7 +158,7 @@ public final class ServerThreadInitializer
                 buffer
         ));
 
-        clientSocket.getOutputStream().write(buffer.toByteArray());
+        socket.getOutputStream().write(buffer.toByteArray());
         clientChannel.flush();
     }
 
@@ -129,7 +166,7 @@ public final class ServerThreadInitializer
     throws Exception {
 
         // Call event of that connection closed.
-        executeEvent(channelListener -> channelListener.onInactive(
+        executeEvent(channelListener -> channelListener.onClosed(
                 ContextFactory.createSuccessEventContext(data.channel, channelListener, new SocketThreadError("Channel was closed"))
         ));
 
@@ -150,7 +187,7 @@ public final class ServerThreadInitializer
             );
 
             // Call event of active that connection.
-            executeEvent(channelListener -> channelListener.onActive(
+            executeEvent(channelListener -> channelListener.onThreadActive(
                     ContextFactory.createSuccessEventContext(data.channel, channelListener)
             ));
 
@@ -159,8 +196,6 @@ public final class ServerThreadInitializer
 
             // While server connection channel was active.
             while (!data.channel.isClosed()) {
-                System.out.println(0);
-                Thread.sleep(1000);
 
                 // Check all connected clients.
                 for (Map.Entry<Socket, RemoteChannel> clientEntry : connected.entrySet()) {
@@ -169,11 +204,11 @@ public final class ServerThreadInitializer
                     RemoteChannel clientChannel = clientEntry.getValue();
 
                     try {
-                        // Detect received bytes from the client.
-                        detectIncomingStream(clientSocket, clientChannel);
-
                         // Get filled buffer & send bytes to connection output.
                         detectOutgoingStream(clientSocket, clientChannel);
+
+                        // Detect received bytes from the client.
+                        detectIncomingStream(clientSocket, clientChannel);
                     }
 
                     catch (Exception exception) {

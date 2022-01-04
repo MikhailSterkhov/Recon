@@ -15,24 +15,33 @@ public abstract class ChannelListenerAdapter
         this(null);
     }
 
+
     public RemoteConnection getConnection() {
         return connection;
     }
 
     @Override
-    public void onActive(ContextHandler contextHandler) {
+    public void onThreadActive(ContextHandler contextHandler) {
     }
 
     @Override
-    public void onInactive(ContextHandler contextHandler) {
+    public void onConnected(ContextHandler contextHandler) {
     }
 
     @Override
-    public void onNewClientActive(RemoteChannel remoteChannel, ContextHandler contextHandler) {
+    public void onClosed(ContextHandler contextHandler) {
     }
 
     @Override
-    public void onClientInactive(RemoteChannel remoteChannel, ContextHandler contextHandler) {
+    public void onTimedOut(RemoteChannel channel, ContextHandler contextHandler) {
+    }
+
+    @Override
+    public void onClientConnected(RemoteChannel remoteChannel, ContextHandler contextHandler) {
+    }
+
+    @Override
+    public void onClientClosed(RemoteChannel remoteChannel, ContextHandler contextHandler) {
     }
 
     @Override

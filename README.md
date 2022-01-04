@@ -30,8 +30,7 @@ soon...
 
 ## How to create remote connection?
 
-Create a server connection:
-
+#### Server Examples:
 ```java
 import org.itzstonlex.recon.side.Server;
 
@@ -53,8 +52,7 @@ public class ServerConnection {
 }
 ```
 
-Create a client connection:
-
+#### Client Examples:
 ```java
 import org.itzstonlex.recon.side.Client;
 
@@ -80,26 +78,28 @@ public class ClientConnection {
 
 ## Events Listening
 
-For server example:
+Listening for events makes it possible to notice 
+changes in time and perform the necessary processes 
+related to channels and processing bytes
 
+#### Server Examples:
 ```java
 import org.itzstonlex.recon.ContextHandler;
 import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
 
-public class ConnectionListener extends ChannelListenerAdapter {
+public class ServerChannelListener extends ChannelListenerAdapter {
 
     @Override
-    public void onActive(ContextHandler contextHandler) {
+    public void onConnected(ContextHandler contextHandler) {
         System.out.println("[Server] Connection was success bind on "
                 + contextHandler.channel().address());
     }
 
     @Override
-    public void onInactive(ContextHandler contextHandler) {
+    public void onClosed(ContextHandler contextHandler) {
         System.out.println("[Server] Connection is closed!");
     }
-
 
     @Override
     public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {
@@ -107,16 +107,38 @@ public class ConnectionListener extends ChannelListenerAdapter {
     }
 }
 ```
+---
 
-Before add the listener to connection:
+Listeners are registered via `ChannelPipeline` as follows:
 
 ```java
 Server server = new Server();
-
-server.addListener(new ConnectionListener()); [<---]
-server.bindLocal(1010);
+server.bindLocal(BIND_PORT, config -> {
+    
+    config.pipeline().putLast("channel-handler", new ServerChannelListener(server));
+    ...
+});
 ```
 
+---
+
+Some of the available events work on specific 
+sides of the connection:
+
+- Client: 
+    - `onConnected(ContextHandler contextHandler)`
+    - `onTimedOut(RemoteChannel channel, ContextHandler contextHandler)`
+    
+- Server:
+    - `onClientConnected(RemoteChannel remoteChannel, ContextHandler contextHandler)`
+    - `onClientClosed(RemoteChannel remoteChannel, ContextHandler contextHandler)`
+
+- For all:
+    - `onThreadActive(ContextHandler contextHandler)`
+    - `onClosed(ContextHandler contextHandler)`
+    - `void onRead(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Input buffer)`
+    - `void onWrite(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Output buffer)`
+    - `void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable)`
 ---
 
 ## Bytes Write
@@ -202,7 +224,96 @@ public class ReadHandler extends IncomingByteHandler {
 }
 ```
 
-Register handler to connection:
-```java
+---
 
+`ReadHandler` and `WriteHandler` are registered exactly the same way 
+through the `ChannelPipeline`, like all other event handlers 
+for channels, because they inherit the `ChannelListener` interface
+---
+
+## Client Reconnection
+
+The Recon library has functionality for 
+reconnecting clients to a crashed server
+
+To do this, it is enough to use one method, which adds a special
+listener to check the data it needs and start the reconnection task.
+
+**IMPORTANT!** This method works exclusively for clients.
+
+```java
+Client client = new Client();
+
+client.connectLocal(1010, config -> {
+    
+    // vars init.
+    boolean hasDebug = true;
+    long reconnectDelay = 5;
+
+    // add reconnect listener.
+    config.addClientReconnector(hasDebug, reconnectDelay, TimeUnit.SECONDS);
+    ...
+});
 ```
+---
+## Fast Recon
+
+Sometimes we use large and functional libraries for simple 
+algorithms, which is why we have to write many lines of code
+
+Therefore, Recon Library offers the `FastRecon` utility for use, 
+which in a couple of lines can **connect via http**, 
+**bind a free port**, **connect to an existing one**, or **create a byte buffer**
+
+#### FastRecon Connection-Builder Examples:
+```java
+Client client = FastRecon.newLocalConnection( CONNECT_PORT )
+    .client_setTimeout(5000)
+
+    .pipeline_addLast("read-handler", new ReadHandler())
+    .pipeline_addLast("connection-handler", new ConnectionListener())
+
+    .asClient();
+```
+
+#### FastRecon.Buffer Examples:
+```java
+byte[] bytes = FastRecon.Buffer.initBytes(buffer -> {
+
+    buffer.writeBoolean(true);
+    buffer.writeInt(512_000);
+    buffer.writeString("github.com");
+});
+```
+
+#### FastRecon.HTTP Examples:
+```java
+String url = "https://some-url/";
+...
+
+FastRecon.HTTP.fastHttpConnect(url, (callback, error) -> {
+
+    if (error != null) {
+        error.printStackTrace();
+        return;
+    }
+    
+    System.out.println(callback);
+});
+```
+
+#### FastRecon.Machine Examples:
+```java
+Server server = FastRecon.Machine.fastBind("127.0.0.1", BIND_PORT, null);
+Client client = FastRecon.Machine.fastConnect("127.0.0.1", CONNECT_PORT, null);
+```
+
+---
+## Meta Dump
+
+
+The data dump is very important in 
+interacting and working with the protocol, therefore the 
+library has a UI interface for tracking metric changes
+
+**IN DEVELOPMENT...**

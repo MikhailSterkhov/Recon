@@ -7,13 +7,14 @@ import org.itzstonlex.recon.error.SocketThreadError;
 import org.itzstonlex.recon.factory.BufferFactory;
 import org.itzstonlex.recon.factory.ContextFactory;
 import org.itzstonlex.recon.factory.SocketFactory;
+import org.itzstonlex.recon.handler.ClientReconnectChannelListener;
 import org.itzstonlex.recon.option.ChannelOption;
 import org.itzstonlex.recon.util.InputUtils;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.net.SocketTimeoutException;
 import java.util.function.Consumer;
 
 public final class ClientThreadInitializer
@@ -35,7 +36,6 @@ public final class ClientThreadInitializer
 
 
     private final Data data;
-    private final ExecutorService inactiveServerThread = Executors.newCachedThreadPool();
 
     public ClientThreadInitializer(Data data) {
         this.data = data;
@@ -47,7 +47,7 @@ public final class ClientThreadInitializer
         }
     }
 
-    private void detectOutgoingStream(Socket socket)
+    private void detectOutgoingStream(OutputStream outputStream)
     throws Exception {
 
         ByteStream.Output buffer = data.channel.buffer();
@@ -58,79 +58,153 @@ public final class ClientThreadInitializer
                     buffer
             ));
 
-            socket.getOutputStream().write(buffer.toByteArray());
+            outputStream.write(buffer.toByteArray());
             data.channel.flush();
         }
     }
 
-    private void detectIncomingStream(Socket socket)
-    throws Exception {
-
-        InputStream inputStream = socket.getInputStream();
-
-        if (!InputUtils.isEmpty(inputStream)) {
-            ByteStream.Input buffer = BufferFactory.createPooledInput(
-                    InputUtils.toByteArray(inputStream)
-            );
-
-            executeEvent(channelListener -> channelListener.onRead(data.channel,
-                    ContextFactory.createSuccessEventContext(data.channel, channelListener),
-                    buffer
-            ));
-
-            buffer.reset();
+    private void detectIncomingStream(InputStream inputStream) {
+        if (InputUtils.isEmpty(inputStream)) {
+            return;
         }
+
+        // Push buf read value.
+        ByteStream.Output transformer = BufferFactory.createPooledOutput();
+
+        if (readBuf >= 0) {
+            transformer.writeByte((byte) readBuf);
+        }
+
+        transformer.write(InputUtils.toByteArray(inputStream));
+        readBuf = -1;
+
+        // Read bytes handle.
+        ByteStream.Input buffer = BufferFactory.createPooledInput(
+                transformer.toByteArray()
+        );
+
+        executeEvent(channelListener -> channelListener.onRead(data.channel,
+                ContextFactory.createSuccessEventContext(data.channel, channelListener),
+                buffer
+        ));
     }
 
+    private int readBuf;
     private void detectServerInactive(Socket socket) {
-        inactiveServerThread.execute(() -> {
+        if (socket.isClosed() || data.channel.isClosed()) {
+            return;
+        }
 
+        data.channel.connection().getThread().execute(() -> {
             try {
-                if (InputUtils.isClosed(socket)) {
-                    shutdown(socket);
+                readBuf = socket.getInputStream().read();
+
+                if (readBuf > 0) {
+                    Thread.sleep(5000L);
+
+                    detectServerInactive(socket);
                 }
             }
+            catch (SocketTimeoutException timeoutException) {
+                try {
+                    Thread.sleep(3000L);
+                    detectServerInactive(socket);
 
-            catch (Exception exception) {
-                executeEvent(channelListener -> channelListener.onExceptionCaught(data.channel, new SocketThreadError(exception)));
+                } catch (Exception ignored) {
+                }
+            }
+            catch (Exception ignored) {
+
+                try {
+                    shutdown(socket);
+
+                    Thread.currentThread().interrupt();
+                    Thread.currentThread().stop();
+                }
+                catch (Exception exception) {
+                    executeEvent(channelListener -> channelListener.onExceptionCaught(data.channel, new SocketThreadError(exception)));
+                }
             }
         });
     }
 
-    private void shutdown(Socket socket)
+    private synchronized void shutdown(Socket socket)
     throws Exception {
-
-        // Call event of that connection closed.
-        executeEvent(channelListener -> channelListener.onInactive(
-                ContextFactory.createSuccessEventContext(data.channel, channelListener, new SocketThreadError("Channel was closed"))
-        ));
 
         // Close a connections.
         data.channel.close();
         socket.close();
 
+        // Call event of that connection closed.
+        executeEvent(channelListener -> channelListener.onClosed(
+                ContextFactory.createSuccessEventContext(data.channel, channelListener)
+        ));
+
         // Stop the connection thread.
-        Thread.currentThread().stop();
+        interrupt();
+        stop();
+    }
+
+    private void timedOut(Socket socket)
+            throws Exception {
+
+        // Call event of that connection closed.
+        executeEvent(channelListener -> channelListener.onTimedOut(data.channel,
+                ContextFactory.createErrorEventContext(data.channel, channelListener, new SocketThreadError("timed out"))));
+
+        // Check reconnect status.
+        ClientReconnectChannelListener reconnectHandler
+                = data.channel.pipeline().get(ClientReconnectChannelListener.class);
+
+        if (reconnectHandler != null && reconnectHandler.isThreadAlive()) {
+            data.channel.close();
+            return;
+        }
+
+        // Shutdown the connection.
+        shutdown(socket);
     }
 
     @Override
     public void run() {
         try {
-            Socket socket = SocketFactory.createClientSocket(data.options, data.channel.address(), data.timeout);
 
-            executeEvent(channelListener -> channelListener.onActive(
+            Socket socket = SocketFactory.createClientSocket(data.options, data.channel.address(), data.timeout);
+            long maxConnectionMillis = System.currentTimeMillis() + data.timeout;
+
+            executeEvent(channelListener -> channelListener.onThreadActive(
                     ContextFactory.createSuccessEventContext(data.channel, channelListener)
             ));
 
-            while (!socket.isClosed()) {
-                try {
+            while (!data.channel.isClosed()) {
+
+                // Check timed out.
+                if (!socket.isConnected()) {
+                    if (maxConnectionMillis > 0 && maxConnectionMillis - System.currentTimeMillis() < 0) {
+                        timedOut(socket);
+                        return;
+                    }
+
+                    continue;
+                }
+
+                // Call connected event.
+                if (maxConnectionMillis != 0) {
+                    maxConnectionMillis = 0;
+
+                    executeEvent(channelListener -> channelListener.onConnected(
+                            ContextFactory.createSuccessEventContext(data.channel, channelListener)
+                    ));
+
                     detectServerInactive(socket);
+                }
+
+                try {
+                    // Get filled buffer & send bytes to connection output.
+                    detectOutgoingStream(socket.getOutputStream());
 
                     // Detect received bytes from the server.
-                    detectIncomingStream(socket);
-
-                    // Get filled buffer & send bytes to connection output.
-                    detectOutgoingStream(socket);
+                    detectIncomingStream(socket.getInputStream());
                 }
 
                 catch (Exception exception) {

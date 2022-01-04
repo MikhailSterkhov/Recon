@@ -1,6 +1,8 @@
 package org.itzstonlex.recon.side;
 
-import org.itzstonlex.recon.*;
+import org.itzstonlex.recon.ChannelConfig;
+import org.itzstonlex.recon.RemoteChannel;
+import org.itzstonlex.recon.RemoteConnection;
 import org.itzstonlex.recon.factory.ChannelFactory;
 import org.itzstonlex.recon.init.ChannelInitializer;
 import org.itzstonlex.recon.init.ClientThreadInitializer;
@@ -18,6 +20,7 @@ import java.util.function.Consumer;
 public class Client implements RemoteConnection, RemoteConnection.Connector {
 
     private RemoteChannel channel;
+    private int timeout = -1;
 
     private final ExecutorService thread
             = Executors.newSingleThreadExecutor();
@@ -41,6 +44,11 @@ public class Client implements RemoteConnection, RemoteConnection.Connector {
     }
 
     @Override
+    public ChannelOption[] options() {
+        return optionSet.toArray(new ChannelOption[0]);
+    }
+
+    @Override
     public void setOption(ChannelOption channelOption) {
         optionSet.add(channelOption);
     }
@@ -48,10 +56,13 @@ public class Client implements RemoteConnection, RemoteConnection.Connector {
     @Override
     public void shutdown() throws IOException {
         if (channel != null) {
-
-            channel.write(-18);
             channel.close();
         }
+    }
+
+    @Override
+    public int timeout() {
+        return timeout;
     }
 
     @Override
@@ -81,7 +92,7 @@ public class Client implements RemoteConnection, RemoteConnection.Connector {
 
     @Override
     public RemoteChannel connect(InetSocketAddress address, Consumer<ChannelConfig> config) {
-        return connect(address, 5000, null);
+        return connect(address, 5000, config);
     }
 
     @Override
@@ -97,7 +108,7 @@ public class Client implements RemoteConnection, RemoteConnection.Connector {
         ClientThreadInitializer.Data clientData = new ClientThreadInitializer.Data (
                 channel,
                 optionSet.toArray(new ChannelOption[0]),
-                timeout
+                this.timeout = timeout
         );
 
         new ClientThreadInitializer(clientData).start();

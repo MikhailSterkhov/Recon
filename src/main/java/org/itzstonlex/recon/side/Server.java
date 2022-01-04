@@ -41,6 +41,11 @@ public class Server implements RemoteConnection, RemoteConnection.Binder {
     }
 
     @Override
+    public ChannelOption[] options() {
+        return optionSet.toArray(new ChannelOption[0]);
+    }
+
+    @Override
     public void setOption(ChannelOption channelOption) {
         optionSet.add(channelOption);
     }

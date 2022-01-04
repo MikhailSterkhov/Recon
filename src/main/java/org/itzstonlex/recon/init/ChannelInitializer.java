@@ -2,10 +2,12 @@ package org.itzstonlex.recon.init;
 
 import org.itzstonlex.recon.*;
 import org.itzstonlex.recon.factory.BufferFactory;
+import org.itzstonlex.recon.handler.ClientReconnectChannelListener;
 import org.itzstonlex.recon.log.ConnectionLogger;
 import org.itzstonlex.recon.option.ChannelOption;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 public class ChannelInitializer implements RemoteChannel {
@@ -17,6 +19,12 @@ public class ChannelInitializer implements RemoteChannel {
         public Config(RemoteConnection connection, RemoteChannel channel) {
             this.connection = connection;
             this.channel = channel;
+        }
+
+        @Override
+        public void addClientReconnector(boolean hasDebug, long delay, TimeUnit unit) {
+            channel.pipeline().putLast(ClientReconnectChannelListener.PIPELINE_ID,
+                    new ClientReconnectChannelListener(connection, delay, unit, hasDebug));
         }
 
         @Override
@@ -107,6 +115,11 @@ public class ChannelInitializer implements RemoteChannel {
 
         this.buffer.reset();
         this.buffer = null;
+    }
+
+    @Override
+    public void forceOpen() {
+        this.closed = false;
     }
 
     @Override

@@ -5,7 +5,10 @@ import org.itzstonlex.recon.ContextHandler;
 import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.RemoteConnection;
 import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
+import org.itzstonlex.recon.handler.ClientReconnectChannelListener;
 import org.itzstonlex.recon.handler.PacketHandler;
+
+import java.util.concurrent.TimeUnit;
 
 public class ClientTest {
 
@@ -16,6 +19,8 @@ public class ClientTest {
 
     public void launchApplication(Client client) {
         client.connectLocal(1010, config -> {
+
+            config.addClientReconnector(true, 5, TimeUnit.SECONDS);
 
             config.pipeline().putLast("connection-listener", new ConnectionListener(client));
             config.pipeline().putAfter("connection-listener", "packet-handler", new PacketHandler());
@@ -32,13 +37,18 @@ public class ClientTest {
         }
 
         @Override
-        public void onActive(ContextHandler contextHandler) {
+        public void onThreadActive(ContextHandler contextHandler) {
+            connection.logger().info("[Client] Connecting... ");
+        }
+
+        @Override
+        public void onConnected(ContextHandler contextHandler) {
             connection.logger().info("[Client] Connection was success connected on "
                     + contextHandler.channel().address());
         }
 
         @Override
-        public void onInactive(ContextHandler contextHandler) {
+        public void onClosed(ContextHandler contextHandler) {
             connection.logger().info("[Client] Connection is closed!");
         }
 
@@ -51,9 +61,18 @@ public class ClientTest {
 
         @Override
         public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {
-            connection.logger().severe(throwable.getMessage());
 
-            super.onExceptionCaught(remoteChannel, throwable);
+            // Check reconnect status.
+            ClientReconnectChannelListener reconnectHandler
+                    = remoteChannel.pipeline().get(ClientReconnectChannelListener.class);
+
+            if (reconnectHandler != null && reconnectHandler.isThreadAlive()) {
+                return;
+            }
+
+            // throw exceptions.
+            connection.logger().severe(throwable.getMessage());
+            throwable.printStackTrace();
         }
     }
 
