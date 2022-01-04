@@ -245,7 +245,7 @@ listener to check the data it needs and start the reconnection task.
 ```java
 Client client = new Client();
 
-client.connectLocal(1010, config -> {
+client.connectLocal(CONNECT_PORT, config -> {
     
     // vars init.
     boolean hasDebug = true;
