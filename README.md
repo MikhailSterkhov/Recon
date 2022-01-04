@@ -136,9 +136,9 @@ sides of the connection:
 - For all:
     - `onThreadActive(ContextHandler contextHandler)`
     - `onClosed(ContextHandler contextHandler)`
-    - `void onRead(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Input buffer)`
-    - `void onWrite(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Output buffer)`
-    - `void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable)`
+    - `onRead(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Input buffer)`
+    - `onWrite(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Output buffer)`
+    - `onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable)`
 ---
 
 ## Bytes Write
