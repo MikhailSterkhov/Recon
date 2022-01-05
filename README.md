@@ -22,6 +22,13 @@
 
 ---
 
+## Recon Modules
+
+* **MinecraftRecon**: [Click to redirect](minecraft-recon)
+* **WebRecon**: In development...
+
+---
+
 ## Use & Installation
 
 soon...
