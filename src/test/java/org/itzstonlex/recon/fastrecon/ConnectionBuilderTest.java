@@ -44,10 +44,10 @@ public class ConnectionBuilderTest {
 
         @Override
         public void onRead(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Input buffer) {
-            byte[] bytes = BufferFactory.transformOutput(buffer).toByteArray();
+            byte[] bytes = BufferFactory.transformOutput(buffer).array();
 
             remoteChannel.logger().info("Bytes read: " + Arrays.toString(bytes));
-            buffer.reset();
+            buffer.flush();
         }
     }
 

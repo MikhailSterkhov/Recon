@@ -58,7 +58,7 @@ public final class ClientThreadInitializer
                     buffer
             ));
 
-            outputStream.write(buffer.toByteArray());
+            outputStream.write(buffer.array());
             data.channel.flush();
         }
     }
@@ -80,7 +80,7 @@ public final class ClientThreadInitializer
 
         // Read bytes handle.
         ByteStream.Input buffer = BufferFactory.createPooledInput(
-                transformer.toByteArray()
+                transformer.array()
         );
 
         executeEvent(channelListener -> channelListener.onRead(data.channel,

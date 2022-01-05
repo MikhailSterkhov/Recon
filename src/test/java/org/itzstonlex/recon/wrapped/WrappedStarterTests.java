@@ -6,4 +6,5 @@ public class WrappedStarterTests {
         new WrappedServer().bind();
         new WrappedClient().connect();
     }
+
 }

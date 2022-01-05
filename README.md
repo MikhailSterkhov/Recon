@@ -173,7 +173,6 @@ For example:
 import org.itzstonlex.recon.ByteStream;
 import org.itzstonlex.recon.ContextHandler;
 import org.itzstonlex.recon.RemoteChannel;
-import org.itzstonlex.recon.factory.BufferFactory;
 import org.itzstonlex.recon.handler.OutgoingByteHandler;
 
 import java.util.Arrays;
@@ -181,10 +180,10 @@ import java.util.Arrays;
 public class WriteHandler extends OutgoingByteHandler {
 
     @Override
-    public void onWrite(RemoteChannel remoteChannel, ContextHandler contextHandler, 
+    public void onWrite(RemoteChannel remoteChannel, ContextHandler contextHandler,
                         ByteStream.Output buffer) {
-        
-        byte[] bytes = buffer.toByteArray();
+
+        byte[] bytes = buffer.array();
 
         // ...handle write bytes
         remoteChannel.logger().info("onWrite: [bytes]:" + Arrays.toString(bytes));
@@ -212,11 +211,11 @@ import java.util.Arrays;
 public class ReadHandler extends IncomingByteHandler {
 
     @Override
-    public void onRead(RemoteChannel remoteChannel, ContextHandler contextHandler, 
+    public void onRead(RemoteChannel remoteChannel, ContextHandler contextHandler,
                        ByteStream.Input buffer) {
-        
+
         byte[] bytes = BufferFactory.transformOutput(buffer)
-                .toByteArray();
+                .array();
 
         // ...read or handle bytes
         remoteChannel.logger().info("onRead: [bytes]:" + Arrays.toString(bytes));

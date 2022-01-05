@@ -10,9 +10,7 @@ import org.itzstonlex.recon.option.ChannelOption;
 import org.itzstonlex.recon.side.Client;
 import org.itzstonlex.recon.util.InputUtils;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -136,7 +134,7 @@ public final class ServerThreadInitializer
 
         // Read bytes handle.
         ByteStream.Input buffer = BufferFactory.createPooledInput(
-                transformer.toByteArray()
+                transformer.array()
         );
 
         executeEvent(channelListener -> channelListener.onRead(clientChannel,
@@ -158,7 +156,7 @@ public final class ServerThreadInitializer
                 buffer
         ));
 
-        socket.getOutputStream().write(buffer.toByteArray());
+        socket.getOutputStream().write(buffer.array());
         clientChannel.flush();
     }
 

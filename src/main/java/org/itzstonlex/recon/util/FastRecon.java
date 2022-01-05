@@ -202,7 +202,7 @@ public final class FastRecon {
                 bufferAppender.accept(buffer);
             }
 
-            return buffer.toByteArray();
+            return buffer.array();
         }
 
         public static byte[] initBytes(int packetID, Consumer<ByteStream.Output> bufferAppender) {
@@ -213,11 +213,11 @@ public final class FastRecon {
                 bufferAppender.accept(buffer);
             }
 
-            return buffer.toByteArray();
+            return buffer.array();
         }
 
         public static byte[] transformInput(ByteStream.Input input) {
-            return BufferFactory.transformOutput(input).toByteArray();
+            return BufferFactory.transformOutput(input).array();
         }
     }
 

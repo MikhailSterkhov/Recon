@@ -1,6 +1,10 @@
 package org.itzstonlex.recon;
 
 import java.nio.charset.Charset;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public interface ByteStream {
@@ -14,19 +18,26 @@ public interface ByteStream {
     Output newOutput();
 
 
-    interface Input {
+    interface Buffer {
 
         int size();
+
+        void flush();
 
         byte array(int index);
 
         byte[] array();
+    }
+
+    interface Input extends Buffer {
 
         byte[] read(int length);
 
         byte readByte();
 
         int readInt();
+
+        long readLong();
 
         float readFloat();
 
@@ -42,12 +53,28 @@ public interface ByteStream {
 
         String readString();
 
+        List<String> readStringList();
+
+        int[] readIntArray();
+
+        long[] readLongArray();
+
+        float[] readFloatArray();
+
+        double[] readDoubleArray();
+
+        boolean[] readBooleanArray();
+
+        <R, C extends Collection<R>> C readCollection(Supplier<C> collectionInstance, Function<Input, R> reader);
+
+        <R> R[] readArray(Function<Input, R> reader);
+
         <R extends ByteSerializable<?>> R readObject(Supplier<R> instance);
 
-        void reset();
+        Input copy();
     }
 
-    interface Output {
+    interface Output extends Buffer {
 
         void write(byte[] bytes);
 
@@ -55,21 +82,37 @@ public interface ByteStream {
 
         void writeInt(int value);
 
+        void writeLong(long value);
+
         void writeFloat(float value);
 
         void writeDouble(double value);
 
-        void writeBoolean(boolean flag);
+        void writeBoolean(boolean value);
 
         void writeString(String value, Charset charset);
 
         void writeString(String value);
 
+        void writeStringList(List<String> value);
+
+        void writeIntArray(int... value);
+
+        void writeLongArray(long... value);
+
+        void writeFloatArray(float... value);
+
+        void writeDoubleArray(double... value);
+
+        void writeBooleanArray(boolean... value);
+
+        <R> void writeCollection(Collection<R> collection, BiConsumer<R, Output> writer);
+
+        <R> void writeArray(R[] array, BiConsumer<R, Output> writer);
+
         void writeObject(ByteSerializable<?> value);
 
-        void reset();
-
-        byte[] toByteArray();
+        Output copy();
     }
 
 }

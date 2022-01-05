@@ -8,7 +8,7 @@ public class BufferTest {
         ByteStream.Output buffer = BufferFactory.createPooledOutput();
 
         write( buffer );
-        read( BufferFactory.createPooledInput(buffer.toByteArray()) );
+        read( BufferFactory.createPooledInput(buffer.array()) );
     }
 
     public static void write(ByteStream.Output buffer) {

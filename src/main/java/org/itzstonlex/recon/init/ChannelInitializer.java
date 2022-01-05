@@ -113,7 +113,7 @@ public class ChannelInitializer implements RemoteChannel {
             return;
         }
 
-        this.buffer.reset();
+        this.buffer.flush();
         this.buffer = null;
     }
 
