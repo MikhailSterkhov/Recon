@@ -24,8 +24,8 @@
 
 ## Recon Modules
 
-* **MinecraftRecon**: [Click to redirect](minecraft-recon)
-* **WebRecon**: In development...
+* **MinecraftRecon**: [[Left Click]](minecraft-recon)
+* **HttpRecon**: [[Left Click]](http-recon)
 
 ---
 
@@ -90,6 +90,7 @@ changes in time and perform the necessary processes
 related to channels and processing bytes
 
 #### Server Examples:
+
 ```java
 import org.itzstonlex.recon.ContextHandler;
 import org.itzstonlex.recon.RemoteChannel;
@@ -97,21 +98,21 @@ import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
 
 public class ServerChannelListener extends ChannelListenerAdapter {
 
-    @Override
-    public void onConnected(ContextHandler contextHandler) {
-        System.out.println("[Server] Connection was success bind on "
-                + contextHandler.channel().address());
-    }
+  @Override
+  public void onConnected(ContextHandler contextHandler) {
+    System.out.println("[Server] Connection was success bind on "
+            + contextHandler.channel().address());
+  }
 
-    @Override
-    public void onClosed(ContextHandler contextHandler) {
-        System.out.println("[Server] Connection is closed!");
-    }
+  @Override
+  public void onClosed(ContextHandler contextHandler) {
+    System.out.println("[Server] Connection is closed!");
+  }
 
-    @Override
-    public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {
-        throwable.printStackTrace();
-    }
+  @Override
+  public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {
+    throwable.printStackTrace();
+  }
 }
 ```
 ---
