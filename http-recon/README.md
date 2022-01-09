@@ -51,15 +51,15 @@ public class HttpRecon {
 After that, all kinds of request options open before us:
 
 ```java
-[GET]: HttpResponse httpResponse = httpClient.executeGet("SOME-URL");
-[HEAD]: HttpResponse httpResponse = httpClient.executeHead("SOME-URL");
-[POST]: HttpResponse httpResponse = httpClient.executePost("SOME-URL");
-[PUT]: HttpResponse httpResponse = httpClient.executePut("SOME-URL");
-[DELETE]: HttpResponse httpResponse = httpClient.executeDelete("SOME-URL");
-[CONNECT]: HttpResponse httpResponse = httpClient.executeConnect("SOME-URL");
-[OPTIONS]: HttpResponse httpResponse = httpClient.executeOptions("SOME-URL");
-[TRACE]: HttpResponse httpResponse = httpClient.executeTrace("SOME-URL");
-[PATCH]: HttpResponse httpResponse = httpClient.executePatch("SOME-URL");
+[GET]:      HttpResponse httpResponse = httpClient.executeGet("SOME-URL");
+[HEAD]:     HttpResponse httpResponse = httpClient.executeHead("SOME-URL");
+[POST]:     HttpResponse httpResponse = httpClient.executePost("SOME-URL");
+[PUT]:      HttpResponse httpResponse = httpClient.executePut("SOME-URL");
+[DELETE]:   HttpResponse httpResponse = httpClient.executeDelete("SOME-URL");
+[CONNECT]:  HttpResponse httpResponse = httpClient.executeConnect("SOME-URL");
+[OPTIONS]:  HttpResponse httpResponse = httpClient.executeOptions("SOME-URL");
+[TRACE]:    HttpResponse httpResponse = httpClient.executeTrace("SOME-URL");
+[PATCH]:    HttpResponse httpResponse = httpClient.executePatch("SOME-URL");
 ```
 
 And you can also execute a custom request with your own parameters:
