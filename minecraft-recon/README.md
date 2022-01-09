@@ -84,11 +84,11 @@ private final class ServerInitializer
     @Override
     public CoreServer init(RemoteChannel channel, ServerHandshake handshake) {
         String serverName = handshake.getName();
-        String mainWorld = handshake.getMainWorld();
+        boolean isProxy = handshake.isProxy();
 
         InetSocketAddress address = handshake.getAddress();
 
-        return new CoreServer(minecraftCore, channel, serverName, mainWorld, address);
+        return new CoreServer(minecraftCore, channel, isProxy, serverName, address);
     }
 }
 ```
