@@ -67,11 +67,11 @@ public final class DefaultMinecraftManagementService implements MinecraftManagem
         @Override
         public MinecraftServer init(RemoteChannel channel, ServerHandshake handshake) {
             String serverName = handshake.getName();
-            String mainWorld = handshake.getMainWorld();
+            boolean isProxy = handshake.isProxy();
 
             InetSocketAddress address = handshake.getAddress();
 
-            return new MinecraftServer(registry, channel, serverName, mainWorld, address);
+            return new MinecraftServer(registry, channel, isProxy, serverName, address);
         }
     }
 }
