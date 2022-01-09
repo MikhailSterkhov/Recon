@@ -133,19 +133,19 @@ Some of the available events work on specific
 sides of the connection:
 
 - Client: 
-    - `onConnected(ContextHandler contextHandler)`
-    - `onTimedOut(RemoteChannel channel, ContextHandler contextHandler)`
+    - `onConnected(ContextHandler)`
+    - `onTimedOut(RemoteChannel, ContextHandler)`
     
 - Server:
-    - `onClientConnected(RemoteChannel remoteChannel, ContextHandler contextHandler)`
-    - `onClientClosed(RemoteChannel remoteChannel, ContextHandler contextHandler)`
+    - `onClientConnected(RemoteChannel, ContextHandler)`
+    - `onClientClosed(RemoteChannel, ContextHandler)`
 
 - For all:
-    - `onThreadActive(ContextHandler contextHandler)`
-    - `onClosed(ContextHandler contextHandler)`
-    - `onRead(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Input buffer)`
-    - `onWrite(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Output buffer)`
-    - `onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable)`
+    - `onThreadActive(ContextHandler)`
+    - `onClosed(ContextHandler)`
+    - `onRead(RemoteChannel, ContextHandler, ByteStream.Input)`
+    - `onWrite(RemoteChannel, ContextHandler, ByteStream.Output)`
+    - `onExceptionCaught(RemoteChannel, Throwable)`
 ---
 
 ## Bytes Write
