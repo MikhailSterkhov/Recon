@@ -13,6 +13,7 @@
     <modules>
         <module>minecraft-recon</module>
         <module>http-recon</module>
+        <module>annotated-recon</module>
     </modules>
 
     <properties>
