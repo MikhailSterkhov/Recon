@@ -256,7 +256,7 @@ Packet class example:
 ```java
 public final class PlayerChat extends MinecraftPacket {
 
-    // Packet veriables
+    // Packet variables
     private String playerName;
     private String message;
 
