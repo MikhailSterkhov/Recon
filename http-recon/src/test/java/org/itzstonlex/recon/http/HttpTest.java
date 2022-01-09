@@ -1,7 +1,5 @@
 package org.itzstonlex.recon.http;
 
-import org.itzstonlex.recon.http.util.HttpParameters;
-
 public class HttpTest {
 
     public static final String URL
@@ -12,20 +10,15 @@ public class HttpTest {
         HttpResponse httpResponse = httpClient.executeGet(URL);
 
         System.out.println("status-code: " + httpResponse.getStatusCode());
-
         Throwable error = httpResponse.getError();
+
         if (error != null) {
             error.printStackTrace();
+            return;
         }
 
         // OK Response handle.
         System.out.println("callback: " + httpResponse.getCallback());
-
-
-        String someURL = HttpParameters.create("http://SOME-URL/")
-                .addParameter("example_access_token", "example_01928374fhdj29jcmfsdl9ehl")
-                .addParameter("author", "ItzStonlex")
-                .appendParameters();
     }
 
 }

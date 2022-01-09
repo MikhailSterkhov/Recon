@@ -54,15 +54,17 @@ public final class AnnotatedReconScanner {
     }
 
 
-    private static final List<ReconProperty> propertyList = new ArrayList<>();
+    private static final List<ReconProperty> PROPERTIES_LIST
+            = new ArrayList<>();
 
     public static void addProperty(ReconProperty reconProperty) {
-        propertyList.add(reconProperty);
+        PROPERTIES_LIST.add(reconProperty);
     }
 
     public static List<ReconProperty> getPropertyList() {
-        return propertyList;
+        return PROPERTIES_LIST;
     }
+
 
     public static void scanInstance(Object instance) {
         InstanceScanner instanceScanner = new InstanceScanner(instance);
