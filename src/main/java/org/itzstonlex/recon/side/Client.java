@@ -116,7 +116,7 @@ public class Client implements RemoteConnection, RemoteConnection.Connector {
     }
 
     public void initChannel(InetSocketAddress address) {
-        this.channel = ChannelFactory.createClientChannel(address, this);
+        this.channel = ChannelFactory.createChannel(address, this);
     }
 
 }

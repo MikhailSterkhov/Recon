@@ -46,7 +46,7 @@ public final class ServerThreadInitializer
     }
 
     private RemoteChannel newClientChannel(InetSocketAddress address) {
-        return ChannelFactory.createClientChannel(address, new Client());
+        return ChannelFactory.createChannel(address, new Client());
     }
 
     private void executeEvent(Consumer<ChannelListener> handler) {

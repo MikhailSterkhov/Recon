@@ -9,7 +9,8 @@ import java.net.InetSocketAddress;
 
 public abstract class AbstractClient {
 
-    private final InetSocketAddress address;
+    protected final InetSocketAddress address;
+    protected final Client client = new Client();
 
     public AbstractClient(InetSocketAddress address) {
         // unresolved addresses fix.
@@ -35,8 +36,6 @@ public abstract class AbstractClient {
     }
 
     public RemoteChannel connect(int timeout) {
-
-        Client client = new Client();
         return client.connect(address, timeout, config -> initChannel(client.logger(), config));
     }
 
