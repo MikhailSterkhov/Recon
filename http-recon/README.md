@@ -44,6 +44,9 @@ public class HttpRecon {
     }
 }
 ```
+---
+
+## How to execute http request?
 
 After that, all kinds of request options open before us:
 
