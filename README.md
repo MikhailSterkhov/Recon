@@ -24,9 +24,10 @@
 
 ## Recon Modules
 
-* **AnnotatedRecon**: [[Left Click]](annotated-recon)
-* **HttpRecon**: [[Left Click]](http-recon)
-* **MinecraftRecon**: [[Left Click]](minecraft-recon)
+* AnnotatedRecon: [[Left Click]](annotated-recon)
+* HttpRecon: [[Left Click]](http-recon)
+* MetricRecon: [[Left Click]](metrics-recon)
+* MinecraftRecon: [[Left Click]](minecraft-recon)
 
 ---
 
