@@ -147,7 +147,7 @@ ReconMetrics.TOTAL_READS.increment();
 
 ---
 
-### `Initialize:`
+## How to add handlers for the base metric of a module?
 
 The API of this module allows you to both
 create your own custom metric and use template templates,

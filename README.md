@@ -26,7 +26,7 @@
 
 * AnnotatedRecon: [[Link]](annotated-recon)
 * HttpRecon: [[Link]](http-recon)
-* MetricRecon: [[Link]](metrics-recon)
+* MetricsRecon: [[Link]](metrics-recon)
 * MinecraftRecon: [[Link]](minecraft-recon)
 
 ---
