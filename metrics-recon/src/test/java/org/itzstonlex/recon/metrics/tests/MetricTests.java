@@ -60,7 +60,7 @@ public class MetricTests {
 
         @Override
         public void initChannel(ConnectionLogger logger, ChannelConfig channelConfig) {
-            reconMetrics.appendPipeline(channelConfig.pipeline());
+            reconMetrics.initPipelines(channelConfig.pipeline());
 
             Executors.newSingleThreadScheduledExecutor()
                     .scheduleAtFixedRate(() -> {
@@ -82,7 +82,7 @@ public class MetricTests {
 
         @Override
         public void initChannel(ConnectionLogger logger, ChannelConfig channelConfig) {
-            reconMetrics.appendPipeline(channelConfig.pipeline());
+            reconMetrics.initPipelines(channelConfig.pipeline());
 
             channelConfig.pipeline().putLast("connect-handler", new ChannelListenerAdapter() {
 

@@ -2,10 +2,10 @@ package org.itzstonlex.recon.metrics;
 
 import java.util.concurrent.TimeUnit;
 
-public final class MetricTime {
+public final class MetricTimeSnippet {
 
-    public static MetricTime of(long time, TimeUnit unit) {
-        return new MetricTime(time, unit);
+    public static MetricTimeSnippet of(long time, TimeUnit unit) {
+        return new MetricTimeSnippet(time, unit);
     }
 
     private final long value;
@@ -13,7 +13,7 @@ public final class MetricTime {
 
     private final String stringLine;
 
-    private MetricTime(long value, TimeUnit unit) {
+    private MetricTimeSnippet(long value, TimeUnit unit) {
         this.value = value;
         this.unit = unit;
 

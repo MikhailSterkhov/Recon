@@ -13,77 +13,77 @@ public final class MetricCounter {
     private long lastUpdateMillis = System.currentTimeMillis();
     private int value;
 
-    private final Map<MetricTime, Integer> timeSnippetsMap;
+    private final Map<MetricTimeSnippet, Integer> snippetsMap;
 
     MetricCounter(String id, String label) {
         this.id = id;
         this.label = label;
 
         // Metric Cache of Time.
-        timeSnippetsMap = new HashMap<>();
+        snippetsMap = new HashMap<>();
 
         // Seconds.
-        timeSnippetsMap.put(MetricTime.of(1, TimeUnit.SECONDS), 0);
-        timeSnippetsMap.put(MetricTime.of(5, TimeUnit.SECONDS), 0);
-        timeSnippetsMap.put(MetricTime.of(10, TimeUnit.SECONDS), 0);
-        timeSnippetsMap.put(MetricTime.of(15, TimeUnit.SECONDS), 0);
-        timeSnippetsMap.put(MetricTime.of(30, TimeUnit.SECONDS), 0);
+        snippetsMap.put(MetricTimeSnippet.of(1, TimeUnit.SECONDS), 0);
+        snippetsMap.put(MetricTimeSnippet.of(5, TimeUnit.SECONDS), 0);
+        snippetsMap.put(MetricTimeSnippet.of(10, TimeUnit.SECONDS), 0);
+        snippetsMap.put(MetricTimeSnippet.of(15, TimeUnit.SECONDS), 0);
+        snippetsMap.put(MetricTimeSnippet.of(30, TimeUnit.SECONDS), 0);
 
         // Minutes.
-        timeSnippetsMap.put(MetricTime.of(1, TimeUnit.MINUTES), 0);
-        timeSnippetsMap.put(MetricTime.of(5, TimeUnit.MINUTES), 0);
-        timeSnippetsMap.put(MetricTime.of(10, TimeUnit.MINUTES), 0);
-        timeSnippetsMap.put(MetricTime.of(15, TimeUnit.MINUTES), 0);
-        timeSnippetsMap.put(MetricTime.of(30, TimeUnit.MINUTES), 0);
+        snippetsMap.put(MetricTimeSnippet.of(1, TimeUnit.MINUTES), 0);
+        snippetsMap.put(MetricTimeSnippet.of(5, TimeUnit.MINUTES), 0);
+        snippetsMap.put(MetricTimeSnippet.of(10, TimeUnit.MINUTES), 0);
+        snippetsMap.put(MetricTimeSnippet.of(15, TimeUnit.MINUTES), 0);
+        snippetsMap.put(MetricTimeSnippet.of(30, TimeUnit.MINUTES), 0);
 
         // Hours.
-        timeSnippetsMap.put(MetricTime.of(1, TimeUnit.HOURS), 0);
-        timeSnippetsMap.put(MetricTime.of(12, TimeUnit.HOURS), 0);
-        timeSnippetsMap.put(MetricTime.of(24, TimeUnit.HOURS), 0);
+        snippetsMap.put(MetricTimeSnippet.of(1, TimeUnit.HOURS), 0);
+        snippetsMap.put(MetricTimeSnippet.of(12, TimeUnit.HOURS), 0);
+        snippetsMap.put(MetricTimeSnippet.of(24, TimeUnit.HOURS), 0);
     }
 
-    public Set<MetricTime> timeKeys() {
-        return timeSnippetsMap.keySet();
+    public Set<MetricTimeSnippet> timeKeys() {
+        return snippetsMap.keySet();
     }
 
     public void printDump(PrintStream printer) {
         assert printer != null;
 
-        timeSnippetsMap.keySet()
+        snippetsMap.keySet()
                 .stream()
-                .sorted(Comparator.comparingLong(MetricTime::toMillis))
+                .sorted(Comparator.comparingLong(MetricTimeSnippet::toMillis))
 
-                .forEach(metricTime -> printer.printf("[MetricCounter] %s => %s%n",
-                        metricTime, timeSnippetsMap.get(metricTime)));
+                .forEach(metricTimeSnippet -> printer.printf("[Counter-Dump] %s => %s%n",
+                        metricTimeSnippet, snippetsMap.get(metricTimeSnippet)));
     }
 
-    public void addTimeSnippet(MetricTime metricTime) {
-        assert metricTime != null;
+    public void addSnippet(MetricTimeSnippet snippet) {
+        assert snippet != null;
 
         // We check for the presence of a key with the
         // same time for caching to extract the possibility
         // of overwriting values.
-        for (MetricTime current : timeSnippetsMap.keySet()) {
+        for (MetricTimeSnippet current : snippetsMap.keySet()) {
 
-            if (current.toMillis() == metricTime.toMillis()) {
+            if (current.toMillis() == snippet.toMillis()) {
                 return;
             }
         }
 
         // Add new time-key.
-        timeSnippetsMap.put(metricTime, 0);
+        snippetsMap.put(snippet, 0);
     }
 
-    private MetricTime optimalKey(long currentMillis) {
-        MetricTime prev = null;
-        MetricTime result = null;
+    private MetricTimeSnippet optimalKey(long currentMillis) {
+        MetricTimeSnippet prev = null;
+        MetricTimeSnippet result = null;
 
         long nearedTime = 1_000;
 
-        for (MetricTime metricTime : timeSnippetsMap.keySet()) {
+        for (MetricTimeSnippet metricTimeSnippet : snippetsMap.keySet()) {
 
-            if (metricTime.toMillis() == currentMillis) {
-                return metricTime;
+            if (metricTimeSnippet.toMillis() == currentMillis) {
+                return metricTimeSnippet;
             }
 
             if (prev != null) {
@@ -95,17 +95,17 @@ public final class MetricCounter {
                 }
             }
 
-            prev = metricTime;
+            prev = metricTimeSnippet;
         }
 
         return result;
     }
 
     private void _resetValue(long millisFor, int newValue) {
-        for (MetricTime current : timeSnippetsMap.keySet()) {
+        for (MetricTimeSnippet current : snippetsMap.keySet()) {
 
             if (current.toMillis() == millisFor) {
-                timeSnippetsMap.put(current, newValue);
+                snippetsMap.put(current, newValue);
             }
         }
     }
@@ -116,30 +116,30 @@ public final class MetricCounter {
         long currentUpdateMillis = System.currentTimeMillis() - lastUpdateMillis;
 
         if (currentUpdateMillis > 1_000) {
-            MetricTime snippet = optimalKey(currentUpdateMillis);
+            MetricTimeSnippet snippet = optimalKey(currentUpdateMillis);
 
             // If the last update was more than 1 second ago
             if (snippet != null) {
 
-                List<MetricTime> sortedMetricKeysList = timeSnippetsMap.keySet()
+                List<MetricTimeSnippet> sortedMetricKeysList = snippetsMap.keySet()
                         .stream()
-                        .sorted(Comparator.comparingLong(MetricTime::toMillis))
+                        .sorted(Comparator.comparingLong(MetricTimeSnippet::toMillis))
                         .collect(Collectors.toList());
 
                 int snippetIndex = sortedMetricKeysList.indexOf(snippet);
-                int[] cache = sortedMetricKeysList.stream().mapToInt(timeSnippetsMap::get).toArray();
+                int[] cache = sortedMetricKeysList.stream().mapToInt(snippetsMap::get).toArray();
 
                 // Fill values by snippet index as current counter value.
                 for (int current = 1; current <= snippetIndex && current < sortedMetricKeysList.size(); current++) {
 
-                    MetricTime currentSnippet = sortedMetricKeysList.get(current);
+                    MetricTimeSnippet currentSnippet = sortedMetricKeysList.get(current);
                     _resetValue(currentSnippet.toMillis(), cache[0]);
                 }
 
                 // Fill other points from snippet index to cache limit.
                 for (int other = 1; snippetIndex + other < sortedMetricKeysList.size(); other++) {
 
-                    MetricTime otherSnippet = sortedMetricKeysList.get(snippetIndex + other);
+                    MetricTimeSnippet otherSnippet = sortedMetricKeysList.get(snippetIndex + other);
                     _resetValue(otherSnippet.toMillis(), cache[other]);
                 }
 
@@ -160,6 +160,18 @@ public final class MetricCounter {
         set(value - take);
     }
 
+    public void divide(int divide) {
+        set(value / divide);
+    }
+
+    public void multiply(int multiply) {
+        set(value * multiply);
+    }
+
+    public void pow(int exponent) {
+        set((int) Math.pow(value, exponent));
+    }
+
     public void increment() {
         add(1);
     }
@@ -168,36 +180,36 @@ public final class MetricCounter {
         take(1);
     }
 
-    public int valueOf(long timeFor, TimeUnit unit) {
+    public int valueOf(long timePer, TimeUnit unit) {
         // update cache data.
         set(currentValue());
 
         // getting process.
-        long currentMillis = unit.toMillis(timeFor);
+        long currentMillis = unit.toMillis(timePer);
 
         if (currentMillis < 5_000) {
-            for (MetricTime current : timeSnippetsMap.keySet()) {
+            for (MetricTimeSnippet current : snippetsMap.keySet()) {
 
-                if ((current.getTime() == timeFor && current.getUnit() == unit)
-                        || (unit == TimeUnit.MILLISECONDS && current.toMillis() == timeFor)) {
+                if ((current.getTime() == timePer && current.getUnit() == unit)
+                        || (unit == TimeUnit.MILLISECONDS && current.toMillis() == timePer)) {
 
-                    return timeSnippetsMap.get(current);
+                    return snippetsMap.get(current);
                 }
             }
 
             return 0;
         }
 
-        MetricTime optimalKey = optimalKey(currentMillis);
-        return optimalKey != null ? timeSnippetsMap.get(optimalKey) : 0;
+        MetricTimeSnippet optimalSnippet = optimalKey(currentMillis);
+        return optimalSnippet != null ? snippetsMap.get(optimalSnippet) : 0;
     }
 
     public int valueOf(long millisFor) {
         return valueOf(millisFor, TimeUnit.MILLISECONDS);
     }
 
-    public int valueOf(MetricTime metricTime) {
-        return valueOf(metricTime.toMillis());
+    public int valueOf(MetricTimeSnippet snippet) {
+        return valueOf(snippet.toMillis());
     }
 
     public String id() {

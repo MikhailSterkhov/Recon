@@ -48,12 +48,11 @@ public final class ReconMetrics {
         this.metricHandlers = new HashSet<>();
     }
 
-
     public void addPipelineHandler(PipelineMetricHandler metricHandler) {
         metricHandlers.add(metricHandler);
     }
 
-    public void appendPipeline(ChannelPipeline channelPipeline) {
+    public void initPipelines(ChannelPipeline channelPipeline) {
         assert channelPipeline != null;
 
         for (PipelineMetricHandler metricHandler : metricHandlers) {
@@ -61,9 +60,9 @@ public final class ReconMetrics {
         }
     }
 
-    public void appendPipeline(RemoteChannel channel) {
+    public void initPipelines(RemoteChannel channel) {
         ChannelPipeline pipeline = channel.pipeline();
-        appendPipeline(pipeline);
+        initPipelines(pipeline);
     }
 
 }

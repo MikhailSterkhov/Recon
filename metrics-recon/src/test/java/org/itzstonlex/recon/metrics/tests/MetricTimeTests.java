@@ -1,7 +1,7 @@
 package org.itzstonlex.recon.metrics.tests;
 
 import org.itzstonlex.recon.metrics.MetricCounter;
-import org.itzstonlex.recon.metrics.MetricTime;
+import org.itzstonlex.recon.metrics.MetricTimeSnippet;
 import org.itzstonlex.recon.metrics.ReconMetrics;
 
 import java.util.concurrent.Executors;
@@ -13,11 +13,11 @@ public class MetricTimeTests {
     public static void main(String[] args) {
         MetricCounter metricCounter = ReconMetrics.TOTAL_BYTES_WRITE;
 
-        metricCounter.addTimeSnippet(MetricTime.of(20, TimeUnit.SECONDS));
-        metricCounter.addTimeSnippet(MetricTime.of(40, TimeUnit.SECONDS));
-        metricCounter.addTimeSnippet(MetricTime.of(45, TimeUnit.SECONDS));
-        metricCounter.addTimeSnippet(MetricTime.of(50, TimeUnit.SECONDS));
-        metricCounter.addTimeSnippet(MetricTime.of(55, TimeUnit.SECONDS));
+        metricCounter.addSnippet(MetricTimeSnippet.of(20, TimeUnit.SECONDS));
+        metricCounter.addSnippet(MetricTimeSnippet.of(40, TimeUnit.SECONDS));
+        metricCounter.addSnippet(MetricTimeSnippet.of(45, TimeUnit.SECONDS));
+        metricCounter.addSnippet(MetricTimeSnippet.of(50, TimeUnit.SECONDS));
+        metricCounter.addSnippet(MetricTimeSnippet.of(55, TimeUnit.SECONDS));
 
         metricCounter.add(10);
         metricCounter.printDump(System.out);

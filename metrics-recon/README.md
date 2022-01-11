@@ -58,8 +58,8 @@ Let's use `ReconMetrics.TOTAL_READS` as an example:
 ```java
 MetricCounter metricCounter = ReconMetrics.TOTAL_READS;
 
-metricCounter.addTimeSnippet(MetricTime.of(20, TimeUnit.SECONDS));
-metricCounter.addTimeSnippet(MetricTime.of(4, TimeUnit.DAYS));
+metricCounter.addSnippet( MetricTimeSnippet.of(20, TimeUnit.SECONDS) );
+metricCounter.addSnippet( MetricTimeSnippet.of(4, TimeUnit.DAYS) );
 // ...and more
 ```
 
@@ -74,6 +74,8 @@ receiving ready-made data and registering it in
 the remote connection channel:
 
 ```java
+import org.itzstonlex.recon.metrics.ReconMetrics;
+
 public class ExampleServer extends AbstractServer {
     private final ReconMetrics reconMetrics;
 
@@ -85,9 +87,9 @@ public class ExampleServer extends AbstractServer {
 
     @Override
     public void initChannel(ConnectionLogger logger, ChannelConfig channelConfig) {
-        
+
         // Registration of a prepared metric.
-        reconMetrics.appendPipeline(channelConfig.pipeline());
+        reconMetrics.initPipelines(channelConfig.pipeline());
     }
 }
 ```
@@ -101,13 +103,11 @@ what exactly you need: Get a value from a certain period of
 time or the current value.
 
 ```java
-int totalReads = ReconMetrics.TOTAL_READS
-        .currentValue();
+int totalReads = ReconMetrics.TOTAL_READS.currentValue();
 ```
 
 ```java
-int totalReadsInFiveSeconds = ReconMetrics.TOTAL_READS
-        .valueOf(5, TimeUnit.SECONDS);
+int totalReadsInFiveSeconds = ReconMetrics.TOTAL_READS.valueOf(5, TimeUnit.SECONDS);
 ```
 
 And also there is the possibility of a quick dump of the counter:
@@ -127,17 +127,20 @@ does everything for you.
 
 To update values, it is possible to use methods such as 
 `MetricCounter#increment()`, `MetricCounter#decrement()`, 
-`MetricCounter#add(int)`, `MetricCounter#take(int)` and 
-`MetricCounter#set(int)`
+`MetricCounter#add(int)`, `MetricCounter#take(int)`, 
+`MetricCounter#divide(int)`, `MetricCounter#multiply(int)`, 
+`MetricCounter#pow(int)` and `MetricCounter#set(int)`
 
 For example:
 
 ```java
 ReconMetrics.TOTAL_READS.set(53);
 
-ReconMetrics.TOTAL_READS.add(10_000);
+ReconMetrics.TOTAL_READS.divide(5);
 
-ReconMetrics.TOTAL_READS.decrement();
+ReconMetrics.TOTAL_READS.multiply(10);
+
+ReconMetrics.TOTAL_READS.increment();
 
 // ...and more
 ```
