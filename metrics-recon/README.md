@@ -65,34 +65,34 @@ metricCounter.addSnippet( MetricTimeSnippet.of(4, TimeUnit.DAYS) );
 
 ---
 
-## How to create, get or update metrics data?
+## How to manage and monitor metric values?
+
+`MetricCounter` - Class for managing data, cache 
+and metric values, sharpened for a unique identifier.
+
+Below we will look at a few basic ways 
+to manage and configure this utility.
+
+---
+
 ### `Create:`
 
-The API of this module allows you to both 
-create your own custom metric and use template templates, 
-receiving ready-made data and registering it in 
-the remote connection channel:
+Creating your own counters takes place through a simple factory:
 
 ```java
-import org.itzstonlex.recon.metrics.ReconMetrics;
+String id = "example_counter";
+String label = "Metrics counter for Example."
 
-public class ExampleServer extends AbstractServer {
-    private final ReconMetrics reconMetrics;
-
-    public ExampleServer(ReconMetrics reconMetrics) {
-        super("localhost", 3305);
-
-        this.reconMetrics = reconMetrics;
-    }
-
-    @Override
-    public void initChannel(ConnectionLogger logger, ChannelConfig channelConfig) {
-
-        // Registration of a prepared metric.
-        reconMetrics.initPipelines(channelConfig.pipeline());
-    }
-}
+MetricCounter counter = MetricCounter.newCounter(id, label);
 ```
+
+
+After that, full control of its data is transferred to you:
+* Changing values;
+* Adding new slots for caching;
+* Cleaning values;
+
+...and more
 
 ---
 
@@ -143,4 +143,34 @@ ReconMetrics.TOTAL_READS.multiply(10);
 ReconMetrics.TOTAL_READS.increment();
 
 // ...and more
+```
+
+---
+
+### `Initialize:`
+
+The API of this module allows you to both
+create your own custom metric and use template templates,
+receiving ready-made data and registering it in
+the remote connection channel:
+
+```java
+import org.itzstonlex.recon.metrics.ReconMetrics;
+
+public class ExampleServer extends AbstractServer {
+    private final ReconMetrics reconMetrics;
+
+    public ExampleServer(ReconMetrics reconMetrics) {
+        super("localhost", 3305);
+
+        this.reconMetrics = reconMetrics;
+    }
+
+    @Override
+    public void initChannel(ConnectionLogger logger, ChannelConfig channelConfig) {
+
+        // Registration of a prepared metric.
+        reconMetrics.initPipelines(channelConfig.pipeline());
+    }
+}
 ```

@@ -7,6 +7,14 @@ import java.util.stream.Collectors;
 
 public final class MetricCounter {
 
+    public static MetricCounter newCounter(String id, String label) {
+        return new MetricCounter(id, label);
+    }
+
+    public static MetricCounter newCounter(String id) {
+        return new MetricCounter(id, "N/A");
+    }
+
     private final String id;
     private final String label;
 
@@ -15,7 +23,7 @@ public final class MetricCounter {
 
     private final Map<MetricTimeSnippet, Integer> snippetsMap;
 
-    MetricCounter(String id, String label) {
+    private MetricCounter(String id, String label) {
         this.id = id;
         this.label = label;
 
@@ -72,6 +80,10 @@ public final class MetricCounter {
 
         // Add new time-key.
         snippetsMap.put(snippet, 0);
+    }
+
+    public void clearValues() {
+        snippetsMap.replaceAll((metricTimeSnippet, integer) -> 0);
     }
 
     private MetricTimeSnippet optimalKey(long currentMillis) {
