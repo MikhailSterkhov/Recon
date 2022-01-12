@@ -318,13 +318,3 @@ FastRecon.HTTP.fastHttpConnect(url, (callback, error) -> {
 Server server = FastRecon.Machine.fastBind("127.0.0.1", BIND_PORT, null);
 Client client = FastRecon.Machine.fastConnect("127.0.0.1", CONNECT_PORT, null);
 ```
-
----
-## Meta Dump
-
-
-The data dump is very important in 
-interacting and working with the protocol, therefore the 
-library has a UI interface for tracking metric changes
-
-**IN DEVELOPMENT...**
