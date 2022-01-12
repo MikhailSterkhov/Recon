@@ -192,6 +192,20 @@ public final class MetricCounter {
         take(1);
     }
 
+    public int maxValue() {
+        int max = currentValue();
+
+        for (MetricTimeSnippet snippet : snippetsMap.keySet()) {
+            int value = snippetsMap.get(snippet);
+
+            if (value > max) {
+                max = value;
+            }
+        }
+
+        return max;
+    }
+
     public int valueOf(long timePer, TimeUnit unit) {
         // update cache data.
         set(currentValue());
