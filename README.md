@@ -28,6 +28,7 @@
 * HttpRecon: [[Link]](http-recon)
 * MetricsRecon: [[Link]](metrics-recon)
 * MinecraftRecon: [[Link]](minecraft-recon)
+* UILauncherRecon: [[Link]](launcher-ui-recon)
 
 ---
 
