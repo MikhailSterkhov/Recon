@@ -65,7 +65,7 @@ public class ChannelOption {
 
         public void apply(ServerSocket serverSocket, Object value) {
             try {
-                serverSocket.setOption(impl, value);
+                serverSocket.getChannel().setOption(impl, value);
             }
             catch (IOException exception) {
                 throw new SocketSetOptionError(exception);
@@ -74,7 +74,7 @@ public class ChannelOption {
 
         public void apply(Socket socket, Object value) {
             try {
-                socket.setOption(impl, value);
+                socket.getChannel().setOption(impl, value);
             }
             catch (IOException exception) {
                 throw new SocketSetOptionError(exception);

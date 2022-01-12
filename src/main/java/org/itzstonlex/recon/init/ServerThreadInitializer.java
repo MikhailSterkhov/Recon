@@ -23,6 +23,8 @@ import java.util.function.Consumer;
 public final class ServerThreadInitializer
         extends Thread {
 
+    private static int threadsCounter = 1;
+
     public static final class Data {
 
         public final RemoteChannel channel;
@@ -42,6 +44,7 @@ public final class ServerThreadInitializer
     private final Map<Socket, RemoteChannel> connected = new ConcurrentHashMap<>();
 
     public ServerThreadInitializer(Data data) {
+        super("recon-server-" + threadsCounter++);
         this.data = data;
     }
 

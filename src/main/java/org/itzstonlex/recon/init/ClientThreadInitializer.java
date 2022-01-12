@@ -20,6 +20,8 @@ import java.util.function.Consumer;
 public final class ClientThreadInitializer
         extends Thread {
 
+    private static int threadsCounter = 1;
+
     public static final class Data {
 
         public final RemoteChannel channel;
@@ -38,6 +40,7 @@ public final class ClientThreadInitializer
     private final Data data;
 
     public ClientThreadInitializer(Data data) {
+        super("recon-client-" + threadsCounter++);
         this.data = data;
     }
 
