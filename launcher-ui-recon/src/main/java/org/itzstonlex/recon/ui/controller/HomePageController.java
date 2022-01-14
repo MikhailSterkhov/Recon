@@ -2,15 +2,16 @@ package org.itzstonlex.recon.ui.controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.chart.*;
+import javafx.geometry.NodeOrientation;
+import javafx.geometry.Side;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.*;
 import javafx.scene.control.Label;
-import javafx.scene.control.Menu;
 import javafx.scene.control.MenuItem;
-import javafx.scene.control.ProgressBar;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.Region;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.itzstonlex.recon.metrics.MetricCounter;
@@ -22,13 +23,12 @@ import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.*;
-import java.util.List;
-import java.util.concurrent.ThreadLocalRandom;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public final class HomePageController extends AbstractPageController {
 
@@ -63,6 +63,22 @@ public final class HomePageController extends AbstractPageController {
     private GridPane graphicsGridPane;
 
 
+    @FXML
+    private CheckBox settings_createPoints;
+
+    @FXML
+    private CheckBox settings_chartsAnimated;
+
+    @FXML
+    private MenuItem settings_displaySide_left;
+
+    @FXML
+    private MenuItem settings_displaySide_right;
+
+    @FXML
+    private CheckBox settings_stateColor;
+
+
     @Override
     public void initialize() {
         addHelpMenuActions();
@@ -72,6 +88,8 @@ public final class HomePageController extends AbstractPageController {
         startGraphicsUpdater();
 
         startMemoriesUpdater(Runtime.getRuntime());
+
+        initGraphicsDisplaySettings();
     }
 
 
@@ -94,31 +112,33 @@ public final class HomePageController extends AbstractPageController {
                         label.setFont(new Font(16));
                     }
 
-                    switch (thread.getState()) {
-                        case NEW: {
-                            label.setTextFill(Color.LIME);
-                            break;
-                        }
+                    if (settings_stateColor.isSelected()) {
+                        switch (thread.getState()) {
+                            case NEW: {
+                                label.setTextFill(Color.LIME);
+                                break;
+                            }
 
-                        case BLOCKED: {
-                            label.setTextFill(Color.RED);
-                            break;
-                        }
+                            case BLOCKED: {
+                                label.setTextFill(Color.RED);
+                                break;
+                            }
 
-                        case WAITING:
-                        case TIMED_WAITING: {
-                            label.setTextFill(Color.ORANGE);
-                            break;
-                        }
+                            case WAITING:
+                            case TIMED_WAITING: {
+                                label.setTextFill(Color.ORANGE);
+                                break;
+                            }
 
-                        case TERMINATED: {
-                            label.setTextFill(Color.DARKRED);
-                            break;
-                        }
+                            case TERMINATED: {
+                                label.setTextFill(Color.DARKRED);
+                                break;
+                            }
 
-                        case RUNNABLE: {
-                            label.setTextFill(Color.GREEN);
-                            break;
+                            case RUNNABLE: {
+                                label.setTextFill(Color.GREEN);
+                                break;
+                            }
                         }
                     }
 
@@ -142,6 +162,36 @@ public final class HomePageController extends AbstractPageController {
 
     private final Map<Integer, LineChart<String, Number>> graphicsMap
             = new HashMap<>();
+
+    private void initGraphicsDisplaySettings() {
+        settings_displaySide_left.setOnAction(event -> {
+
+            for (LineChart<String, Number> lineChart : graphicsMap.values()) {
+                lineChart.setNodeOrientation(NodeOrientation.LEFT_TO_RIGHT);
+            }
+        });
+
+        settings_displaySide_right.setOnAction(event -> {
+
+            for (LineChart<String, Number> lineChart : graphicsMap.values()) {
+                lineChart.setNodeOrientation(NodeOrientation.RIGHT_TO_LEFT);
+            }
+        });
+
+        settings_createPoints.setOnAction(event -> {
+
+            for (LineChart<String, Number> lineChart : graphicsMap.values()) {
+                lineChart.setCreateSymbols(settings_createPoints.isSelected());
+            }
+        });
+
+        settings_chartsAnimated.setOnAction(event -> {
+
+            for (LineChart<String, Number> lineChart : graphicsMap.values()) {
+                lineChart.setAnimated(settings_chartsAnimated.isSelected());
+            }
+        });
+    }
 
     private void updateGraphicNode(MetricCounter metricCounter,
                                    XYChart.Series<String, Number> series) {
@@ -174,6 +224,7 @@ public final class HomePageController extends AbstractPageController {
         NumberAxis yAxis = new NumberAxis();
 
         LineChart<String, Number> lineChart = new LineChart<>(xAxis, yAxis);
+        lineChart.setAnimated(false);
         lineChart.setTitle(title);
 
         lineChart.setAxisSortingPolicy(LineChart.SortingPolicy.X_AXIS);
@@ -215,7 +266,7 @@ public final class HomePageController extends AbstractPageController {
                 this.created = true;
             }
 
-        }.runTimer(0, 10, TimeUnit.SECONDS);
+        }.runTimer(0, 2, TimeUnit.SECONDS);
     }
 
     private void updateMemoryStatus(Runtime runtime) {
@@ -229,6 +280,10 @@ public final class HomePageController extends AbstractPageController {
     }
 
     private void startMemoriesUpdater(Runtime runtime) {
+        memoryProgress.setPrefHeight(16);
+        memoryProgress.setMinHeight(16);
+        memoryProgress.setMaxHeight(16);
+
         new TaskScheduler("memory_updater_recon") {
 
             @Override

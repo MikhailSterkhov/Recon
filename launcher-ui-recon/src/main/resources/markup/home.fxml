@@ -33,20 +33,23 @@
 -->
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ProgressBar?>
 <?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
-<?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
 <VBox prefHeight="600.0" prefWidth="900.0" styleClass="labels" stylesheets="@../css/home.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.itzstonlex.recon.ui.controller.HomePageController">
@@ -126,10 +129,14 @@
                                             <content>
                                               <AnchorPane>
                                                    <children>
-                                                      <GridPane fx:id="graphicsGridPane" gridLinesVisible="true" prefHeight="505.0" prefWidth="433.0" styleClass="panel">
+                                                      <GridPane fx:id="graphicsGridPane" gridLinesVisible="true" layoutY="-1.0" prefHeight="505.0" prefWidth="433.0" styleClass="panel">
                                                         <columnConstraints>
                                                           <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                                         </columnConstraints>
+                                                         <rowConstraints>
+                                                            <RowConstraints />
+                                                            <RowConstraints />
+                                                         </rowConstraints>
                                                       </GridPane>
                                                    </children>
                                                 </AnchorPane>
@@ -147,14 +154,64 @@
         </AnchorPane>
             <AnchorPane prefHeight="549.0" prefWidth="370.0" styleClass="panel">
                <children>
-                  <Label alignment="CENTER" contentDisplay="CENTER" layoutY="-4.0" maxHeight="1.7976931348623157E308" maxWidth="-1.0" prefHeight="551.0" prefWidth="224.0" text="Empty">
-                     <font>
-                        <Font size="11.0" fx:id="x31" />
-                     </font>
-                     <textFill>
-                        <Color red="0.625" green="0.625" blue="0.625" fx:id="x41" />
-                     </textFill>
-                  </Label>
+                  <SplitPane dividerPositions="0.062157221206581355, 0.4753199268738574" layoutX="-5.0" layoutY="1.0" orientation="VERTICAL" prefHeight="549.0" prefWidth="231.0">
+                     <items>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" styleClass="frame">
+                           <children>
+                              <Label contentDisplay="CENTER" layoutX="11.0" layoutY="2.0" prefHeight="27.0" prefWidth="201.0" text="Display Settings:" textFill="#727272" wrapText="true">
+                                 <font>
+                                    <Font name="Microsoft Tai Le" size="14.0" />
+                                 </font>
+                              </Label>
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                           <children>
+                              <Label contentDisplay="CENTER" layoutX="17.0" layoutY="6.0" prefHeight="27.0" prefWidth="201.0" text="Graphics:" textFill="#727272" wrapText="true">
+                                 <font>
+                                    <Font name="Microsoft Tai Le" size="16.0" />
+                                 </font>
+                              </Label>
+                              <CheckBox fx:id="settings_createPoints" layoutX="20.0" layoutY="41.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="96.0" selected="true" text="Create Points" textFill="#433e3e" wrapText="true">
+                                 <font>
+                                    <Font name="Microsoft Tai Le" size="12.0" />
+                                 </font>
+                              </CheckBox>
+                              <CheckBox fx:id="settings_chartsAnimated" layoutX="20.0" layoutY="68.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="96.0" text="Animated" textFill="#433e3e" wrapText="true">
+                                 <font>
+                                    <Font name="Microsoft Tai Le" size="12.0" />
+                                 </font>
+                              </CheckBox>
+                              <MenuButton fx:id="settings_displaySide" layoutX="18.0" layoutY="183.0" mnemonicParsing="false" popupSide="TOP" text="Display Side" textFill="#433e3e">
+                                <items>
+                                  <MenuItem fx:id="settings_displaySide_left" mnemonicParsing="false" text="Left" />
+                                  <MenuItem fx:id="settings_displaySide_right" mnemonicParsing="false" text="Right" />
+                                </items>
+                                 <font>
+                                    <Font name="Microsoft Tai Le" size="12.0" />
+                                 </font>
+                              </MenuButton>
+                              <Separator layoutX="17.0" layoutY="170.0" prefWidth="200.0" />
+                              <Separator layoutX="17.0" layoutY="35.0" prefWidth="200.0" />
+                           </children>
+                        </AnchorPane>
+                        <AnchorPane layoutX="10.0" layoutY="10.0" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
+                           <children>
+                              <Label contentDisplay="CENTER" layoutX="14.0" layoutY="9.0" prefHeight="27.0" prefWidth="201.0" text="Threads:" textFill="#727272" wrapText="true">
+                                 <font>
+                                    <Font name="Microsoft Tai Le" size="16.0" />
+                                 </font>
+                              </Label>
+                              <Separator layoutX="14.0" layoutY="38.0" prefWidth="200.0" />
+                              <CheckBox fx:id="settings_stateColor" layoutX="17.0" layoutY="49.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="136.0" selected="true" text="State Color" textFill="#433e3e" wrapText="true">
+                                 <font>
+                                    <Font name="Microsoft Tai Le" size="12.0" />
+                                 </font>
+                              </CheckBox>
+                           </children>
+                        </AnchorPane>
+                     </items>
+                  </SplitPane>
                </children>
             </AnchorPane>
       </items>
@@ -173,7 +230,7 @@
                         <Font size="11.0" fx:id="x32" />
                      </font>
                   </Label>
-                  <ProgressBar fx:id="memoryProgress" layoutX="318.0" prefHeight="16.0" prefWidth="264.0" progress="0.52" />
+                  <ProgressBar fx:id="memoryProgress" layoutX="318.0" prefHeight="16.0" prefWidth="264.0" progress="0.29" />
                </children></Pane>
       </children>
       <padding>
