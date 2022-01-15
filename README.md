@@ -51,8 +51,7 @@ public class ServerConnection {
 
     public void launchApplication() {
         Server server = new Server();
-        
-        RemoteChannel channel = server.bindLocal(BIND_PORT);
+        RemoteChannel serverChannel = server.bindLocal(BIND_PORT);
     }
 
     // That method running from manifest classpath.
@@ -74,8 +73,7 @@ public class ClientConnection {
 
     public void launchApplication() {
         Client client = new Client();
-
-        RemoteChannel channel = client.connectLocal(CONNECT_PORT);
+        RemoteChannel clientChannel = client.connectLocal(CONNECT_PORT);
     }
 
     // That method running from manifest classpath.
@@ -101,18 +99,22 @@ import org.itzstonlex.recon.ContextHandler;
 import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
 
+import java.net.InetSocketAddress;
+
 public class ServerChannelListener extends ChannelListenerAdapter {
 
     @Override
     public void onThreadActive(ContextHandler contextHandler) {
+        InetSocketAddress address = contextHandler.channel().address();
+      
         ReconLog log = contextHandler.channel().logger();
         
         if (contextHandler.isSuccess()) {
-            log.info("[Server] Connection was success bind on " + contextHandler.channel().address());
+            log.info("[Server] Connection was success bind on " + address);
             
         } else {
-
-            log.info("[Server] Could not bind on " + contextHandler.channel().address());
+            
+            log.info("[Server] Could not bind on " + address);
         }
     }
   
@@ -263,15 +265,11 @@ listener to check the data it needs and start the reconnection task.
 ```java
 Client client = new Client();
 
-client.connectLocal(CONNECT_PORT, config -> {
-    
-    // vars init.
-    long reconnectDelay = 5;
+RemoteChannel clientChannel = client.connectLocal(CONNECT_PORT, config -> {
 
     // add reconnect listener.
     ClientReconnectionUtils.setDebug(true);
     ClientReconnectionUtils.addReconnector(config.pipeline(), 5, TimeUnit.SECONDS);
-    ...
 });
 ```
 ---
