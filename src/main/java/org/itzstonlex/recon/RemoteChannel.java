@@ -1,6 +1,6 @@
 package org.itzstonlex.recon;
 
-import org.itzstonlex.recon.log.ConnectionLogger;
+import org.itzstonlex.recon.log.ReconLog;
 
 import java.io.Closeable;
 import java.net.InetSocketAddress;
@@ -9,7 +9,7 @@ public interface RemoteChannel extends Closeable {
 
     RemoteConnection connection();
 
-    ConnectionLogger logger();
+    ReconLog logger();
 
     ChannelPipeline pipeline();
 

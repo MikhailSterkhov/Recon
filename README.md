@@ -101,21 +101,28 @@ import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
 
 public class ServerChannelListener extends ChannelListenerAdapter {
 
-  @Override
-  public void onConnected(ContextHandler contextHandler) {
-    System.out.println("[Server] Connection was success bind on "
-            + contextHandler.channel().address());
-  }
+    @Override
+    public void onThreadActive(ContextHandler contextHandler) {
+        ReconLog log = contextHandler.channel().logger();
+        
+        if (contextHandler.isSuccess()) {
+            log.info("[Server] Connection was success bind on " + contextHandler.channel().address());
+            
+        } else {
 
-  @Override
-  public void onClosed(ContextHandler contextHandler) {
-    System.out.println("[Server] Connection is closed!");
-  }
-
-  @Override
-  public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {
-    throwable.printStackTrace();
-  }
+            log.info("[Server] Could not bind on " + contextHandler.channel().address());
+        }
+    }
+  
+    @Override
+    public void onClosed(ContextHandler contextHandler) {
+        contextHandler.channel().logger().info("[Server] Connection is closed!");
+    }
+  
+    @Override
+    public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {
+        throwable.printStackTrace();
+    }
 }
 ```
 ---
@@ -196,7 +203,7 @@ public class WriteHandler extends OutgoingByteHandler {
 
         byte[] bytes = buffer.array();
 
-        // ...handle write bytes
+        // ...handle bytes write
         remoteChannel.logger().info("onWrite: [bytes]:" + Arrays.toString(bytes));
     }
 }
@@ -224,10 +231,9 @@ public class ReadHandler extends IncomingByteHandler {
     @Override
     public void onRead(RemoteChannel remoteChannel, ContextHandler contextHandler,
                        ByteStream.Input buffer) {
-
-        byte[] bytes = BufferFactory.transformOutput(buffer)
-                .array();
-
+        
+        byte[] bytes = buffer.array();
+        
         // ...read or handle bytes
         remoteChannel.logger().info("onRead: [bytes]:" + Arrays.toString(bytes));
     }

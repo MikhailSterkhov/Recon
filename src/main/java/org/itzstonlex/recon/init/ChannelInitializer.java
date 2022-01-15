@@ -3,7 +3,7 @@ package org.itzstonlex.recon.init;
 import org.itzstonlex.recon.*;
 import org.itzstonlex.recon.factory.BufferFactory;
 import org.itzstonlex.recon.handler.ClientReconnectChannelListener;
-import org.itzstonlex.recon.log.ConnectionLogger;
+import org.itzstonlex.recon.log.ReconLog;
 import org.itzstonlex.recon.option.ChannelOption;
 
 import java.net.InetSocketAddress;
@@ -58,10 +58,10 @@ public class ChannelInitializer implements RemoteChannel {
 
     private final InetSocketAddress address;
 
-    private final ConnectionLogger logger;
+    private final ReconLog logger;
     private final ChannelPipeline pipeline;
 
-    public ChannelInitializer(RemoteConnection connection, InetSocketAddress address, ConnectionLogger logger) {
+    public ChannelInitializer(RemoteConnection connection, InetSocketAddress address, ReconLog logger) {
         this.connection = connection;
         this.address = address;
         this.logger = logger;
@@ -75,7 +75,7 @@ public class ChannelInitializer implements RemoteChannel {
     }
 
     @Override
-    public ConnectionLogger logger() {
+    public ReconLog logger() {
         return logger;
     }
 

@@ -6,7 +6,7 @@ import org.itzstonlex.recon.RemoteConnection;
 import org.itzstonlex.recon.factory.ChannelFactory;
 import org.itzstonlex.recon.init.ChannelInitializer;
 import org.itzstonlex.recon.init.ClientThreadInitializer;
-import org.itzstonlex.recon.log.ConnectionLogger;
+import org.itzstonlex.recon.log.ReconLog;
 import org.itzstonlex.recon.option.ChannelOption;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class Client implements RemoteConnection, RemoteConnection.Connector {
     private final ExecutorService thread
             = Executors.newSingleThreadExecutor();
 
-    private final ConnectionLogger logger = new ConnectionLogger("Client");
+    private final ReconLog logger = new ReconLog("Client");
     private final Set<ChannelOption> optionSet = new HashSet<>();
 
     @Override
@@ -34,7 +34,7 @@ public class Client implements RemoteConnection, RemoteConnection.Connector {
     }
 
     @Override
-    public ConnectionLogger logger() {
+    public ReconLog logger() {
         return logger;
     }
 

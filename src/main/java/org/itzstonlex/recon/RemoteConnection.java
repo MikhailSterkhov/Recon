@@ -1,6 +1,6 @@
 package org.itzstonlex.recon;
 
-import org.itzstonlex.recon.log.ConnectionLogger;
+import org.itzstonlex.recon.log.ReconLog;
 import org.itzstonlex.recon.option.ChannelOption;
 
 import java.io.IOException;
@@ -12,7 +12,7 @@ public interface RemoteConnection {
 
     ExecutorService getThread();
 
-    ConnectionLogger logger();
+    ReconLog logger();
 
     RemoteChannel channel();
 

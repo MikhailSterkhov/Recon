@@ -9,6 +9,7 @@ import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.GridPane;
@@ -17,6 +18,7 @@ import javafx.scene.text.Font;
 import org.itzstonlex.recon.metrics.MetricCounter;
 import org.itzstonlex.recon.metrics.MetricTimeSnippet;
 import org.itzstonlex.recon.metrics.ReconMetrics;
+import org.itzstonlex.recon.ui.ReconUILauncher;
 import org.itzstonlex.recon.ui.scheduler.TaskScheduler;
 
 import java.awt.*;
@@ -79,6 +81,10 @@ public final class HomePageController extends AbstractPageController {
     private CheckBox settings_stateColor;
 
 
+    @FXML
+    private Button garbageCollectorButton;
+
+
     @Override
     public void initialize() {
         addHelpMenuActions();
@@ -90,10 +96,29 @@ public final class HomePageController extends AbstractPageController {
         startMemoriesUpdater(Runtime.getRuntime());
 
         initGraphicsDisplaySettings();
+        initGarbageCollector();
     }
 
+    private void initGarbageCollector() {
+        String text = garbageCollectorButton.getText();
 
-    private final String threadTitleFormat = "   Thread@%s";
+        garbageCollectorButton.setOnAction(event -> {
+            System.gc();
+
+            // Timed block the button.
+            garbageCollectorButton.setDisable(true);
+            garbageCollectorButton.setText("In process...");
+
+            ReconUILauncher.getInstance().getSchedulerManager().runLater("garbageCollector", () -> {
+                garbageCollectorButton.setDisable(false);
+
+                Platform.runLater(() -> garbageCollectorButton.setText(text));
+
+            }, 2, TimeUnit.SECONDS);
+        });
+    }
+
+    private final String threadTitleFormat = ("   Thread@%s");
 
     private void drawThreads() {
         Platform.runLater(() -> runningThreadsPane.getChildren().clear());

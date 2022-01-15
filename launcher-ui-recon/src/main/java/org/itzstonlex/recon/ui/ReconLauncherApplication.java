@@ -5,14 +5,18 @@ import javafx.stage.Stage;
 import org.itzstonlex.recon.metrics.ReconMetrics;
 import org.itzstonlex.recon.side.Client;
 import org.itzstonlex.recon.side.Server;
-import org.itzstonlex.recon.ui.util.ScenesUtils;
 
 import java.util.concurrent.Executors;
 
 public class ReconLauncherApplication extends Application {
 
-    public static void main(String[] args) {
+    public static final ReconUILauncher launcher = new ReconUILauncher();
 
+    public static void main(String[] args) {
+        launch(args);
+    }
+
+    private void runTestConnections() {
         Executors.newCachedThreadPool().submit(() -> {
             try {
                 for (int i = 0; i < 10; i++) {
@@ -29,17 +33,13 @@ public class ReconLauncherApplication extends Application {
                 exception.printStackTrace();
             }
         });
-
-        // generate service instance.
-        new ReconUILauncher();
-
-        // launch the application.
-        launch(args);
     }
 
     @Override
     public void start(Stage primaryStage) {
-        ScenesUtils.open(primaryStage, ScenesUtils.HOME_FXML);
+        runTestConnections();
+
+        launcher.start(primaryStage);
     }
 
 }

@@ -5,11 +5,11 @@ import org.itzstonlex.recon.util.TimeUtils;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
-public class ConnectionLogger extends Logger {
+public class ReconLog extends Logger {
 
     public static final String LOG_FORMAT = "[{time}][{name} {level}]: {message}";
 
-    public ConnectionLogger(String name) {
+    public ReconLog(String name) {
         super(name, null);
     }
 

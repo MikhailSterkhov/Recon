@@ -1,7 +1,7 @@
 package org.itzstonlex.recon.http;
 
 import org.itzstonlex.recon.http.util.HttpUtils;
-import org.itzstonlex.recon.log.ConnectionLogger;
+import org.itzstonlex.recon.log.ReconLog;
 import org.itzstonlex.recon.util.InputUtils;
 
 import java.net.HttpURLConnection;
@@ -10,9 +10,9 @@ import java.nio.charset.StandardCharsets;
 
 public final class HttpClient {
 
-    private final ConnectionLogger logger = new ConnectionLogger("HttpClient");
+    private final ReconLog logger = new ReconLog("HttpClient");
 
-    public ConnectionLogger logger() {
+    public ReconLog logger() {
         return logger;
     }
 

@@ -33,6 +33,7 @@
 -->
 
 <?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -91,7 +92,7 @@
                                 <content>
                                   <AnchorPane prefWidth="198.0">
                                        <children>
-                                          <GridPane fx:id="runningThreadsPane" layoutX="2.0" layoutY="-1.0" prefHeight="505.0" prefWidth="195.0" styleClass="panel">
+                                          <GridPane fx:id="runningThreadsPane" gridLinesVisible="true" layoutX="2.0" layoutY="-1.0" prefHeight="505.0" prefWidth="195.0" styleClass="panel">
                                             <columnConstraints>
                                               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                             </columnConstraints>
@@ -231,6 +232,11 @@
                      </font>
                   </Label>
                   <ProgressBar fx:id="memoryProgress" layoutX="318.0" prefHeight="16.0" prefWidth="264.0" progress="0.29" />
+                  <Button fx:id="garbageCollectorButton" layoutX="740.0" layoutY="-2.0" mnemonicParsing="false" prefHeight="9.0" prefWidth="157.0" text="Garbage Collector" textFill="#433e3e">
+                     <font>
+                        <Font name="Microsoft Tai Le" size="10.0" />
+                     </font>
+                  </Button>
                </children></Pane>
       </children>
       <padding>

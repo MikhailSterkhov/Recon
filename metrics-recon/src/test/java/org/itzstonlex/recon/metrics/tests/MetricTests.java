@@ -6,8 +6,7 @@ import org.itzstonlex.recon.ContextHandler;
 import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
 import org.itzstonlex.recon.factory.BufferFactory;
-import org.itzstonlex.recon.log.ConnectionLogger;
-import org.itzstonlex.recon.metrics.MetricCounter;
+import org.itzstonlex.recon.log.ReconLog;
 import org.itzstonlex.recon.metrics.ReconMetrics;
 import org.itzstonlex.recon.side.wrapped.AbstractClient;
 import org.itzstonlex.recon.side.wrapped.AbstractServer;
@@ -60,7 +59,7 @@ public class MetricTests {
         }
 
         @Override
-        public void initChannel(ConnectionLogger logger, ChannelConfig channelConfig) {
+        public void initChannel(ReconLog logger, ChannelConfig channelConfig) {
             reconMetrics.initPipelines(channelConfig.pipeline());
 
             Executors.newSingleThreadScheduledExecutor()
@@ -82,7 +81,7 @@ public class MetricTests {
         }
 
         @Override
-        public void initChannel(ConnectionLogger logger, ChannelConfig channelConfig) {
+        public void initChannel(ReconLog logger, ChannelConfig channelConfig) {
             reconMetrics.initPipelines(channelConfig.pipeline());
 
             channelConfig.pipeline().putLast("connect-handler", new ChannelListenerAdapter() {

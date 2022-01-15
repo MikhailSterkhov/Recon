@@ -2,7 +2,7 @@ package org.itzstonlex.recon.side.wrapped;
 
 import org.itzstonlex.recon.ChannelConfig;
 import org.itzstonlex.recon.RemoteChannel;
-import org.itzstonlex.recon.log.ConnectionLogger;
+import org.itzstonlex.recon.log.ReconLog;
 import org.itzstonlex.recon.side.Server;
 
 import java.net.InetSocketAddress;
@@ -27,7 +27,7 @@ public abstract class AbstractServer {
 
 
     public abstract void initChannel (
-            ConnectionLogger logger,
+            ReconLog logger,
             ChannelConfig channelConfig
     );
 
