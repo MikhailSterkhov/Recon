@@ -5,6 +5,7 @@ import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.RemoteConnection;
 import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
 import org.itzstonlex.recon.error.ReconRuntimeError;
+import org.itzstonlex.recon.factory.ReconThreadFactory;
 import org.itzstonlex.recon.init.ClientThreadInitializer;
 import org.itzstonlex.recon.side.Client;
 
@@ -16,7 +17,8 @@ import java.util.concurrent.TimeUnit;
 public final class ChannelReconnectListener
         extends ChannelListenerAdapter {
 
-    public static final String PIPELINE_ID = ("@client-reconnect-channel-listener");
+    public static final String THREAD_NAME_FORMAT   = ("recon-client-reconnect-%s");
+    public static final String PIPELINE_ID          = ("@client-reconnect-channel-listener");
 
     public static class ReconnectTaskSettings {
 
@@ -32,9 +34,10 @@ public final class ChannelReconnectListener
         }
     }
 
-    public final ReconnectTaskSettings reconnectInfo;
+    private final ScheduledExecutorService reconnectTaskService
+            = Executors.newSingleThreadScheduledExecutor(ReconThreadFactory.asInstance(THREAD_NAME_FORMAT));
 
-    private final ScheduledExecutorService reconnectTaskService = Executors.newSingleThreadScheduledExecutor();
+    public final ReconnectTaskSettings reconnectInfo;
     private ScheduledFuture<?> reconnectTask;
 
     public ChannelReconnectListener(RemoteConnection connection,
