@@ -89,14 +89,12 @@ public class Server implements RemoteConnection, RemoteConnection.Binder {
     @Override
     public RemoteChannel bind(InetSocketAddress address, Consumer<ChannelConfig> config) {
         channel = ChannelFactory.createChannel(address, this);
+
         ChannelInitializer.applyConfigValues(this, channel, config);
 
-        ServerThreadInitializer.Data serverData = new ServerThreadInitializer.Data (
-                channel,
-                optionSet.toArray(new ChannelOption[0])
-        );
-
+        ServerThreadInitializer.Data serverData = new ServerThreadInitializer.Data(channel, options());
         new ServerThreadInitializer(serverData).start();
+
         return channel;
     }
 

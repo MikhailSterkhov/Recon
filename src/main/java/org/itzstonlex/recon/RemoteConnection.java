@@ -3,7 +3,6 @@ package org.itzstonlex.recon;
 import org.itzstonlex.recon.log.ReconLog;
 import org.itzstonlex.recon.option.ChannelOption;
 
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.concurrent.ExecutorService;
 import java.util.function.Consumer;

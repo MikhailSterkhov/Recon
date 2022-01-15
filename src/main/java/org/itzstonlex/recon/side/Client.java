@@ -106,21 +106,14 @@ public class Client implements RemoteConnection, RemoteConnection.Connector {
 
     @Override
     public RemoteChannel connect(InetSocketAddress address, int timeout, Consumer<ChannelConfig> config) {
-        initChannel(address);
+        this.channel = ChannelFactory.createChannel(address, this);
+
         ChannelInitializer.applyConfigValues(this, channel, config);
 
-        ClientThreadInitializer.Data clientData = new ClientThreadInitializer.Data (
-                channel,
-                optionSet.toArray(new ChannelOption[0]),
-                this.timeout = timeout
-        );
-
+        ClientThreadInitializer.Data clientData = new ClientThreadInitializer.Data (channel, options(), this.timeout = timeout);
         new ClientThreadInitializer(clientData).start();
-        return channel;
-    }
 
-    public void initChannel(InetSocketAddress address) {
-        this.channel = ChannelFactory.createChannel(address, this);
+        return channel;
     }
 
 }
