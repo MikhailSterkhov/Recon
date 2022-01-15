@@ -43,6 +43,7 @@ soon...
 #### Server Examples:
 ```java
 import org.itzstonlex.recon.side.Server;
+import org.itzstonlex.recon.RemoteChannel;
 
 public class ServerConnection {
 
@@ -50,8 +51,8 @@ public class ServerConnection {
 
     public void launchApplication() {
         Server server = new Server();
-
-        server.bindLocal(BIND_PORT);
+        
+        RemoteChannel channel = server.bindLocal(BIND_PORT);
     }
 
     // That method running from manifest classpath.
@@ -65,6 +66,7 @@ public class ServerConnection {
 #### Client Examples:
 ```java
 import org.itzstonlex.recon.side.Client;
+import org.itzstonlex.recon.RemoteChannel;
 
 public class ClientConnection {
 
@@ -73,7 +75,7 @@ public class ClientConnection {
     public void launchApplication() {
         Client client = new Client();
 
-        client.connectLocal(CONNECT_PORT);
+        RemoteChannel channel = client.connectLocal(CONNECT_PORT);
     }
 
     // That method running from manifest classpath.
@@ -264,11 +266,11 @@ Client client = new Client();
 client.connectLocal(CONNECT_PORT, config -> {
     
     // vars init.
-    boolean hasDebug = true;
     long reconnectDelay = 5;
 
     // add reconnect listener.
-    config.addClientReconnector(hasDebug, reconnectDelay, TimeUnit.SECONDS);
+    ClientReconnectionUtils.setDebug(true);
+    ClientReconnectionUtils.addReconnector(config.pipeline(), 5, TimeUnit.SECONDS);
     ...
 });
 ```

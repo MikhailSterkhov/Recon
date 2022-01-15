@@ -5,8 +5,9 @@ import org.itzstonlex.recon.ContextHandler;
 import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.RemoteConnection;
 import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
-import org.itzstonlex.recon.handler.ClientReconnectChannelListener;
 import org.itzstonlex.recon.handler.PacketHandler;
+import org.itzstonlex.recon.util.reconnect.ChannelReconnectListener;
+import org.itzstonlex.recon.util.reconnect.ClientReconnectionUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -20,8 +21,11 @@ public class ClientTest {
     public void launchApplication(Client client) {
         client.connectLocal(1010, config -> {
 
-            config.addClientReconnector(true, 5, TimeUnit.SECONDS);
+            // Init channel-reconnector.
+            ClientReconnectionUtils.setDebug(true);
+            ClientReconnectionUtils.addReconnector(config.pipeline(), 5, TimeUnit.SECONDS);
 
+            // Init other pipeline listeners.
             config.pipeline().putLast("connection-listener", new ConnectionListener(client));
             config.pipeline().putAfter("connection-listener", "packet-handler", new PacketHandler());
 
@@ -63,10 +67,8 @@ public class ClientTest {
         public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {
 
             // Check reconnect status.
-            ClientReconnectChannelListener reconnectHandler
-                    = remoteChannel.pipeline().get(ClientReconnectChannelListener.class);
-
-            if (reconnectHandler != null && reconnectHandler.isThreadAlive()) {
+            ChannelReconnectListener reconnectListener = remoteChannel.pipeline().get(ChannelReconnectListener.class);
+            if (reconnectListener != null && reconnectListener.isThreadAlive()) {
                 return;
             }
 

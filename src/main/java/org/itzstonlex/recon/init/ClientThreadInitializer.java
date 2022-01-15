@@ -7,9 +7,9 @@ import org.itzstonlex.recon.error.SocketThreadError;
 import org.itzstonlex.recon.factory.BufferFactory;
 import org.itzstonlex.recon.factory.ContextFactory;
 import org.itzstonlex.recon.factory.SocketFactory;
-import org.itzstonlex.recon.handler.ClientReconnectChannelListener;
 import org.itzstonlex.recon.option.ChannelOption;
 import org.itzstonlex.recon.util.InputUtils;
+import org.itzstonlex.recon.util.reconnect.ChannelReconnectListener;
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -156,10 +156,9 @@ public final class ClientThreadInitializer
                 ContextFactory.createErrorEventContext(data.channel, channelListener, new SocketThreadError("timed out"))));
 
         // Check reconnect status.
-        ClientReconnectChannelListener reconnectHandler
-                = data.channel.pipeline().get(ClientReconnectChannelListener.class);
+        ChannelReconnectListener reconnectListener = data.channel.pipeline().get(ChannelReconnectListener.class);
 
-        if (reconnectHandler != null && reconnectHandler.isThreadAlive()) {
+        if (reconnectListener != null && reconnectListener.isThreadAlive()) {
             data.channel.close();
             return;
         }

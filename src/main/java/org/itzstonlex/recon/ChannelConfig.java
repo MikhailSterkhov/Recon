@@ -7,8 +7,6 @@ import java.util.concurrent.TimeUnit;
 
 public interface ChannelConfig {
 
-    void addClientReconnector(boolean hasDebug, long delay, TimeUnit unit);
-
     void option(ChannelOption option);
 
     ChannelPipeline pipeline();
