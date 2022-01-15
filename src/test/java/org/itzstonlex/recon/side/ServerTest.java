@@ -17,8 +17,8 @@ public class ServerTest {
 
             ChannelPipeline channelPipeline = config.pipeline();
 
-            channelPipeline.putLast("connection-listener", new ConnectionListener(server));
-            channelPipeline.putAfter("connection-listener", "packet-handler", new PacketHandler());
+            channelPipeline.addLast("connection-listener", new ConnectionListener(server));
+            channelPipeline.addAfter("connection-listener", "packet-handler", new PacketHandler());
 
             server.logger().info("[ChannelInitializer]: Init Channel " + config.address());
         });

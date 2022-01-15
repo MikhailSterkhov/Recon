@@ -94,15 +94,15 @@ public final class FastRecon {
 
         private void initPipeline(ChannelPipeline pipeline) {
             for (PipelineNode pipelineNode : pipeline_lastNodes) {
-                pipeline.putLast(pipelineNode.id, pipelineNode.handler);
+                pipeline.addLast(pipelineNode.id, pipelineNode.handler);
             }
 
             for (PipelineNode pipelineNode : pipeline_afterNodes) {
-                pipeline.putAfter(pipelineNode.target, pipelineNode.id, pipelineNode.handler);
+                pipeline.addAfter(pipelineNode.target, pipelineNode.id, pipelineNode.handler);
             }
 
             for (PipelineNode pipelineNode : pipeline_beforeNodes) {
-                pipeline.putBefore(pipelineNode.target, pipelineNode.id, pipelineNode.handler);
+                pipeline.addBefore(pipelineNode.target, pipelineNode.id, pipelineNode.handler);
             }
         }
 
@@ -170,7 +170,7 @@ public final class FastRecon {
                 return;
             }
 
-            fastConnect(address, config -> config.pipeline().putLast("singleton-buf-write-handler", new ChannelListenerAdapter(null) {
+            fastConnect(address, config -> config.pipeline().addLast("singleton-buf-write-handler", new ChannelListenerAdapter(null) {
 
                 @Override
                 public void onThreadActive(RemoteChannel channel, ContextHandler contextHandler) {

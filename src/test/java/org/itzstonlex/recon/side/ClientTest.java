@@ -26,8 +26,8 @@ public class ClientTest {
             ClientReconnectionUtils.addReconnector(config.pipeline(), 5, TimeUnit.SECONDS);
 
             // Init other pipeline listeners.
-            config.pipeline().putLast("connection-listener", new ConnectionListener(client));
-            config.pipeline().putAfter("connection-listener", "packet-handler", new PacketHandler());
+            config.pipeline().addLast("connection-listener", new ConnectionListener(client));
+            config.pipeline().addAfter("connection-listener", "packet-handler", new PacketHandler());
 
             client.logger().info("[ChannelInitializer]: Init Channel " + config.address());
         });

@@ -4,11 +4,11 @@ public interface ChannelPipeline {
 
     RemoteChannel channel();
 
-    void putLast(String id, ChannelListener handler);
+    void addLast(String id, ChannelListener handler);
 
-    void putBefore(String target, String id, ChannelListener handler);
+    void addBefore(String target, String id, ChannelListener handler);
 
-    void putAfter(String target, String id, ChannelListener handler);
+    void addAfter(String target, String id, ChannelListener handler);
 
     void remove(String id);
 

@@ -84,7 +84,7 @@ public class MetricTests {
         public void initChannel(ReconLog logger, ChannelConfig channelConfig) {
             reconMetrics.initPipelines(channelConfig.pipeline());
 
-            channelConfig.pipeline().putLast("connect-handler", new ChannelListenerAdapter() {
+            channelConfig.pipeline().addLast("connect-handler", new ChannelListenerAdapter() {
 
                 @Override
                 public void onConnected(RemoteChannel channel, ContextHandler contextHandler) {

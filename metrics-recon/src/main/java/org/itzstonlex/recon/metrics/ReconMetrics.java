@@ -56,7 +56,7 @@ public final class ReconMetrics {
         assert channelPipeline != null;
 
         for (PipelineMetricHandler metricHandler : metricHandlers) {
-            channelPipeline.putLast(metricHandler.getPipelineID(), metricHandler);
+            channelPipeline.addLast(metricHandler.getPipelineID(), metricHandler);
         }
     }
 

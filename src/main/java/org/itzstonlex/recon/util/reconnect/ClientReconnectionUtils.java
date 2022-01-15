@@ -34,7 +34,7 @@ public final class ClientReconnectionUtils {
                 reconnectDelay, reconnectUnit, canDebug()
         );
 
-        pipeline.putLast(ChannelReconnectListener.PIPELINE_ID, reconnectListener);
+        pipeline.addLast(ChannelReconnectListener.PIPELINE_ID, reconnectListener);
     }
 
 }

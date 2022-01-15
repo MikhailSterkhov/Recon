@@ -13,7 +13,7 @@ public class WrappedClient extends AbstractClient {
 
     @Override
     public void initChannel(ReconLog logger, ChannelConfig channelConfig) {
-        channelConfig.pipeline().putLast("packet-handler", new PacketHandler());
+        channelConfig.pipeline().addLast("packet-handler", new PacketHandler());
     }
 
 }

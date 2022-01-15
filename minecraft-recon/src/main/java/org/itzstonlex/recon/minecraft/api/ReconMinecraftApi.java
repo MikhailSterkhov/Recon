@@ -69,7 +69,7 @@ public final class ReconMinecraftApi {
             BossHandler bossHandler = new BossHandler(registry);
             bossHandler.addPacketHandler(new HandshakeHandler(config.pipeline().channel(), bossHandler, serviceFactory.getManagementService()));
 
-            config.pipeline().putLast("@boss-handler", bossHandler);
+            config.pipeline().addLast("@boss-handler", bossHandler);
 
             // Register handshake packets.
             registerHandshake();

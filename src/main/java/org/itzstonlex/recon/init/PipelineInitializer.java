@@ -68,12 +68,12 @@ public final class PipelineInitializer
     }
 
     @Override
-    public void putLast(String id, ChannelListener handler) {
+    public void addLast(String id, ChannelListener handler) {
         fill(nodes.size(), id, handler);
     }
 
     @Override
-    public void putBefore(String target, String id, ChannelListener handler) {
+    public void addBefore(String target, String id, ChannelListener handler) {
         int targetIndex = indexOf(target);
         if (targetIndex < 0) {
             throw new PipelineNotFoundError("ByteHandler target id:'%s' is`nt find", target);
@@ -83,7 +83,7 @@ public final class PipelineInitializer
     }
 
     @Override
-    public void putAfter(String target, String id, ChannelListener handler) {
+    public void addAfter(String target, String id, ChannelListener handler) {
         fill(indexOf(target) + 1, id, handler);
     }
 
