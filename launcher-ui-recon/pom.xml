@@ -48,10 +48,10 @@
                     <archive>
                         <manifest>
                             <addClasspath>true</addClasspath>
-                            <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>org.itzstonlex.recon.ui.ReconLauncherApplication</mainClass>
                         </manifest>
                     </archive>
+                    <outputDirectory>../target-compiled</outputDirectory>
                 </configuration>
             </plugin>
             <plugin>
@@ -76,7 +76,6 @@
                                 <exclude>**/*.SF</exclude>
                                 <exclude>**/*.DSA</exclude>
                                 <exclude>module-info.class</exclude>
-                                <exclude>**/Log4j2Plugins.dat</exclude>
                             </excludes>
                         </filter>
                     </filters>

@@ -27,7 +27,13 @@ public final class HttpParameters {
     }
 
     private String encode(String value) {
-        return URLEncoder.encode(value, StandardCharsets.UTF_8);
+        try {
+            return URLEncoder.encode(value, StandardCharsets.UTF_8.name());
+        }
+        catch (UnsupportedEncodingException exception) {
+            exception.printStackTrace();
+            return value;
+        }
     }
 
     public String appendParameters() {

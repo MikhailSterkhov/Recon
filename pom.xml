@@ -7,7 +7,6 @@
     <groupId>com.github.itzstonlex</groupId>
     <artifactId>Recon</artifactId>
     <version>1.0.0</version>
-
     <packaging>pom</packaging>
 
     <modules>
@@ -18,10 +17,9 @@
         <module>launcher-ui-recon</module>
     </modules>
 
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-    </properties>
+    <name>Recon</name>
+    <url>https://github.com/ItzStonlex/Recon</url>
+    <description>Protocol and remote-connection management</description>
 
     <developers>
         <developer>
@@ -32,4 +30,37 @@
             <url>https://github.com/ItzStonlex</url>
         </developer>
     </developers>
+
+    <properties>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
+    </properties>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <defaultGoal>clean package install</defaultGoal>
+
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.0.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                        </manifest>
+                    </archive>
+                    <outputDirectory>target-compiled</outputDirectory>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

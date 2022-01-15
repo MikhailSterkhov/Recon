@@ -1,7 +1,5 @@
 package org.itzstonlex.recon.factory;
 
-import com.sun.istack.internal.NotNull;
-
 import java.util.concurrent.ThreadFactory;
 
 public final class ReconThreadFactory implements ThreadFactory {
@@ -63,7 +61,7 @@ public final class ReconThreadFactory implements ThreadFactory {
     }
 
     @Override
-    public Thread newThread(@NotNull Runnable command) {
+    public Thread newThread(Runnable command) {
         Thread thread = new Thread(group, command, name, stackSize);
         thread.setDaemon(daemon);
 

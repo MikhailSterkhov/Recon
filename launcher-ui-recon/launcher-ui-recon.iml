@@ -11,6 +11,7 @@
     </content>
     <orderEntry type="jdk" jdkName="1.8" jdkType="JavaSDK" />
     <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="module" module-name="metrics-recon" />
     <orderEntry type="module" module-name="Recon" />
     <orderEntry type="module" module-name="metrics-recon" />
     <orderEntry type="library" name="Maven: com.google.guava:guava:28.2-jre" level="project" />
