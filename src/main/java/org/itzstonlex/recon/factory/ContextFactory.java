@@ -4,7 +4,7 @@ import org.itzstonlex.recon.ChannelListener;
 import org.itzstonlex.recon.ContextHandler;
 import org.itzstonlex.recon.RemoteChannel;
 
-public class ContextFactory {
+public final class ContextFactory {
 
     public static ContextHandler createEventContext(RemoteChannel channel, ChannelListener listener,
                                                     boolean isSuccess, Throwable error) {
