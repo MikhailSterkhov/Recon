@@ -1,5 +1,7 @@
 package org.itzstonlex.recon.factory;
 
+import com.sun.istack.internal.NotNull;
+
 import java.util.concurrent.ThreadFactory;
 
 public final class ReconThreadFactory implements ThreadFactory {
@@ -18,10 +20,21 @@ public final class ReconThreadFactory implements ThreadFactory {
         return ReconThreadFactory.asBuilder().setName(name);
     }
 
+    private Thread.UncaughtExceptionHandler uncaughtExceptionHandler;
+
     private String name;
     private ThreadGroup group;
 
+    private boolean daemon;
+
+    private int priority = -1, stackSize;
+
     private ReconThreadFactory() {
+    }
+
+    public ReconThreadFactory setUncaughtExceptionHandler(Thread.UncaughtExceptionHandler uncaughtExceptionHandler) {
+        this.uncaughtExceptionHandler = uncaughtExceptionHandler;
+        return this;
     }
 
     public ReconThreadFactory setName(String name) {
@@ -34,8 +47,34 @@ public final class ReconThreadFactory implements ThreadFactory {
         return this;
     }
 
+    public ReconThreadFactory setPriority(int priority) {
+        this.priority = priority;
+        return this;
+    }
+
+    public ReconThreadFactory setStackSize(int stackSize) {
+        this.stackSize = stackSize;
+        return this;
+    }
+
+    public ReconThreadFactory setDaemon(boolean daemon) {
+        this.daemon = daemon;
+        return this;
+    }
+
     @Override
-    public Thread newThread(Runnable command) {
-        return new Thread(group, command, name);
+    public Thread newThread(@NotNull Runnable command) {
+        Thread thread = new Thread(group, command, name, stackSize);
+        thread.setDaemon(daemon);
+
+        if (priority >= 0) {
+            thread.setPriority(priority);
+        }
+
+        if (uncaughtExceptionHandler != null) {
+            thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
+        }
+
+        return thread;
     }
 }
