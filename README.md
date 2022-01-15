@@ -24,6 +24,19 @@
 
 ---
 
+## What is this?
+
+**Recon** - most simple and simplified 
+library for implementing _protocol applications_, 
+_remote data transfer_ and _remote connections with 
+servers, sites_, etc.
+
+This is a single **API** association and **many auxiliary 
+modules** for both simplifying the code and for new 
+functionality.
+
+---
+
 ## Recon Modules
 
 * AnnotatedRecon: [(Link)](annotated-recon)
