@@ -20,7 +20,7 @@ public interface RemoteConnection {
 
     void setOption(ChannelOption channelOption);
 
-    void shutdown() throws IOException;
+    void shutdown();
 
     interface Binder {
 

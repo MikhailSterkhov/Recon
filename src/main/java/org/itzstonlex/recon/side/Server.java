@@ -51,10 +51,13 @@ public class Server implements RemoteConnection, RemoteConnection.Binder {
     }
 
     @Override
-    public void shutdown() throws IOException {
-
-        if (channel != null) {
-            channel.close();
+    public void shutdown() {
+        try {
+            if (channel != null && !channel.isClosed()) {
+                channel.close();
+            }
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
     }
 
