@@ -22,18 +22,17 @@
 
 ---
 
-## What is this?
+## Documentation
 
-
-This application is able to parse the data 
-from the [Metrics Module](../metrics-recon) 
-and display the current connection flows.
-
-![ApplicationScreen](src/main/resources/recon-launcher.jpg)
+You can view the full documentation of the library by clicking on
+[the link](https://github.com/ItzStonlex/Recon/wiki/Launcher-UI-Recon)
 
 ---
 
-**ATTENTION!** This application will be updated 
-with functionality in the future. You can also 
-contribute to this by **submitting your ideas on 
-my discord server**!
+## Use & Installation
+
+Download the necessary libraries from [this folder](../target-compiled)
+and install them into your project through *artifacts*,
+*local repositories*, or any other methods convenient for you.
+
+---

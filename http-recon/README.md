@@ -22,66 +22,17 @@
 
 ---
 
-## Help
+## Documentation
 
-If something of what was said below was 
-not clear to you, then you can refer to the tests, 
-which were the source of information and code: [Click to redirect](src/test/java/org/itzstonlex/recon/http)
+You can view the full documentation of the library by clicking on
+[the link](https://github.com/ItzStonlex/Recon/wiki/Http-Recon)
 
 ---
 
-## How to create http client?
+## Use & Installation
 
-First, let's create a client that will already process all client requests.
+Download the necessary libraries from [this folder](../target-compiled)
+and install them into your project through *artifacts*,
+*local repositories*, or any other methods convenient for you.
 
-```java
-import org.itzstonlex.recon.http.HttpClient;
-
-public class HttpRecon {
-
-    public static void main(String[] args) {
-        HttpClient httpClient = new HttpClient();
-    }
-}
-```
 ---
-
-## How to execute http request?
-
-After that, all kinds of request options open before us:
-
-```java
-[GET]:      HttpResponse httpResponse = httpClient.executeGet("SOME-URL");
-[HEAD]:     HttpResponse httpResponse = httpClient.executeHead("SOME-URL");
-[POST]:     HttpResponse httpResponse = httpClient.executePost("SOME-URL");
-[PUT]:      HttpResponse httpResponse = httpClient.executePut("SOME-URL");
-[DELETE]:   HttpResponse httpResponse = httpClient.executeDelete("SOME-URL");
-[CONNECT]:  HttpResponse httpResponse = httpClient.executeConnect("SOME-URL");
-[OPTIONS]:  HttpResponse httpResponse = httpClient.executeOptions("SOME-URL");
-[TRACE]:    HttpResponse httpResponse = httpClient.executeTrace("SOME-URL");
-[PATCH]:    HttpResponse httpResponse = httpClient.executePatch("SOME-URL");
-```
-
-And you can also execute a custom request with your own parameters:
-
-```java
-HttpRequestConfig requestConfig = new HttpRequestConfig(HttpUtils.REQUEST_POST);
-
-requestConfig.setConnectTimeout(3000);
-requestConfig.setReadTimeout(500);
-requestConfig.setRequestProperty("request-key", "request-value");
-
-HttpResponse httpResponse = httpClient.execute("SOME-URL", requestConfig);
-// ...
-```
-
-This module allows you to change the request parameters in 
-the original URL. For this, the `HttpParameters` utility is used:
-
-```java
-String someURL = HttpParameters.create("http://SOME-URL/")
-    .addParameter("example_access_token", "example_01928374fhdj29jcmfsdl9ehl")
-    .addParameter("author", "ItzStonlex")
-        
-    .appendParameters();
-```

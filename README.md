@@ -36,7 +36,6 @@
 
 ## Use & Installation
 
-
 Download the necessary libraries from [this folder](target-compiled) 
 and install them into your project through *artifacts*, 
 *local repositories*, or any other methods convenient for you.
