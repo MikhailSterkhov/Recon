@@ -87,7 +87,7 @@ public class MetricTests {
             channelConfig.pipeline().putLast("connect-handler", new ChannelListenerAdapter() {
 
                 @Override
-                public void onConnected(ContextHandler contextHandler) {
+                public void onConnected(RemoteChannel channel, ContextHandler contextHandler) {
                     ByteStream.Output output = BufferFactory.createPooledOutput();
 
                     output.writeBoolean(true);

@@ -41,18 +41,18 @@ public class ClientTest {
         }
 
         @Override
-        public void onThreadActive(ContextHandler contextHandler) {
+        public void onThreadActive(RemoteChannel channel, ContextHandler contextHandler) {
             connection.logger().info("[Client] Connecting... ");
         }
 
         @Override
-        public void onConnected(ContextHandler contextHandler) {
+        public void onConnected(RemoteChannel channel, ContextHandler contextHandler) {
             connection.logger().info("[Client] Connection was success connected on "
                     + contextHandler.channel().address());
         }
 
         @Override
-        public void onClosed(ContextHandler contextHandler) {
+        public void onClosed(RemoteChannel channel, ContextHandler contextHandler) {
             connection.logger().info("[Client] Connection is closed!");
         }
 

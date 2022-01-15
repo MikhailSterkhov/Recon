@@ -44,22 +44,13 @@ public final class ClientThreadInitializer
         this.data = data;
     }
 
-    private void executeEvent(Consumer<ChannelListener> handler) {
-        for (ChannelListener channelListener : data.channel.pipeline().nodes()) {
-            handler.accept(channelListener);
-        }
-    }
-
     private void detectOutgoingStream(OutputStream outputStream)
     throws Exception {
 
         ByteStream.Output buffer = data.channel.buffer();
 
         if (buffer != null) {
-            executeEvent(channelListener -> channelListener.onWrite(data.channel,
-                    ContextFactory.createSuccessEventContext(data.channel, channelListener),
-                    buffer
-            ));
+            data.channel.pipeline().fireWriteEvent(buffer);
 
             outputStream.write(buffer.array());
             data.channel.flush();
@@ -86,10 +77,7 @@ public final class ClientThreadInitializer
                 transformer.array()
         );
 
-        executeEvent(channelListener -> channelListener.onRead(data.channel,
-                ContextFactory.createSuccessEventContext(data.channel, channelListener),
-                buffer
-        ));
+        data.channel.pipeline().fireReadEvent(buffer);
     }
 
     private int readBuf;
@@ -125,7 +113,7 @@ public final class ClientThreadInitializer
                     Thread.currentThread().stop();
                 }
                 catch (Exception exception) {
-                    executeEvent(channelListener -> channelListener.onExceptionCaught(data.channel, new SocketThreadError(exception)));
+                    data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
                 }
             }
         });
@@ -139,9 +127,7 @@ public final class ClientThreadInitializer
         socket.close();
 
         // Call event of that connection closed.
-        executeEvent(channelListener -> channelListener.onClosed(
-                ContextFactory.createSuccessEventContext(data.channel, channelListener)
-        ));
+        data.channel.pipeline().fireClosedEvent();
 
         // Stop the connection thread.
         interrupt();
@@ -152,8 +138,7 @@ public final class ClientThreadInitializer
             throws Exception {
 
         // Call event of that connection closed.
-        executeEvent(channelListener -> channelListener.onTimedOut(data.channel,
-                ContextFactory.createErrorEventContext(data.channel, channelListener, new SocketThreadError("timed out"))));
+        data.channel.pipeline().fireTimedOutEvent();
 
         // Check reconnect status.
         ChannelReconnectListener reconnectListener = data.channel.pipeline().get(ChannelReconnectListener.class);
@@ -174,9 +159,7 @@ public final class ClientThreadInitializer
             Socket socket = SocketFactory.createClientSocket(data.options, data.channel.address(), data.timeout);
             long maxConnectionMillis = System.currentTimeMillis() + data.timeout;
 
-            executeEvent(channelListener -> channelListener.onThreadActive(
-                    ContextFactory.createSuccessEventContext(data.channel, channelListener)
-            ));
+            data.channel.pipeline().fireThreadActiveEvent();
 
             while (!data.channel.isClosed()) {
 
@@ -194,9 +177,7 @@ public final class ClientThreadInitializer
                 if (maxConnectionMillis != 0) {
                     maxConnectionMillis = 0;
 
-                    executeEvent(channelListener -> channelListener.onConnected(
-                            ContextFactory.createSuccessEventContext(data.channel, channelListener)
-                    ));
+                    data.channel.pipeline().fireConnectedEvent();
 
                     detectServerInactive(socket);
                 }
@@ -210,7 +191,7 @@ public final class ClientThreadInitializer
                 }
 
                 catch (Exception exception) {
-                    executeEvent(channelListener -> channelListener.onExceptionCaught(data.channel, new SocketThreadError(exception)));
+                    data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
                 }
             }
 
@@ -218,7 +199,7 @@ public final class ClientThreadInitializer
         }
 
         catch (Exception exception) {
-            executeEvent(channelListener -> channelListener.onExceptionCaught(data.channel, new SocketThreadError(exception)));
+            data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
         }
     }
 }

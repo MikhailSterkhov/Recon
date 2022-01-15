@@ -30,7 +30,7 @@ public class ConnectionBuilderTest {
         }
 
         @Override
-        public void onThreadActive(ContextHandler contextHandler) {
+        public void onThreadActive(RemoteChannel channel, ContextHandler contextHandler) {
             contextHandler.channel().logger().info("Server was success bind on " + contextHandler.channel().address());
         }
     }

@@ -173,7 +173,7 @@ public final class FastRecon {
             fastConnect(address, config -> config.pipeline().putLast("singleton-buf-write-handler", new ChannelListenerAdapter(null) {
 
                 @Override
-                public void onThreadActive(ContextHandler contextHandler) {
+                public void onThreadActive(RemoteChannel channel, ContextHandler contextHandler) {
                     ByteStream.Output buffer = BufferFactory.createPooledOutput();
                     bufferAppender.accept(buffer);
 

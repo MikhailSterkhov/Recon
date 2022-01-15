@@ -96,12 +96,12 @@ public final class ChannelReconnectListener
     }
 
     @Override
-    public void onConnected(ContextHandler contextHandler) {
+    public void onConnected(RemoteChannel channel, ContextHandler contextHandler) {
         shutdownReconnectTask();
     }
 
     @Override
-    public void onClosed(ContextHandler contextHandler) {
+    public void onClosed(RemoteChannel channel, ContextHandler contextHandler) {
         startReconnectTask();
     }
 

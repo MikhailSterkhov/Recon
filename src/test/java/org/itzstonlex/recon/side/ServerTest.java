@@ -1,9 +1,6 @@
 package org.itzstonlex.recon.side;
 
-import org.itzstonlex.recon.ByteStream;
-import org.itzstonlex.recon.ContextHandler;
-import org.itzstonlex.recon.RemoteChannel;
-import org.itzstonlex.recon.RemoteConnection;
+import org.itzstonlex.recon.*;
 import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
 import org.itzstonlex.recon.factory.BufferFactory;
 import org.itzstonlex.recon.handler.PacketHandler;
@@ -18,8 +15,10 @@ public class ServerTest {
     public void launchApplication(Server server) {
         server.bindLocal(1010, config -> {
 
-            config.pipeline().putLast("connection-listener", new ConnectionListener(server));
-            config.pipeline().putAfter("connection-listener", "packet-handler", new PacketHandler());
+            ChannelPipeline channelPipeline = config.pipeline();
+
+            channelPipeline.putLast("connection-listener", new ConnectionListener(server));
+            channelPipeline.putAfter("connection-listener", "packet-handler", new PacketHandler());
 
             server.logger().info("[ChannelInitializer]: Init Channel " + config.address());
         });
@@ -32,13 +31,13 @@ public class ServerTest {
         }
 
         @Override
-        public void onThreadActive(ContextHandler contextHandler) {
+        public void onThreadActive(RemoteChannel channel, ContextHandler contextHandler) {
             connection.logger().info("[Server] Connection was success bind on "
                     + contextHandler.channel().address());
         }
 
         @Override
-        public void onClosed(ContextHandler contextHandler) {
+        public void onClosed(RemoteChannel channel, ContextHandler contextHandler) {
             connection.logger().info("[Server] Connection is closed!");
         }
 

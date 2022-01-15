@@ -1,12 +1,16 @@
 package org.itzstonlex.recon.init;
 
+import org.itzstonlex.recon.ByteStream;
 import org.itzstonlex.recon.ChannelListener;
 import org.itzstonlex.recon.ChannelPipeline;
 import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.error.PipelineNotFoundError;
+import org.itzstonlex.recon.error.SocketThreadError;
+import org.itzstonlex.recon.factory.ContextFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 public final class PipelineInitializer
         implements ChannelPipeline {
@@ -83,6 +87,26 @@ public final class PipelineInitializer
         fill(indexOf(target) + 1, id, handler);
     }
 
+    @Override
+    public void remove(String id) {
+        int targetIndex = indexOf(id);
+        if (targetIndex < 0) {
+            return;
+        }
+
+        nodes.remove(targetIndex);
+    }
+
+    @Override
+    public void remove(Class<? extends ChannelListener> clazz) {
+        for (Node node : nodes) {
+
+            if (node.handler.getClass().equals(clazz)) {
+                remove(node.id);
+            }
+        }
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public <Handler extends ChannelListener> Handler get(String id) {
@@ -99,7 +123,7 @@ public final class PipelineInitializer
     public <Handler extends ChannelListener> Handler get(Class<Handler> clazz) {
         for (Node node : nodes) {
 
-            if (node.handler.getClass().isAssignableFrom(clazz)) {
+            if (node.handler.getClass().equals(clazz)) {
                 return (Handler) node.handler;
             }
         }
@@ -110,5 +134,74 @@ public final class PipelineInitializer
     @Override
     public ChannelListener[] nodes() {
         return nodes.stream().map(node -> node.handler).toArray(f -> new ChannelListener[nodes.size()]);
+    }
+
+    @Override
+    public ChannelListener first() {
+        if (nodes.isEmpty()) {
+            return null;
+        }
+
+        return nodes.get(0).handler;
+    }
+
+    @Override
+    public ChannelListener last() {
+        if (nodes.isEmpty()) {
+            return null;
+        }
+
+        return nodes.get(nodes.size() - 1).handler;
+    }
+
+    private void forEachNodes(Consumer<ChannelListener> nodeConsumer) {
+        for (ChannelListener channelListener : nodes()) {
+            nodeConsumer.accept(channelListener);
+        }
+    }
+
+    @Override
+    public void fireThreadActiveEvent() {
+        forEachNodes(listener -> listener.onThreadActive(channel, ContextFactory.createSuccessEventContext(channel, listener)));
+    }
+
+    @Override
+    public void fireClosedEvent() {
+        forEachNodes(listener -> listener.onClosed(channel, ContextFactory.createSuccessEventContext(channel, listener)));
+    }
+
+    @Override
+    public void fireReadEvent(ByteStream.Input buffer) {
+        forEachNodes(listener -> listener.onRead(channel, ContextFactory.createSuccessEventContext(channel, listener), buffer));
+    }
+
+    @Override
+    public void fireWriteEvent(ByteStream.Output buffer) {
+        forEachNodes(listener -> listener.onWrite(channel, ContextFactory.createSuccessEventContext(channel, listener), buffer));
+    }
+
+    @Override
+    public void fireExceptionCaughtEvent(Throwable throwable) {
+        forEachNodes(listener -> listener.onExceptionCaught(channel, throwable));
+    }
+
+    @Override
+    public void fireConnectedEvent() {
+        forEachNodes(listener -> listener.onConnected(channel, ContextFactory.createSuccessEventContext(channel, listener)));
+    }
+
+    @Override
+    public void fireTimedOutEvent() {
+        forEachNodes(listener -> listener.onTimedOut(channel, ContextFactory.createErrorEventContext(channel, listener, new SocketThreadError("timed out"))));
+    }
+
+    @Override
+    public void fireClientConnectedEvent() {
+        forEachNodes(listener -> listener.onClientConnected(channel, ContextFactory.createSuccessEventContext(channel, listener)));
+    }
+
+    @Override
+    public void fireClientClosedEvent() {
+        forEachNodes(listener -> listener.onClientClosed(channel, ContextFactory.createSuccessEventContext(channel, listener)));
     }
 }

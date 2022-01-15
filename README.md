@@ -104,7 +104,7 @@ import java.net.InetSocketAddress;
 public class ServerChannelListener extends ChannelListenerAdapter {
 
     @Override
-    public void onThreadActive(ContextHandler contextHandler) {
+    public void onThreadActive(RemoteChannel channel, ContextHandler contextHandler) {
         InetSocketAddress address = contextHandler.channel().address();
       
         ReconLog log = contextHandler.channel().logger();
@@ -119,7 +119,7 @@ public class ServerChannelListener extends ChannelListenerAdapter {
     }
   
     @Override
-    public void onClosed(ContextHandler contextHandler) {
+    public void onClosed(RemoteChannel channel, ContextHandler contextHandler) {
         contextHandler.channel().logger().info("[Server] Connection is closed!");
     }
   
@@ -148,7 +148,7 @@ Some of the available events work on specific
 sides of the connection:
 
 - Client: 
-    - `onConnected(ContextHandler)`
+    - `onConnected(RemoteChannel, ContextHandler)`
     - `onTimedOut(RemoteChannel, ContextHandler)`
     
 - Server:
@@ -156,8 +156,8 @@ sides of the connection:
     - `onClientClosed(RemoteChannel, ContextHandler)`
 
 - For all:
-    - `onThreadActive(ContextHandler)`
-    - `onClosed(ContextHandler)`
+    - `onThreadActive(RemoteChannel, ContextHandler)`
+    - `onClosed(RemoteChannel, ContextHandler)`
     - `onRead(RemoteChannel, ContextHandler, ByteStream.Input)`
     - `onWrite(RemoteChannel, ContextHandler, ByteStream.Output)`
     - `onExceptionCaught(RemoteChannel, Throwable)`

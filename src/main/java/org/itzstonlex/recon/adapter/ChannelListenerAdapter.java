@@ -21,15 +21,15 @@ public abstract class ChannelListenerAdapter
     }
 
     @Override
-    public void onThreadActive(ContextHandler contextHandler) {
+    public void onThreadActive(RemoteChannel channel, ContextHandler contextHandler) {
     }
 
     @Override
-    public void onConnected(ContextHandler contextHandler) {
+    public void onConnected(RemoteChannel channel, ContextHandler contextHandler) {
     }
 
     @Override
-    public void onClosed(ContextHandler contextHandler) {
+    public void onClosed(RemoteChannel channel, ContextHandler contextHandler) {
     }
 
     @Override

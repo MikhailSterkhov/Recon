@@ -52,12 +52,6 @@ public final class ServerThreadInitializer
         return ChannelFactory.createChannel(address, new Client());
     }
 
-    private void executeEvent(Consumer<ChannelListener> handler) {
-        for (ChannelListener channelListener : data.channel.pipeline().nodes()) {
-            handler.accept(channelListener);
-        }
-    }
-
     private void detectNewConnections(ServerSocket serverSocket) {
         newConnectionsExecutor.execute(() -> {
 
@@ -73,12 +67,10 @@ public final class ServerThreadInitializer
                     connected.put(accept, clientChannel);
                     addSocketToAutoInactiveDetect(accept, clientChannel);
 
-                    executeEvent(channelListener -> channelListener.onClientConnected(clientChannel,
-                            ContextFactory.createSuccessEventContext(clientChannel, channelListener)
-                    ));
+                    data.channel.pipeline().fireClientConnectedEvent();
 
                 } catch (Exception exception) {
-                    executeEvent(channelListener -> channelListener.onExceptionCaught(data.channel, new SocketThreadError(exception)));
+                    data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
                 }
             }
         });
@@ -95,7 +87,7 @@ public final class ServerThreadInitializer
                     disconnectChannel(socket);
                 }
                 catch (Exception exception) {
-                    executeEvent(channelListener -> channelListener.onExceptionCaught(channel, new SocketThreadError(exception)));
+                    data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
                 }
             }
         });
@@ -109,9 +101,7 @@ public final class ServerThreadInitializer
             return;
         }
 
-        executeEvent(channelListener -> channelListener.onClientClosed(channel,
-                ContextFactory.createSuccessEventContext(channel, channelListener)
-        ));
+        data.channel.pipeline().fireClientClosedEvent();
 
         channel.close();
         socket.close();
@@ -140,10 +130,7 @@ public final class ServerThreadInitializer
                 transformer.array()
         );
 
-        executeEvent(channelListener -> channelListener.onRead(clientChannel,
-                ContextFactory.createSuccessEventContext(clientChannel, channelListener),
-                buffer
-        ));
+        data.channel.pipeline().fireReadEvent(buffer);
     }
 
     private void detectOutgoingStream(Socket socket, RemoteChannel clientChannel)
@@ -154,10 +141,7 @@ public final class ServerThreadInitializer
             return;
         }
 
-        executeEvent(channelListener -> channelListener.onWrite(data.channel,
-                ContextFactory.createSuccessEventContext(data.channel, channelListener),
-                buffer
-        ));
+        data.channel.pipeline().fireWriteEvent(buffer);
 
         socket.getOutputStream().write(buffer.array());
         clientChannel.flush();
@@ -167,9 +151,7 @@ public final class ServerThreadInitializer
     throws Exception {
 
         // Call event of that connection closed.
-        executeEvent(channelListener -> channelListener.onClosed(
-                ContextFactory.createSuccessEventContext(data.channel, channelListener, new SocketThreadError("Channel was closed"))
-        ));
+        data.channel.pipeline().fireClosedEvent();
 
         // Close a connections.
         data.channel.close();
@@ -188,9 +170,7 @@ public final class ServerThreadInitializer
             );
 
             // Call event of active that connection.
-            executeEvent(channelListener -> channelListener.onThreadActive(
-                    ContextFactory.createSuccessEventContext(data.channel, channelListener)
-            ));
+            data.channel.pipeline().fireThreadActiveEvent();
 
             // Detect new client connections.
             detectNewConnections(serverSocket);
@@ -213,7 +193,7 @@ public final class ServerThreadInitializer
                     }
 
                     catch (Exception exception) {
-                        executeEvent(channelListener -> channelListener.onExceptionCaught(data.channel, new SocketThreadError(exception)));
+                        data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
                     }
                 }
             }
@@ -222,7 +202,7 @@ public final class ServerThreadInitializer
         }
 
         catch (Exception exception) {
-            executeEvent(channelListener -> channelListener.onExceptionCaught(data.channel, new SocketThreadError(exception)));
+            data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
         }
     }
 
