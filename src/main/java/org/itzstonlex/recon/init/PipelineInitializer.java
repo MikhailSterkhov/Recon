@@ -4,8 +4,8 @@ import org.itzstonlex.recon.ByteStream;
 import org.itzstonlex.recon.ChannelListener;
 import org.itzstonlex.recon.ChannelPipeline;
 import org.itzstonlex.recon.RemoteChannel;
-import org.itzstonlex.recon.error.PipelineNotFoundError;
-import org.itzstonlex.recon.error.SocketThreadError;
+import org.itzstonlex.recon.exception.PipelineNotFoundException;
+import org.itzstonlex.recon.exception.TimeoutException;
 import org.itzstonlex.recon.factory.ContextFactory;
 
 import java.util.ArrayList;
@@ -49,7 +49,7 @@ public final class PipelineInitializer
 
     public void fill(int index, String id, ChannelListener handler) {
         if (id == null || handler == null) {
-            throw new PipelineNotFoundError("pipeline id or handler cannot be null");
+            throw new PipelineNotFoundException("pipeline id or handler cannot be null");
         }
 
         Node newNode = new Node(id, handler);
@@ -76,7 +76,7 @@ public final class PipelineInitializer
     public void addBefore(String target, String id, ChannelListener handler) {
         int targetIndex = indexOf(target);
         if (targetIndex < 0) {
-            throw new PipelineNotFoundError("ByteHandler target id:'%s' is`nt find", target);
+            throw new PipelineNotFoundException("ByteHandler target id:'%s' is`nt find", target);
         }
 
         fill(targetIndex, id, handler);
@@ -192,16 +192,21 @@ public final class PipelineInitializer
 
     @Override
     public void fireTimedOutEvent() {
-        forEachNodes(listener -> listener.onTimedOut(channel, ContextFactory.createErrorEventContext(channel, listener, new SocketThreadError("timed out"))));
+        forEachNodes(listener -> listener.onTimedOut(channel, ContextFactory.createErrorEventContext(channel, listener, new TimeoutException("timed out"))));
     }
 
     @Override
-    public void fireClientConnectedEvent() {
+    public void fireBindEvent() {
+        forEachNodes(listener -> listener.onBind(channel, ContextFactory.createSuccessEventContext(channel, listener)));
+    }
+
+    @Override
+    public void fireClientConnectedEvent(RemoteChannel channel) {
         forEachNodes(listener -> listener.onClientConnected(channel, ContextFactory.createSuccessEventContext(channel, listener)));
     }
 
     @Override
-    public void fireClientClosedEvent() {
+    public void fireClientClosedEvent(RemoteChannel channel) {
         forEachNodes(listener -> listener.onClientClosed(channel, ContextFactory.createSuccessEventContext(channel, listener)));
     }
 }
