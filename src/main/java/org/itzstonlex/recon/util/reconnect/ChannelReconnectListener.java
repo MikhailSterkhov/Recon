@@ -4,9 +4,9 @@ import org.itzstonlex.recon.ContextHandler;
 import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.RemoteConnection;
 import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
-import org.itzstonlex.recon.error.ReconRuntimeError;
+import org.itzstonlex.recon.exception.ReconRuntimeException;
 import org.itzstonlex.recon.factory.ReconThreadFactory;
-import org.itzstonlex.recon.init.ClientThreadInitializer;
+import org.itzstonlex.recon.thread.ReconClientThread;
 import org.itzstonlex.recon.side.Client;
 
 import java.util.concurrent.Executors;
@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 public final class ChannelReconnectListener
         extends ChannelListenerAdapter {
 
-    public static final String THREAD_NAME_FORMAT   = ("recon-client-reconnect-%s");
+    public static final String THREAD_NAME_FORMAT   = ("ReconReconnect-%s");
     public static final String PIPELINE_ID          = ("@client-reconnect-channel-listener");
 
     public static class ReconnectTaskSettings {
@@ -46,7 +46,7 @@ public final class ChannelReconnectListener
         this.reconnectInfo = new ReconnectTaskSettings(delay, unit, debug);
 
         if (!(connection instanceof RemoteConnection.Connector)) {
-            throw new ReconRuntimeError("That connection is`nt instance by RemoteConnection.Connector");
+            throw new ReconRuntimeException("That connection is`nt instance by RemoteConnection.Connector");
         }
     }
 
@@ -75,11 +75,11 @@ public final class ChannelReconnectListener
 
             // Start client connection task
             Client client = ((Client) connection);
-            ClientThreadInitializer.Data clientData = new ClientThreadInitializer.Data (
+            ReconClientThread.Data clientData = new ReconClientThread.Data (
                     connection.channel(), client.options(), client.timeout()
             );
 
-            new ClientThreadInitializer(clientData).start();
+            new ReconClientThread(clientData).start();
 
             // Debug the reconnect handle.
             if (reconnectInfo.hasDebug) {
@@ -109,7 +109,7 @@ public final class ChannelReconnectListener
     }
 
     @Override
-    public void onTimedOut(RemoteChannel channel, ContextHandler contextHandler) {
+    public void onConnectTimeout(RemoteChannel channel, ContextHandler contextHandler) {
         startReconnectTask();
     }
 

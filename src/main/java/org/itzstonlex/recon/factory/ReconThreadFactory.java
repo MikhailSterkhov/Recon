@@ -1,5 +1,7 @@
 package org.itzstonlex.recon.factory;
 
+import org.itzstonlex.recon.util.ReconThreadsStorage;
+
 import java.util.concurrent.ThreadFactory;
 
 public final class ReconThreadFactory implements ThreadFactory {
@@ -73,6 +75,7 @@ public final class ReconThreadFactory implements ThreadFactory {
             thread.setUncaughtExceptionHandler(uncaughtExceptionHandler);
         }
 
+        ReconThreadsStorage.getAllThreads().add(thread);
         return thread;
     }
 }

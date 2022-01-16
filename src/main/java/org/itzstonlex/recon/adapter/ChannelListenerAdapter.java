@@ -36,7 +36,7 @@ public abstract class ChannelListenerAdapter
     }
 
     @Override
-    public void onTimedOut(RemoteChannel channel, ContextHandler contextHandler) {
+    public void onConnectTimeout(RemoteChannel channel, ContextHandler contextHandler) {
         // override me.
     }
 

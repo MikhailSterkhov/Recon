@@ -1,23 +1,21 @@
-package org.itzstonlex.recon.init;
+package org.itzstonlex.recon.thread;
 
 import org.itzstonlex.recon.ByteStream;
-import org.itzstonlex.recon.ChannelListener;
 import org.itzstonlex.recon.RemoteChannel;
-import org.itzstonlex.recon.error.SocketThreadError;
+import org.itzstonlex.recon.exception.ReconThreadException;
 import org.itzstonlex.recon.factory.BufferFactory;
-import org.itzstonlex.recon.factory.ContextFactory;
 import org.itzstonlex.recon.factory.SocketFactory;
 import org.itzstonlex.recon.option.ChannelOption;
-import org.itzstonlex.recon.util.InputUtils;
+import org.itzstonlex.recon.util.ReconThreadsStorage;
 import org.itzstonlex.recon.util.reconnect.ChannelReconnectListener;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.function.Consumer;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
+import java.util.Arrays;
 
-public final class ClientThreadInitializer
+public final class ReconClientThread
         extends Thread {
 
     private static int threadsCounter = 1;
@@ -36,48 +34,54 @@ public final class ClientThreadInitializer
         }
     }
 
-
     private final Data data;
 
-    public ClientThreadInitializer(Data data) {
-        super("recon-client-" + threadsCounter++);
+    public ReconClientThread(Data data) {
+        super("ReconClient-" + threadsCounter++);
         this.data = data;
+
+        ReconThreadsStorage.addClientThread(this);
     }
 
-    private void detectOutgoingStream(OutputStream outputStream)
-    throws Exception {
+    private void detectIncomingStream(SocketChannel socketChannel)
+            throws Exception {
 
-        ByteStream.Output buffer = data.channel.buffer();
+        ByteBuffer channelBuffer = ByteBuffer.wrap(new byte[8192]);
+        int size = socketChannel.read(channelBuffer);
 
-        if (buffer != null) {
-            data.channel.pipeline().fireWriteEvent(buffer);
-
-            outputStream.write(buffer.array());
-            data.channel.flush();
-        }
-    }
-
-    private void detectIncomingStream(InputStream inputStream) {
-        if (InputUtils.isEmpty(inputStream)) {
+        if (size <= 0) {
             return;
         }
 
         // Push buf read value.
-        ByteStream.Output transformer = BufferFactory.createPooledOutput();
+        ByteStream.Output converter = BufferFactory.createPooledOutput();
 
-        if (readBuf >= 0) {
-            transformer.writeByte((byte) readBuf);
+        if (readBuf > 0) {
+            converter.writeByte((byte) readBuf);
         }
 
-        transformer.write(InputUtils.toByteArray(inputStream));
+        converter.write(Arrays.copyOf(channelBuffer.array(), size));
         readBuf = -1;
 
         // Read bytes handle.
-        ByteStream.Input buffer = BufferFactory.createPooledInput(
-                transformer.array()
+        ByteStream.Input inputBuffer = BufferFactory.createPooledInput(
+                converter.array()
         );
 
-        data.channel.pipeline().fireReadEvent(buffer);
+        data.channel.pipeline().fireReadEvent(inputBuffer);
+    }
+
+    private void detectOutgoingStream(SocketChannel socketChannel, RemoteChannel clientChannel)
+            throws Exception {
+
+        ByteStream.Output buffer = clientChannel.buffer();
+
+        if (buffer != null) {
+            socketChannel.write( ByteBuffer.wrap(buffer.array()) );
+
+            data.channel.pipeline().fireWriteEvent(buffer);
+            clientChannel.flush();
+        }
     }
 
     private int readBuf;
@@ -102,6 +106,7 @@ public final class ClientThreadInitializer
                     detectServerInactive(socket);
 
                 } catch (Exception ignored) {
+                    // ignored exception.
                 }
             }
             catch (Exception ignored) {
@@ -113,7 +118,7 @@ public final class ClientThreadInitializer
                     Thread.currentThread().stop();
                 }
                 catch (Exception exception) {
-                    data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
+                    data.channel.pipeline().fireExceptionCaughtEvent(new ReconThreadException(exception));
                 }
             }
         });
@@ -138,7 +143,7 @@ public final class ClientThreadInitializer
             throws Exception {
 
         // Call event of that connection closed.
-        data.channel.pipeline().fireTimedOutEvent();
+        data.channel.pipeline().fireConnectTimeoutEvent();
 
         // Check reconnect status.
         ChannelReconnectListener reconnectListener = data.channel.pipeline().get(ChannelReconnectListener.class);
@@ -154,16 +159,21 @@ public final class ClientThreadInitializer
 
     @Override
     public void run() {
+        long maxConnectionMillis = System.currentTimeMillis() + data.timeout + 100L;
+
+        // Call event of active that connection.
+        data.channel.pipeline().fireThreadActiveEvent();
+
         try {
-
-            Socket socket = SocketFactory.createClientSocket(data.options, data.channel.address(), data.timeout);
-            long maxConnectionMillis = System.currentTimeMillis() + data.timeout;
-
-            data.channel.pipeline().fireThreadActiveEvent();
+            Socket socket = SocketFactory.createClientSocket(
+                    data.options,
+                    data.channel.address(),
+                    data.timeout
+            );
 
             while (!data.channel.isClosed()) {
 
-                // Check timed out.
+                // Check connection timeout.
                 if (!socket.isConnected()) {
                     if (maxConnectionMillis > 0 && maxConnectionMillis - System.currentTimeMillis() < 0) {
                         timedOut(socket);
@@ -183,23 +193,22 @@ public final class ClientThreadInitializer
                 }
 
                 try {
-                    // Get filled buffer & send bytes to connection output.
-                    detectOutgoingStream(socket.getOutputStream());
-
                     // Detect received bytes from the server.
-                    detectIncomingStream(socket.getInputStream());
+                    detectIncomingStream(socket.getChannel());
+
+                    // Get filled buffer & send bytes to connection output.
+                    detectOutgoingStream(socket.getChannel(), data.channel);
                 }
 
                 catch (Exception exception) {
-                    data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
+                    data.channel.pipeline().fireExceptionCaughtEvent(new ReconThreadException(exception));
                 }
             }
 
             shutdown(socket);
         }
-
         catch (Exception exception) {
-            data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
+            data.channel.pipeline().fireExceptionCaughtEvent(new ReconThreadException(exception));
         }
     }
 }

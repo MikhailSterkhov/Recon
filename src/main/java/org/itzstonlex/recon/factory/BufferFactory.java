@@ -8,7 +8,6 @@ public final class BufferFactory {
     public static final ByteStream BYTESTREAM
             = new BufferInitializer.PooledBuffer();
 
-
     public static ByteStream.Input createPooledInput(byte[] bytes) {
         return BYTESTREAM.newInput(bytes);
     }

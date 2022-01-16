@@ -191,8 +191,8 @@ public final class PipelineInitializer
     }
 
     @Override
-    public void fireTimedOutEvent() {
-        forEachNodes(listener -> listener.onTimedOut(channel, ContextFactory.createErrorEventContext(channel, listener, new TimeoutException("timed out"))));
+    public void fireConnectTimeoutEvent() {
+        forEachNodes(listener -> listener.onConnectTimeout(channel, ContextFactory.createErrorEventContext(channel, listener, new TimeoutException("timed out"))));
     }
 
     @Override

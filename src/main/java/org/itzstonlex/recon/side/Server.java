@@ -3,7 +3,7 @@ package org.itzstonlex.recon.side;
 import org.itzstonlex.recon.*;
 import org.itzstonlex.recon.factory.ChannelFactory;
 import org.itzstonlex.recon.init.ChannelInitializer;
-import org.itzstonlex.recon.init.ServerThreadInitializer;
+import org.itzstonlex.recon.thread.ReconServerThread;
 import org.itzstonlex.recon.log.ReconLog;
 import org.itzstonlex.recon.option.ChannelOption;
 
@@ -92,8 +92,8 @@ public class Server implements RemoteConnection, RemoteConnection.Binder {
 
         ChannelInitializer.applyConfigValues(this, channel, config);
 
-        ServerThreadInitializer.Data serverData = new ServerThreadInitializer.Data(channel, options());
-        new ServerThreadInitializer(serverData).start();
+        ReconServerThread.Data serverData = new ReconServerThread.Data(channel, options());
+        new ReconServerThread(serverData).start();
 
         return channel;
     }

@@ -5,7 +5,7 @@ import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.RemoteConnection;
 import org.itzstonlex.recon.factory.ChannelFactory;
 import org.itzstonlex.recon.init.ChannelInitializer;
-import org.itzstonlex.recon.init.ClientThreadInitializer;
+import org.itzstonlex.recon.thread.ReconClientThread;
 import org.itzstonlex.recon.log.ReconLog;
 import org.itzstonlex.recon.option.ChannelOption;
 
@@ -110,8 +110,8 @@ public class Client implements RemoteConnection, RemoteConnection.Connector {
 
         ChannelInitializer.applyConfigValues(this, channel, config);
 
-        ClientThreadInitializer.Data clientData = new ClientThreadInitializer.Data (channel, options(), this.timeout = timeout);
-        new ClientThreadInitializer(clientData).start();
+        ReconClientThread.Data clientData = new ReconClientThread.Data (channel, options(), this.timeout = timeout);
+        new ReconClientThread(clientData).start();
 
         return channel;
     }

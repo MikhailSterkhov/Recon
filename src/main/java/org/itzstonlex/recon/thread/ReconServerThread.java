@@ -1,26 +1,27 @@
-package org.itzstonlex.recon.init;
+package org.itzstonlex.recon.thread;
 
 import org.itzstonlex.recon.*;
-import org.itzstonlex.recon.error.SocketThreadError;
+import org.itzstonlex.recon.exception.ReconThreadException;
 import org.itzstonlex.recon.factory.BufferFactory;
 import org.itzstonlex.recon.factory.ChannelFactory;
-import org.itzstonlex.recon.factory.ContextFactory;
 import org.itzstonlex.recon.factory.SocketFactory;
 import org.itzstonlex.recon.option.ChannelOption;
 import org.itzstonlex.recon.side.Client;
 import org.itzstonlex.recon.util.InputUtils;
+import org.itzstonlex.recon.util.ReconThreadsStorage;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.nio.ByteBuffer;
+import java.nio.channels.SocketChannel;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.function.Consumer;
 
-public final class ServerThreadInitializer
+public final class ReconServerThread
         extends Thread {
 
     private static int threadsCounter = 1;
@@ -36,16 +37,14 @@ public final class ServerThreadInitializer
         }
     }
 
-
     private final Data data;
-
-    private final ExecutorService newConnectionsExecutor = Executors.newSingleThreadExecutor();
-
     private final Map<Socket, RemoteChannel> connected = new ConcurrentHashMap<>();
 
-    public ServerThreadInitializer(Data data) {
-        super("recon-server-" + threadsCounter++);
+    public ReconServerThread(Data data) {
+        super("ReconServer-" + threadsCounter++);
         this.data = data;
+
+        ReconThreadsStorage.addServerThread(this);
     }
 
     private RemoteChannel newClientChannel(InetSocketAddress address) {
@@ -53,7 +52,7 @@ public final class ServerThreadInitializer
     }
 
     private void detectNewConnections(ServerSocket serverSocket) {
-        newConnectionsExecutor.execute(() -> {
+        data.channel.connection().getThread().execute(() -> {
 
             while (!data.channel.isClosed()) {
                 if (!serverSocket.isBound()) {
@@ -64,13 +63,22 @@ public final class ServerThreadInitializer
                     Socket accept = serverSocket.accept();
                     RemoteChannel clientChannel = newClientChannel((InetSocketAddress) accept.getRemoteSocketAddress());
 
+                    for (ChannelOption channelOption : data.options) {
+                        try {
+                            channelOption.apply(accept);
+                        }
+                        catch (UnsupportedOperationException ignored) {
+                            // ignored exception.
+                        }
+                    }
+
                     connected.put(accept, clientChannel);
                     addSocketToAutoInactiveDetect(accept, clientChannel);
 
-                    data.channel.pipeline().fireClientConnectedEvent();
+                    data.channel.pipeline().fireClientConnectedEvent(clientChannel);
 
                 } catch (Exception exception) {
-                    data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
+                    data.channel.pipeline().fireExceptionCaughtEvent(new ReconThreadException(exception));
                 }
             }
         });
@@ -78,16 +86,26 @@ public final class ServerThreadInitializer
 
     private int readBuf;
     private void addSocketToAutoInactiveDetect(Socket socket, RemoteChannel channel) {
+        if (socket.isClosed() || channel.isClosed()) {
+            return;
+        }
+
         channel.connection().getThread().execute(() -> {
             try {
                 readBuf = socket.getInputStream().read();
+
+                if (readBuf >= 0) {
+                    Thread.sleep(1500L);
+
+                    addSocketToAutoInactiveDetect(socket, channel);
+                }
             }
             catch (Exception ignored) {
                 try {
                     disconnectChannel(socket);
                 }
                 catch (Exception exception) {
-                    data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
+                    data.channel.pipeline().fireExceptionCaughtEvent(new ReconThreadException(exception));
                 }
             }
         });
@@ -101,76 +119,81 @@ public final class ServerThreadInitializer
             return;
         }
 
-        data.channel.pipeline().fireClientClosedEvent();
+        data.channel.pipeline().fireClientClosedEvent(channel);
 
         channel.close();
         socket.close();
     }
 
-    private void detectIncomingStream(Socket socket, RemoteChannel clientChannel)
-    throws Exception {
+    private void detectIncomingStream(SocketChannel socketChannel)
+            throws Exception {
 
-        InputStream inputStream = socket.getInputStream();
-        if (InputUtils.isEmpty(inputStream)) {
+        ByteBuffer channelBuffer = ByteBuffer.wrap(new byte[8192]);
+        int size = socketChannel.read(channelBuffer);
+
+        if (size <= 0) {
             return;
         }
 
         // Push buf read value.
-        ByteStream.Output transformer = BufferFactory.createPooledOutput();
+        ByteStream.Output converter = BufferFactory.createPooledOutput();
 
-        if (readBuf >= 0) {
-            transformer.writeByte((byte) readBuf);
+        if (readBuf > 0) {
+            converter.writeByte((byte) readBuf);
         }
 
-        transformer.write(InputUtils.toByteArray(inputStream));
+        converter.write(Arrays.copyOf(channelBuffer.array(), size));
         readBuf = -1;
 
         // Read bytes handle.
-        ByteStream.Input buffer = BufferFactory.createPooledInput(
-                transformer.array()
+        ByteStream.Input inputBuffer = BufferFactory.createPooledInput(
+                converter.array()
         );
 
-        data.channel.pipeline().fireReadEvent(buffer);
+        data.channel.pipeline().fireReadEvent(inputBuffer);
     }
 
-    private void detectOutgoingStream(Socket socket, RemoteChannel clientChannel)
-    throws Exception {
+    private void detectOutgoingStream(SocketChannel socketChannel, RemoteChannel clientChannel)
+            throws Exception {
 
         ByteStream.Output buffer = clientChannel.buffer();
-        if (buffer == null) {
-            return;
+
+        if (buffer != null) {
+            socketChannel.write( ByteBuffer.wrap(buffer.array()) );
+
+            data.channel.pipeline().fireWriteEvent(buffer);
+            clientChannel.flush();
         }
-
-        data.channel.pipeline().fireWriteEvent(buffer);
-
-        socket.getOutputStream().write(buffer.array());
-        clientChannel.flush();
     }
 
     private void shutdown(ServerSocket serverSocket)
     throws Exception {
 
-        // Call event of that connection closed.
-        data.channel.pipeline().fireClosedEvent();
-
         // Close a connections.
         data.channel.close();
         serverSocket.close();
 
+        // Call event of that connection closed.
+        data.channel.pipeline().fireClosedEvent();
+
         // Stop the connection thread.
-        Thread.currentThread().stop();
+        interrupt();
+        stop();
     }
 
     @Override
     public void run() {
+        // Call event of active that connection.
+        data.channel.pipeline().fireThreadActiveEvent();
+
         try {
             ServerSocket serverSocket = SocketFactory.createServerSocket(
                     data.options,
                     data.channel.address()
             );
 
-            // Call event of active that connection.
-            data.channel.pipeline().fireThreadActiveEvent();
+            // Call event of bind that socket.
+            data.channel.pipeline().fireBindEvent();
 
             // Detect new client connections.
             detectNewConnections(serverSocket);
@@ -185,15 +208,17 @@ public final class ServerThreadInitializer
                     RemoteChannel clientChannel = clientEntry.getValue();
 
                     try {
-                        // Get filled buffer & send bytes to connection output.
-                        detectOutgoingStream(clientSocket, clientChannel);
-
                         // Detect received bytes from the client.
-                        detectIncomingStream(clientSocket, clientChannel);
-                    }
+                        detectIncomingStream(clientSocket.getChannel());
 
+                        // Get filled buffer & send bytes to connection output.
+                        detectOutgoingStream(clientSocket.getChannel(), clientChannel);
+                    }
                     catch (Exception exception) {
-                        data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
+
+                        if (exception.getMessage() == null || !exception.getMessage().equals("An existing connection was forcibly closed by the remote host")) {
+                            data.channel.pipeline().fireExceptionCaughtEvent(new ReconThreadException(exception));
+                        }
                     }
                 }
             }
@@ -202,7 +227,7 @@ public final class ServerThreadInitializer
         }
 
         catch (Exception exception) {
-            data.channel.pipeline().fireExceptionCaughtEvent(new SocketThreadError(exception));
+            data.channel.pipeline().fireExceptionCaughtEvent(new ReconThreadException(exception));
         }
     }
 

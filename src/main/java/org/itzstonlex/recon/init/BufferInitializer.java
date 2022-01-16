@@ -2,7 +2,7 @@ package org.itzstonlex.recon.init;
 
 import org.itzstonlex.recon.ByteSerializable;
 import org.itzstonlex.recon.ByteStream;
-import org.itzstonlex.recon.error.BufferReadError;
+import org.itzstonlex.recon.exception.BufferReadException;
 import org.itzstonlex.recon.factory.BufferFactory;
 import org.itzstonlex.recon.util.NumberUtils;
 
@@ -210,7 +210,7 @@ public final class BufferInitializer {
         @Override
         public byte[] read(int length) {
             if (length < 0) {
-                throw new BufferReadError("read length must be >= 0");
+                throw new BufferReadException("read length must be >= 0");
             }
 
             byte[] read = Arrays.copyOfRange(buffer, pointer, pointer + length);
@@ -245,7 +245,7 @@ public final class BufferInitializer {
                 result |= (long) (read & 127) << numRead++ * 7;
 
                 if (numRead > max + 1) {
-                    throw new BufferReadError("VarInt is too big");
+                    throw new BufferReadException("VarInt is too big");
                 }
 
             } while ((read & 128) == 128);
@@ -283,7 +283,7 @@ public final class BufferInitializer {
             byte[] array = read(size);
 
             if (size > length) {
-                throw new BufferReadError("String value length must be <= %d", length);
+                throw new BufferReadException("String value length must be <= %d", length);
             }
 
             return new String(array, 0, size, charset);

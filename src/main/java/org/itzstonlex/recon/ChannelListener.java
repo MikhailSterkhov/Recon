@@ -15,7 +15,7 @@ public interface ChannelListener {
     // Client events.
     void onConnected(RemoteChannel channel, ContextHandler contextHandler);
 
-    void onTimedOut(RemoteChannel channel, ContextHandler contextHandler);
+    void onConnectTimeout(RemoteChannel channel, ContextHandler contextHandler);
 
     // Server Events.
     void onBind(RemoteChannel channel, ContextHandler contextHandler);

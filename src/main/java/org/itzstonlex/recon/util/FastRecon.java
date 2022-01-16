@@ -2,8 +2,8 @@ package org.itzstonlex.recon.util;
 
 import org.itzstonlex.recon.*;
 import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
-import org.itzstonlex.recon.error.BufferReadError;
-import org.itzstonlex.recon.error.SocketThreadError;
+import org.itzstonlex.recon.exception.BufferReadException;
+import org.itzstonlex.recon.exception.ReconThreadException;
 import org.itzstonlex.recon.factory.BufferFactory;
 import org.itzstonlex.recon.side.Client;
 import org.itzstonlex.recon.side.Server;
@@ -185,7 +185,7 @@ public final class FastRecon {
                     try {
                         contextHandler.channel().close();
                     } catch (Exception exception) {
-                        throw new SocketThreadError(exception);
+                        throw new ReconThreadException(exception);
                     }
                 }
             }));
@@ -248,7 +248,7 @@ public final class FastRecon {
 
                     } else {
 
-                        callback.accept(null, new BufferReadError("Empty HTTP callback"));
+                        callback.accept(null, new BufferReadException("Empty HTTP callback"));
                     }
                 } catch (Exception exception) {
                     callback.accept(null, exception);

@@ -37,7 +37,7 @@ public interface ChannelPipeline {
 
     void fireConnectedEvent();
 
-    void fireTimedOutEvent();
+    void fireConnectTimeoutEvent();
 
     void fireBindEvent();
 

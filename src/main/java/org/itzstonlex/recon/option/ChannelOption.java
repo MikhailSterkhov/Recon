@@ -1,12 +1,14 @@
 package org.itzstonlex.recon.option;
 
-import org.itzstonlex.recon.error.SocketSetOptionError;
+import org.itzstonlex.recon.exception.SocketSetOptionException;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketOption;
 import java.net.StandardSocketOptions;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 
 public class ChannelOption {
 
@@ -40,6 +42,14 @@ public class ChannelOption {
         type.apply(socket, value);
     }
 
+    public void apply(ServerSocketChannel channel) {
+        type.apply(channel, value);
+    }
+
+    public void apply(SocketChannel channel) {
+        type.apply(channel, value);
+    }
+
 
     @SuppressWarnings("all")
     public enum Type {
@@ -59,8 +69,26 @@ public class ChannelOption {
 
         private final SocketOption impl;
 
-        <T> Type(SocketOption<T> impl) {
+        Type(SocketOption<?> impl) {
             this.impl = impl;
+        }
+
+        public void apply(ServerSocketChannel channel, Object value) {
+            try {
+                channel.setOption(impl, value);
+            }
+            catch (IOException exception) {
+                throw new SocketSetOptionException(exception);
+            }
+        }
+
+        public void apply(SocketChannel channel, Object value) {
+            try {
+                channel.setOption(impl, value);
+            }
+            catch (IOException exception) {
+                throw new SocketSetOptionException(exception);
+            }
         }
 
         public void apply(ServerSocket serverSocket, Object value) {
@@ -68,7 +96,7 @@ public class ChannelOption {
                 serverSocket.getChannel().setOption(impl, value);
             }
             catch (IOException exception) {
-                throw new SocketSetOptionError(exception);
+                throw new SocketSetOptionException(exception);
             }
         }
 
@@ -77,7 +105,7 @@ public class ChannelOption {
                 socket.getChannel().setOption(impl, value);
             }
             catch (IOException exception) {
-                throw new SocketSetOptionError(exception);
+                throw new SocketSetOptionException(exception);
             }
         }
     }
