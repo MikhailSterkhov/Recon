@@ -4,6 +4,7 @@ import org.itzstonlex.recon.ByteStream;
 import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.factory.BufferFactory;
 import org.itzstonlex.recon.minecraft.PendingConnection;
+import org.itzstonlex.recon.minecraft.api.ReconMinecraftApi;
 import org.itzstonlex.recon.minecraft.api.ReconMinecraftRegistry;
 import org.itzstonlex.recon.minecraft.packet.MinecraftPacket;
 import org.itzstonlex.recon.minecraft.packet.MinecraftPacketHandler;
@@ -13,7 +14,7 @@ import java.net.InetSocketAddress;
 public class MinecraftServer
         extends MinecraftPacketHandler implements PendingConnection {
 
-    protected final ReconMinecraftRegistry minecraftRegistry;
+    protected final ReconMinecraftApi minecraftApi;
 
     protected final String name;
 
@@ -22,10 +23,10 @@ public class MinecraftServer
 
     protected final boolean isProxy;
 
-    public MinecraftServer(ReconMinecraftRegistry minecraftRegistry, RemoteChannel channel,
+    public MinecraftServer(ReconMinecraftApi minecraftApi, RemoteChannel channel,
                            boolean isProxy, String name, InetSocketAddress address) {
 
-        this.minecraftRegistry = minecraftRegistry;
+        this.minecraftApi = minecraftApi;
 
         this.name = name;
         this.isProxy = isProxy;
@@ -66,21 +67,7 @@ public class MinecraftServer
 
     @Override
     public void sendPacket(MinecraftPacket packet) {
-        if (channel == null || channel.isClosed() || !packet.isWriteable()) {
-            return;
-        }
-
-        int packetID = minecraftRegistry.getRegisteredPacketId(packet.getClass());
-        if (packetID < 0) {
-            return;
-        }
-
-        ByteStream.Output buffer = BufferFactory.createPooledOutput();
-        buffer.writeInt(packetID);
-
-        packet.write(buffer);
-
-        channel.write(buffer);
+        minecraftApi.sendPacket(channel, packet);
     }
 
     @Override

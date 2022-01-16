@@ -13,12 +13,12 @@ public class ServerHandshake extends Handshake {
         super();
     }
 
-    public ServerHandshake(int version, String name, InetSocketAddress address,
+    public ServerHandshake(int version, String name, InetSocketAddress address, Status status,
 
                            // Server variables.
                            boolean isProxy) {
 
-        super(version, name, address);
+        super(version, name, address, status);
         this.isProxy = isProxy;
     }
 

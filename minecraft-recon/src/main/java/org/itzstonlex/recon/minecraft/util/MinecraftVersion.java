@@ -86,6 +86,10 @@ public enum MinecraftVersion {
         this.versionId = versionId;
     }
 
+    public int getVersionId() {
+        return versionId;
+    }
+
     public String toClientName() {
         return name().substring(2).replace("_", ".");
     }

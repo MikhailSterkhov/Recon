@@ -10,8 +10,8 @@ public abstract class MinecraftPacketHandler {
     public final void handle(MinecraftPacket packet)
     throws Exception {
 
-        for (Method method : getClass().getMethods()) {
-            if (!method.isAnnotationPresent(PacketHandler.class)) {
+        for (Method method : getClass().getDeclaredMethods()) {
+            if (method.getAnnotation(PacketHandler.class) == null) {
                 continue;
             }
 
@@ -21,7 +21,7 @@ public abstract class MinecraftPacketHandler {
                 continue;
             }
 
-            if (params[0].isAssignableFrom(MinecraftPacket.class)) {
+            if (params[0].isAssignableFrom(packet.getClass())) {
                 method.invoke(this, packet);
             }
         }

@@ -6,6 +6,7 @@ import org.itzstonlex.recon.minecraft.util.BufferUtils;
 import org.itzstonlex.recon.minecraft.packet.MinecraftPacket;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 
 public abstract class Handshake extends MinecraftPacket {
 
@@ -27,11 +28,13 @@ public abstract class Handshake extends MinecraftPacket {
     public Handshake() {
     }
 
-    public Handshake(int version, String name, InetSocketAddress address) {
+    public Handshake(int version, String name, InetSocketAddress address, Status status) {
         this.version = version;
 
         this.name = name;
         this.address = address;
+
+        this.status = status;
     }
 
     @Override

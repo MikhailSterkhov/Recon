@@ -15,21 +15,27 @@ public abstract class MinecraftPacket {
 
     public boolean isWriteable() {
         try {
-            write(BufferFactory.createPooledOutput());
+            write(null);
             return true;
         }
         catch (UnsupportedOperationException exception) {
             return false;
+        }
+        catch (NullPointerException exception) {
+            return true;
         }
     }
 
     public boolean isReadable() {
         try {
-            read(BufferFactory.createPooledInput(new byte[0]));
+            read(null);
             return true;
         }
         catch (UnsupportedOperationException exception) {
             return false;
+        }
+        catch (NullPointerException exception) {
+            return true;
         }
     }
 

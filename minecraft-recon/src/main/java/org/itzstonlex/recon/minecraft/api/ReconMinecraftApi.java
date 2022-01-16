@@ -1,14 +1,18 @@
 package org.itzstonlex.recon.minecraft.api;
 
+import org.itzstonlex.recon.ByteStream;
 import org.itzstonlex.recon.ChannelConfig;
 import org.itzstonlex.recon.RemoteChannel;
+import org.itzstonlex.recon.factory.BufferFactory;
+import org.itzstonlex.recon.minecraft.packet.MinecraftPacket;
+import org.itzstonlex.recon.minecraft.scheduler.SchedulerManager;
+import org.itzstonlex.recon.minecraft.server.ServerManager;
 import org.itzstonlex.recon.minecraft.service.MinecraftManagementService;
 import org.itzstonlex.recon.minecraft.packet.handshake.HandshakeHandler;
 import org.itzstonlex.recon.minecraft.packet.handshake.impl.PlayerHandshake;
 import org.itzstonlex.recon.minecraft.packet.handshake.impl.ServerHandshake;
 import org.itzstonlex.recon.minecraft.packet.handler.BossHandler;
 import org.itzstonlex.recon.minecraft.player.PlayerManager;
-import org.itzstonlex.recon.minecraft.server.ServerManager;
 import org.itzstonlex.recon.option.ChannelOption;
 import org.itzstonlex.recon.side.Client;
 import org.itzstonlex.recon.side.Server;
@@ -138,11 +142,17 @@ public final class ReconMinecraftApi {
     }
 
 
+    private final SchedulerManager schedulerManager = new SchedulerManager();
     private final ReconMinecraftRegistry registry = new ReconMinecraftRegistry();
+
     private MinecraftManagementService managementService;
 
     private void initManagements(MinecraftManagementService managementService) {
         this.managementService = managementService;
+    }
+
+    public SchedulerManager getSchedulerManager() {
+        return schedulerManager;
     }
 
     public PlayerManager<?> getPlayerManager() {
@@ -155,6 +165,24 @@ public final class ReconMinecraftApi {
 
     public ReconMinecraftRegistry getRegistry() {
         return registry;
+    }
+
+    public void sendPacket(RemoteChannel channel, MinecraftPacket packet) {
+        if (channel == null || channel.isClosed() || !packet.isWriteable()) {
+            return;
+        }
+
+        int packetID = registry.getRegisteredPacketId(packet.getClass());
+        if (packetID < 0) {
+            return;
+        }
+
+        ByteStream.Output buffer = BufferFactory.createPooledOutput();
+        buffer.writeInt(packetID);
+
+        packet.write(buffer);
+
+        channel.write(buffer);
     }
 
 }

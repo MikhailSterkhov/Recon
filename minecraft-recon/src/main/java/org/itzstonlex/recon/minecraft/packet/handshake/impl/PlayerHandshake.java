@@ -20,12 +20,12 @@ public class PlayerHandshake extends Handshake {
         super();
     }
 
-    public PlayerHandshake(int version, String name, InetSocketAddress address,
+    public PlayerHandshake(int version, String name, InetSocketAddress address, Status status,
 
                            // Player variables.
                            UUID uniqueId, String displayName, String proxyServer, String currentServer) {
 
-        super(version, name, address);
+        super(version, name, address, status);
 
         this.uniqueId = uniqueId;
 

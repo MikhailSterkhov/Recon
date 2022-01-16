@@ -1,18 +1,23 @@
-package org.itzstonlex.recon.minecraft;
+package org.itzstonlex.recon.minecraft.core;
 
+import org.itzstonlex.recon.RemoteChannel;
+import org.itzstonlex.recon.minecraft.PendingChannelHandler;
+import org.itzstonlex.recon.minecraft.PendingConnection;
 import org.itzstonlex.recon.minecraft.api.ReconMinecraftApi;
 import org.itzstonlex.recon.minecraft.api.ReconMinecraftRegistry;
+import org.itzstonlex.recon.minecraft.core.player.CorePlayer;
+import org.itzstonlex.recon.minecraft.core.server.CoreServer;
+import org.itzstonlex.recon.minecraft.packet.MinecraftPacket;
 import org.itzstonlex.recon.minecraft.packet.PlayerChat;
 import org.itzstonlex.recon.minecraft.packet.PlayerRedirect;
-import org.itzstonlex.recon.minecraft.player.CorePlayer;
-import org.itzstonlex.recon.minecraft.server.CoreServer;
+import org.itzstonlex.recon.minecraft.core.server.impl.Bukkit;
+import org.itzstonlex.recon.minecraft.core.server.impl.Proxy;
 import org.itzstonlex.recon.minecraft.server.MinecraftServersGroup;
-import org.itzstonlex.recon.minecraft.server.impl.Bukkit;
-import org.itzstonlex.recon.minecraft.server.impl.Proxy;
 
+import java.net.InetSocketAddress;
 import java.util.UUID;
 
-public class MinecraftCore {
+public class MinecraftCore implements PendingConnection {
 
     public static final int BIND_PORT = 1000;
 
@@ -24,6 +29,7 @@ public class MinecraftCore {
     }
 
 
+    private RemoteChannel channel;
     private final CoreService coreService = new CoreService(this);
 
     public final CoreService getService() {
@@ -44,19 +50,24 @@ public class MinecraftCore {
      * the port of 1000.
      */
     private void bindLocal() {
-        ReconMinecraftApi.MinecraftApplication server = MINECRAFT_API.newMinecraftApplication();
+        ReconMinecraftApi.MinecraftApplication application = MINECRAFT_API.newMinecraftApplication();
 
         // Create a service-factory.
         ReconMinecraftApi.ServiceFactory serviceFactory = ReconMinecraftApi.ServiceFactory.create(coreService,
                 (bossHandler, channelConfig) -> {
 
-                    registerServersGroups(MINECRAFT_API.getRegistry());
+                    // Registry managements.
+                    ReconMinecraftRegistry registry = MINECRAFT_API.getRegistry();
 
-                    registerPackets(MINECRAFT_API.getRegistry());
+                    registerServersGroups( registry );
+                    registerPackets( registry );
+
+                    // Pipeline managements.
+                    channelConfig.pipeline().addLast("channel-handler", new PendingChannelHandler(MinecraftCore.this));
                 });
 
         // Bind a local server on BIND_PORT (1000)
-        server.bindLocal(BIND_PORT, serviceFactory);
+        this.channel = application.bindLocal(BIND_PORT, serviceFactory);
     }
 
     /**
@@ -144,4 +155,35 @@ public class MinecraftCore {
         return null;
     }
 
+    @Override
+    public String getName() {
+        return "MinecraftCore";
+    }
+
+    @Override
+    public InetSocketAddress getAddress() {
+        return channel.address();
+    }
+
+    @Override
+    public RemoteChannel getChannel() {
+        return channel;
+    }
+
+    @Override
+    public void onConnected(RemoteChannel channel) {
+        channel.logger().info("[MinecraftCore] Channel was success listening on " + channel.address());
+    }
+
+    @Override
+    public void onDisconnected(RemoteChannel channel) {
+        channel.logger().info("[MinecraftCore] Channel was closed!");
+
+        System.exit(0);
+    }
+
+    @Override
+    public void sendPacket(MinecraftPacket packet) {
+        MINECRAFT_API.sendPacket(channel, packet);
+    }
 }

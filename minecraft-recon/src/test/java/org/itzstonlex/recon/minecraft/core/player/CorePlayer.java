@@ -1,7 +1,8 @@
-package org.itzstonlex.recon.minecraft.player;
+package org.itzstonlex.recon.minecraft.core.player;
 
 import org.itzstonlex.recon.minecraft.packet.PlayerChat;
 import org.itzstonlex.recon.minecraft.packet.PlayerRedirect;
+import org.itzstonlex.recon.minecraft.player.MinecraftPlayer;
 import org.itzstonlex.recon.minecraft.server.MinecraftServer;
 
 import java.net.InetSocketAddress;

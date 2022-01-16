@@ -1,6 +1,8 @@
 package org.itzstonlex.recon.minecraft.packet.handshake;
 
 import org.itzstonlex.recon.RemoteChannel;
+import org.itzstonlex.recon.minecraft.server.MinecraftServer;
+import org.itzstonlex.recon.minecraft.server.ServerManager;
 import org.itzstonlex.recon.minecraft.service.MinecraftManagementService;
 import org.itzstonlex.recon.minecraft.packet.handshake.impl.PlayerHandshake;
 import org.itzstonlex.recon.minecraft.packet.handshake.impl.ServerHandshake;
@@ -9,8 +11,6 @@ import org.itzstonlex.recon.minecraft.packet.PacketHandler;
 import org.itzstonlex.recon.minecraft.packet.handler.BossHandler;
 import org.itzstonlex.recon.minecraft.player.MinecraftPlayer;
 import org.itzstonlex.recon.minecraft.player.PlayerManager;
-import org.itzstonlex.recon.minecraft.server.MinecraftServer;
-import org.itzstonlex.recon.minecraft.server.ServerManager;
 
 public class HandshakeHandler extends MinecraftPacketHandler {
 

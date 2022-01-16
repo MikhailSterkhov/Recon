@@ -1,6 +1,7 @@
 package org.itzstonlex.recon.minecraft.service;
 
 import org.itzstonlex.recon.RemoteChannel;
+import org.itzstonlex.recon.minecraft.api.ReconMinecraftApi;
 import org.itzstonlex.recon.minecraft.api.ReconMinecraftRegistry;
 import org.itzstonlex.recon.minecraft.packet.handshake.HandshakeInitializer;
 import org.itzstonlex.recon.minecraft.packet.handshake.impl.PlayerHandshake;
@@ -16,14 +17,14 @@ import java.util.UUID;
 @SuppressWarnings("unchecked")
 public final class DefaultMinecraftManagementService implements MinecraftManagementService {
 
-    public static DefaultMinecraftManagementService create(ReconMinecraftRegistry registry) {
-        return new DefaultMinecraftManagementService(registry);
+    public static DefaultMinecraftManagementService create(ReconMinecraftApi minecraftApi) {
+        return new DefaultMinecraftManagementService(minecraftApi);
     }
 
-    private final ReconMinecraftRegistry registry;
+    private final ReconMinecraftApi minecraftApi;
 
-    private DefaultMinecraftManagementService(ReconMinecraftRegistry registry) {
-        this.registry = registry;
+    private DefaultMinecraftManagementService(ReconMinecraftApi minecraftApi) {
+        this.minecraftApi = minecraftApi;
     }
 
     private final PlayerManager<MinecraftPlayer> playerManager = PlayerManager.newManager(MinecraftPlayer.class, new PlayerInitializer());
@@ -71,7 +72,7 @@ public final class DefaultMinecraftManagementService implements MinecraftManagem
 
             InetSocketAddress address = handshake.getAddress();
 
-            return new MinecraftServer(registry, channel, isProxy, serverName, address);
+            return new MinecraftServer(minecraftApi, channel, isProxy, serverName, address);
         }
     }
 }

@@ -5,12 +5,18 @@ import javafx.stage.Stage;
 import org.itzstonlex.recon.metrics.ReconMetrics;
 import org.itzstonlex.recon.side.Client;
 import org.itzstonlex.recon.side.Server;
+import org.itzstonlex.recon.util.ReconThreadsStorage;
 
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 public class ReconLauncherApplication extends Application {
 
     public static final ReconUILauncher launcher = new ReconUILauncher();
+
+    public static void startApplicationUI() {
+        main(new String[0]);
+    }
 
     public static void main(String[] args) {
         launch(args);
@@ -37,7 +43,7 @@ public class ReconLauncherApplication extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        runTestConnections();
+        // runTestConnections();
 
         launcher.start(primaryStage);
     }

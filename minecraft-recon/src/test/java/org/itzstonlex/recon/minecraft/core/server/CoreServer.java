@@ -1,9 +1,10 @@
-package org.itzstonlex.recon.minecraft.server;
+package org.itzstonlex.recon.minecraft.core.server;
 
 import org.itzstonlex.recon.RemoteChannel;
-import org.itzstonlex.recon.minecraft.CoreService;
-import org.itzstonlex.recon.minecraft.MinecraftCore;
+import org.itzstonlex.recon.minecraft.core.CoreService;
+import org.itzstonlex.recon.minecraft.core.MinecraftCore;
 import org.itzstonlex.recon.minecraft.player.MinecraftPlayer;
+import org.itzstonlex.recon.minecraft.server.MinecraftServer;
 
 import java.net.InetSocketAddress;
 import java.util.List;
@@ -16,11 +17,9 @@ public abstract class CoreServer extends MinecraftServer {
     public CoreServer(MinecraftCore minecraftCore, RemoteChannel channel,
                       boolean isProxy, String name, InetSocketAddress address) {
 
-        super(MinecraftCore.MINECRAFT_API.getRegistry(), channel, isProxy, name, address);
-
+        super(MinecraftCore.MINECRAFT_API, channel, isProxy, name, address);
         this.minecraftCore = minecraftCore;
     }
-
 
     public CoreService getService() {
         return minecraftCore.getService();

@@ -15,9 +15,6 @@ import java.util.concurrent.Executors;
 
 public final class BossHandler extends ChannelListenerAdapter {
 
-    private final ExecutorService packetsHandleTask
-            = Executors.newCachedThreadPool();
-
     private final ReconMinecraftRegistry registry;
     private final List<MinecraftPacketHandler> packetHandlers = new ArrayList<>();
 
@@ -48,18 +45,16 @@ public final class BossHandler extends ChannelListenerAdapter {
             return;
         }
 
-        minecraftPacket.read(buffer);
-        packetsHandleTask.submit(() -> {
-            for (MinecraftPacketHandler packetHandler : getPacketHandlers()) {
+        minecraftPacket.read(buffer);              // fix ConcurrentModificationException
+        for (MinecraftPacketHandler packetHandler : new ArrayList<>(getPacketHandlers())) {
 
-                try {
-                    packetHandler.handle(minecraftPacket);
-                }
-                catch (Exception exception) {
-                    onExceptionCaught(remoteChannel, exception);
-                }
+            try {
+                packetHandler.handle(minecraftPacket);
             }
-        });
+            catch (Exception exception) {
+                onExceptionCaught(remoteChannel, exception);
+            }
+        }
     }
 
     @Override

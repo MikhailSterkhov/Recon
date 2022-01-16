@@ -1,12 +1,12 @@
-package org.itzstonlex.recon.minecraft.server.impl;
+package org.itzstonlex.recon.minecraft.core.server.impl;
 
 import org.itzstonlex.recon.RemoteChannel;
-import org.itzstonlex.recon.minecraft.CoreService;
-import org.itzstonlex.recon.minecraft.MinecraftCore;
+import org.itzstonlex.recon.minecraft.core.CoreService;
+import org.itzstonlex.recon.minecraft.core.MinecraftCore;
+import org.itzstonlex.recon.minecraft.core.player.CorePlayer;
+import org.itzstonlex.recon.minecraft.core.server.CoreServer;
 import org.itzstonlex.recon.minecraft.packet.PacketHandler;
 import org.itzstonlex.recon.minecraft.packet.PlayerChat;
-import org.itzstonlex.recon.minecraft.player.CorePlayer;
-import org.itzstonlex.recon.minecraft.server.CoreServer;
 
 import java.net.InetSocketAddress;
 
