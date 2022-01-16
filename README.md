@@ -2,7 +2,7 @@
 
 # RECON
 
-[![MIT License](https://img.shields.io/github/license/pl3xgaming/Purpur?&logo=github)](License)
+[![MIT License](https://img.shields.io/github/license/pl3xgaming/Purpur?&logo=github)](LICENSE)
 
  <div style="letter-spacing: 3px">
 
