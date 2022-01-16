@@ -20,6 +20,7 @@ import org.itzstonlex.recon.metrics.MetricTimeSnippet;
 import org.itzstonlex.recon.metrics.ReconMetrics;
 import org.itzstonlex.recon.ui.ReconUILauncher;
 import org.itzstonlex.recon.ui.scheduler.TaskScheduler;
+import org.itzstonlex.recon.util.ReconThreadsStorage;
 
 import java.awt.*;
 import java.io.IOException;
@@ -123,52 +124,50 @@ public final class HomePageController extends AbstractPageController {
     private void drawThreads() {
         Platform.runLater(() -> runningThreadsPane.getChildren().clear());
 
-        Thread.getAllStackTraces().keySet().forEach(new Consumer<Thread>() {
+        ReconThreadsStorage.getAllThreads().forEach(new Consumer<Thread>() {
             private int counter = 0;
 
             @Override
             public void accept(Thread thread) {
-                if (thread.getName().startsWith("recon")) {
-                    String threadTitle = String.format(threadTitleFormat, thread.getName());
+                String threadTitle = String.format(threadTitleFormat, thread.getName());
 
-                    Label label = new Label(threadTitle);
+                Label label = new Label(threadTitle);
 
-                    if (label.getFont().getSize() != 16) {
-                        label.setFont(new Font(16));
-                    }
+                if (label.getFont().getSize() != 16) {
+                    label.setFont(new Font(16));
+                }
 
-                    if (settings_stateColor.isSelected()) {
-                        switch (thread.getState()) {
-                            case NEW: {
-                                label.setTextFill(Color.LIME);
-                                break;
-                            }
+                if (settings_stateColor.isSelected()) {
+                    switch (thread.getState()) {
+                        case NEW: {
+                            label.setTextFill(Color.LIME);
+                            break;
+                        }
 
-                            case BLOCKED: {
-                                label.setTextFill(Color.RED);
-                                break;
-                            }
+                        case BLOCKED: {
+                            label.setTextFill(Color.RED);
+                            break;
+                        }
 
-                            case WAITING:
-                            case TIMED_WAITING: {
-                                label.setTextFill(Color.ORANGE);
-                                break;
-                            }
+                        case WAITING:
+                        case TIMED_WAITING: {
+                            label.setTextFill(Color.ORANGE);
+                            break;
+                        }
 
-                            case TERMINATED: {
-                                label.setTextFill(Color.DARKRED);
-                                break;
-                            }
+                        case TERMINATED: {
+                            label.setTextFill(Color.DARKRED);
+                            break;
+                        }
 
-                            case RUNNABLE: {
-                                label.setTextFill(Color.GREEN);
-                                break;
-                            }
+                        case RUNNABLE: {
+                            label.setTextFill(Color.GREEN);
+                            break;
                         }
                     }
-
-                    Platform.runLater(() -> runningThreadsPane.add(label, 0, counter++));
                 }
+
+                Platform.runLater(() -> runningThreadsPane.add(label, 0, counter++));
             }
         });
     }
