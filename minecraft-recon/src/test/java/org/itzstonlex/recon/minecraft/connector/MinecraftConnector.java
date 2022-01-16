@@ -20,17 +20,13 @@ import java.util.function.Consumer;
 
 public class MinecraftConnector implements PendingConnection {
 
+// ====================================================================================================================================== //
+
     public static final int CONNECT_PORT = 1000;
+
     public static final ReconMinecraftApi MINECRAFT_API = new ReconMinecraftApi();
 
-    public static void main(String[] args) {
-        InetSocketAddress address = new InetSocketAddress("127.0.0.1", 25565);
-
-        MinecraftConnector minecraftConnector = new MinecraftConnector("Hub-1", address,
-                onConnected -> onConnected.sendPacket(new ServerHandshake(397, "Hub-1", address, Handshake.Status.CONNECT, false)));
-
-        minecraftConnector.launchConnector();
-    }
+// ====================================================================================================================================== //
 
 
     private final String name;

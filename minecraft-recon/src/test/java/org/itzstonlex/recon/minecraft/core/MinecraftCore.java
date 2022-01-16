@@ -19,6 +19,8 @@ import java.util.UUID;
 
 public class MinecraftCore implements PendingConnection {
 
+// ====================================================================================================================================== //
+
     public static final int BIND_PORT = 1000;
 
     public static final ReconMinecraftApi MINECRAFT_API = new ReconMinecraftApi();
@@ -28,6 +30,7 @@ public class MinecraftCore implements PendingConnection {
         minecraftCore.launchCore();
     }
 
+// ====================================================================================================================================== //
 
     private RemoteChannel channel;
     private final CoreService coreService = new CoreService(this);
