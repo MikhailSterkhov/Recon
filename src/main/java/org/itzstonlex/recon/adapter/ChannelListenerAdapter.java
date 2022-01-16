@@ -22,38 +22,53 @@ public abstract class ChannelListenerAdapter
 
     @Override
     public void onThreadActive(RemoteChannel channel, ContextHandler contextHandler) {
+        // override me.
     }
 
     @Override
     public void onConnected(RemoteChannel channel, ContextHandler contextHandler) {
+        // override me.
     }
 
     @Override
     public void onClosed(RemoteChannel channel, ContextHandler contextHandler) {
+        // override me.
     }
 
     @Override
     public void onTimedOut(RemoteChannel channel, ContextHandler contextHandler) {
+        // override me.
+    }
+
+    @Override
+    public void onBind(RemoteChannel channel, ContextHandler contextHandler) {
+        // override me.
     }
 
     @Override
     public void onClientConnected(RemoteChannel remoteChannel, ContextHandler contextHandler) {
+        // override me.
     }
 
     @Override
     public void onClientClosed(RemoteChannel remoteChannel, ContextHandler contextHandler) {
+        // override me.
     }
 
     @Override
     public void onRead(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Input buffer) {
+        // override me.
     }
 
     @Override
     public void onWrite(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Output buffer) {
+        // override me.
     }
 
     @Override
     public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {
+        // override me.
+
         throwable.printStackTrace();
     }
 

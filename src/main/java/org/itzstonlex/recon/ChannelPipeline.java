@@ -39,7 +39,9 @@ public interface ChannelPipeline {
 
     void fireTimedOutEvent();
 
-    void fireClientConnectedEvent();
+    void fireBindEvent();
 
-    void fireClientClosedEvent();
+    void fireClientConnectedEvent(RemoteChannel channel);
+
+    void fireClientClosedEvent(RemoteChannel channel);
 }

@@ -18,6 +18,8 @@ public interface ChannelListener {
     void onTimedOut(RemoteChannel channel, ContextHandler contextHandler);
 
     // Server Events.
+    void onBind(RemoteChannel channel, ContextHandler contextHandler);
+
     void onClientConnected(RemoteChannel remoteChannel, ContextHandler contextHandler);
 
     void onClientClosed(RemoteChannel remoteChannel, ContextHandler contextHandler);
