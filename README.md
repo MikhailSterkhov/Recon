@@ -1,7 +1,7 @@
 <div style="letter-spacing: 3px" align="center">
 
 # RECON
-###### Protocol and Remote Connection management
+### Protocol and Remote Connection management
 
 [![MIT License](https://img.shields.io/github/license/pl3xgaming/Purpur?&logo=github)](LICENSE)
 
