@@ -77,7 +77,7 @@ public final class HttpDownloadService {
     }
 
     public void downloadAsync(String url, Path target, HttpDownloadHandler downloadHandler) {
-        executor.execute(() -> downloadSync(url, target, downloadHandler));
+        executor.submit(() -> downloadSync(url, target, downloadHandler));
     }
 
     public boolean downloadSync(String url, Path target) {
