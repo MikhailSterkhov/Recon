@@ -6,10 +6,10 @@ import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
 
 public final class PendingChannelHandler extends ChannelListenerAdapter {
 
-    private final PendingConnection connection;
+    private final PendingConnection pendingConnection;
 
-    public PendingChannelHandler(PendingConnection connection) {
-        this.connection = connection;
+    public PendingChannelHandler(PendingConnection pendingConnection) {
+        this.pendingConnection = pendingConnection;
     }
 
     @Override
@@ -25,17 +25,17 @@ public final class PendingChannelHandler extends ChannelListenerAdapter {
 
     @Override
     public void onConnected(RemoteChannel channel, ContextHandler contextHandler) {
-        connection.onConnected(channel);
+        pendingConnection.onConnected(channel);
     }
 
     @Override
     public void onBind(RemoteChannel channel, ContextHandler contextHandler) {
-        connection.onConnected(channel);
+        pendingConnection.onConnected(channel);
     }
 
     @Override
     public void onClosed(RemoteChannel channel, ContextHandler contextHandler) {
-        connection.onDisconnected(channel);
+        pendingConnection.onDisconnected(channel);
     }
 
 

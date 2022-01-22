@@ -8,8 +8,6 @@ import org.itzstonlex.recon.minecraft.api.ReconMinecraftRegistry;
 import org.itzstonlex.recon.minecraft.packet.MinecraftPacket;
 import org.itzstonlex.recon.minecraft.packet.PlayerChat;
 import org.itzstonlex.recon.minecraft.packet.PlayerRedirect;
-import org.itzstonlex.recon.minecraft.packet.handshake.Handshake;
-import org.itzstonlex.recon.minecraft.packet.handshake.impl.ServerHandshake;
 import org.itzstonlex.recon.minecraft.server.MinecraftServersGroup;
 import org.itzstonlex.recon.minecraft.service.DefaultMinecraftManagementService;
 import org.itzstonlex.recon.util.reconnect.ClientReconnectionUtils;

@@ -14,11 +14,6 @@ public class CorePlayer extends MinecraftPlayer {
         super(uniqueId, name, address);
     }
 
-
-    public void sendMessage(String message) {
-        currentServer.sendPacket(new PlayerChat(name, message));
-    }
-
     public void redirect(MinecraftServer server) {
         if (server.isProxy()) {
             return;
@@ -26,6 +21,10 @@ public class CorePlayer extends MinecraftPlayer {
 
         super.sendPacket( new PlayerRedirect(name, server.getName()) );
         this.currentServer = server;
+    }
+
+    public void sendMessage(String message) {
+        currentServer.sendPacket(new PlayerChat(name, message));
     }
 
 }
