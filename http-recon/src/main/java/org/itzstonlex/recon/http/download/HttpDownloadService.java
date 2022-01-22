@@ -1,5 +1,6 @@
 package org.itzstonlex.recon.http.download;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -22,56 +23,70 @@ public final class HttpDownloadService {
         this.executor = Executors.newSingleThreadScheduledExecutor();
     }
 
-    private boolean download0(HttpURLConnection urlConnection, Path target, HttpDownloadHandler downloadHandler) {
-        try (InputStream inputStream = urlConnection.getInputStream()) {
+    private ScheduledFuture<?> scheduleFutureTask(long contentLength, Path target, HttpDownloadHandler downloadHandler) {
+        return executor.scheduleAtFixedRate(new Runnable() {
 
-            ScheduledFuture<?> futureTask = executor.scheduleAtFixedRate(new Runnable() {
-                private long previousLength;
+            private final HttpDownloadContext context = new HttpDownloadContext(contentLength / 1024);
+            private long previousLength;
 
-                @Override
-                public void run() {
-                    if (Files.exists(target)) {
+            @Override
+            public void run() {
+                context.setCurrentKilobytes(target.toFile().length() / 1024);
 
-                        long current = (target.toFile().length() / 1024);
-                        long max = (urlConnection.getContentLengthLong() / 1024);
+                if (Files.exists(target)) {
 
-                        if (current != previousLength) {
-                            if (downloadHandler != null) {
-                                downloadHandler.onDownload(max, current);
-                            }
+                    if (context.currentKilobytes != previousLength) {
+                        previousLength = context.currentKilobytes;
 
-                            previousLength = current;
+                        if (downloadHandler != null) {
+                            downloadHandler.onDownload(context);
                         }
                     }
-                }
-            }, 1, 1, TimeUnit.SECONDS);
 
-            // Copy file bytes to target path.
+                }
+            }
+        }, 1, 1, TimeUnit.SECONDS);
+    }
+
+    private boolean download0(HttpURLConnection http, Path target, HttpDownloadHandler downloadHandler) {
+        ScheduledFuture<?> futureTask = this.scheduleFutureTask(http.getContentLengthLong(), target, downloadHandler);
+
+        // Copy file bytes to target path.
+        try (InputStream inputStream = http.getInputStream()) {
             Files.copy(inputStream, target);
 
-            // Cancel download process.
-            futureTask.cancel(true);
             return true;
         }
-        catch (Exception ignored) {
+        catch (IOException exception) {
             return false;
         }
         finally {
-            urlConnection.disconnect();
+
+            // Close http connection.
+            http.disconnect();
+
+            // Cancel download process.
+            futureTask.cancel(true);
         }
     }
 
     public boolean downloadSync(String url, Path target, HttpDownloadHandler downloadHandler) {
         try {
-            HttpURLConnection connection = ((HttpURLConnection) new URL(url).openConnection());
+            // Cleanup file.
+            if (Files.exists(target)) {
+                Files.deleteIfExists(target);
+            }
 
-            if (connection.getContentLength() <= 0) {
+            // Connect to url content.
+            HttpURLConnection http = ((HttpURLConnection) new URL(url).openConnection());
+            if (http.getContentLength() <= 0) {
                 return false;
             }
 
-            return download0(connection, target, downloadHandler);
+            // Start download process.
+            return download0(http, target, downloadHandler);
         }
-        catch (Exception exception) {
+        catch (IOException exception) {
             return false;
         }
     }
@@ -86,6 +101,35 @@ public final class HttpDownloadService {
 
     public void downloadAsync(String url, Path target) {
         downloadAsync(url, target, null);
+    }
+
+    // Http file download Context.
+    public static class HttpDownloadContext {
+        private final long maxKilobytes;
+
+        private long currentKilobytes;
+        private long speed;
+
+        private HttpDownloadContext(long maxKilobytes) {
+            this.maxKilobytes = maxKilobytes;
+        }
+
+        public long getCurrentKilobytes() {
+            return currentKilobytes;
+        }
+
+        public long getMaxKilobytes() {
+            return maxKilobytes;
+        }
+
+        public long getSpeed() {
+            return speed;
+        }
+
+        void setCurrentKilobytes(long currentKilobytes) {
+            this.speed = currentKilobytes - this.currentKilobytes;
+            this.currentKilobytes = currentKilobytes;
+        }
     }
 
 }

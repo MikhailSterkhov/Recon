@@ -64,22 +64,22 @@ public final class HttpClient {
         url = HttpUtils.getProtocol(url) + "://" + HttpUtils.trim(url) + "/";
 
         try {
-            HttpURLConnection connection = ((HttpURLConnection) new URL(url).openConnection());
+            HttpURLConnection http = ((HttpURLConnection) new URL(url).openConnection());
 
-            connection.setConnectTimeout(requestConfig.getConnectTimeout());
-            connection.setReadTimeout(requestConfig.getReadTimeout());
-            connection.setRequestMethod(requestConfig.getMethod());
+            http.setConnectTimeout(requestConfig.getConnectTimeout());
+            http.setReadTimeout(requestConfig.getReadTimeout());
+            http.setRequestMethod(requestConfig.getMethod());
 
-            requestConfig.getProperties().forEach(connection::setRequestProperty);
+            requestConfig.getProperties().forEach(http::setRequestProperty);
 
             // Response handle.
-            byte[] callbackArray = InputUtils.toByteArray(connection.getInputStream());
+            byte[] callbackArray = InputUtils.toByteArray(http.getInputStream());
             String callback = new String(callbackArray, 0, callbackArray.length, StandardCharsets.UTF_8);
 
-            HttpResponse httpResponse = HttpResponse.create(connection.getContentLength(), connection.getResponseCode(), callback, null);
+            HttpResponse httpResponse = HttpResponse.create(http.getContentLength(), http.getResponseCode(), callback, null);
 
             // Shutdown http connection.
-            connection.disconnect();
+            http.disconnect();
             return httpResponse;
         }
         catch (Exception exception) {
