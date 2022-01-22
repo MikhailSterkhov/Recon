@@ -1,9 +1,9 @@
-<div  align="center">
+<div align="center">
 
 # RECON
 ### Protocol and Remote Connection management
 
-Last version release: [1.0.0](https://github.com/ItzStonlex/Recon/releases/tag/1.0.0)
+Latest version release: [1.0.0](https://github.com/ItzStonlex/Recon/releases/tag/1.0.0)
 
 [![MIT License](https://img.shields.io/github/license/pl3xgaming/Purpur?&logo=github)](LICENSE)
 
