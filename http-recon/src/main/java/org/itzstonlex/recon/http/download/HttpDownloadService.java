@@ -129,6 +129,14 @@ public final class HttpDownloadService {
         void setCurrentKilobytes(long currentKilobytes) {
             this.speed = currentKilobytes - this.currentKilobytes;
             this.currentKilobytes = currentKilobytes;
+
+            if (currentKilobytes >= maxKilobytes) {
+                this.speed = 0;
+            }
+        }
+
+        public boolean isCompleted() {
+            return currentKilobytes >= maxKilobytes;
         }
     }
 
