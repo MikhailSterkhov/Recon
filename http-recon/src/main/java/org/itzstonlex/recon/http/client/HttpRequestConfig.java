@@ -1,4 +1,4 @@
-package org.itzstonlex.recon.http;
+package org.itzstonlex.recon.http.client;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

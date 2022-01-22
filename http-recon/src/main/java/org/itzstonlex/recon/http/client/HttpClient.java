@@ -1,4 +1,4 @@
-package org.itzstonlex.recon.http;
+package org.itzstonlex.recon.http.client;
 
 import org.itzstonlex.recon.http.util.HttpUtils;
 import org.itzstonlex.recon.log.ReconLog;
@@ -17,42 +17,50 @@ public final class HttpClient {
     }
 
     public HttpResponse executeGet(String url) {
-        return execute(url, HttpUtils.createRequest(HttpUtils.REQUEST_GET));
+        return execute(url, new HttpRequestConfig(HttpUtils.REQUEST_GET));
     }
 
     public HttpResponse executeHead(String url) {
-        return execute(url, HttpUtils.createRequest(HttpUtils.REQUEST_HEAD));
+        return execute(url, new HttpRequestConfig(HttpUtils.REQUEST_HEAD));
     }
 
     public HttpResponse executePost(String url) {
-        return execute(url, HttpUtils.createRequest(HttpUtils.REQUEST_POST));
+        return execute(url, new HttpRequestConfig(HttpUtils.REQUEST_POST));
     }
 
     public HttpResponse executePut(String url) {
-        return execute(url, HttpUtils.createRequest(HttpUtils.REQUEST_PUT));
+        return execute(url, new HttpRequestConfig(HttpUtils.REQUEST_PUT));
     }
 
     public HttpResponse executeDelete(String url) {
-        return execute(url, HttpUtils.createRequest(HttpUtils.REQUEST_DELETE));
+        return execute(url, new HttpRequestConfig(HttpUtils.REQUEST_DELETE));
     }
 
     public HttpResponse executeConnect(String url) {
-        return execute(url, HttpUtils.createRequest(HttpUtils.REQUEST_CONNECT));
+        return execute(url, new HttpRequestConfig(HttpUtils.REQUEST_CONNECT));
     }
 
     public HttpResponse executeOptions(String url) {
-        return execute(url, HttpUtils.createRequest(HttpUtils.REQUEST_OPTIONS));
+        return execute(url, new HttpRequestConfig(HttpUtils.REQUEST_OPTIONS));
     }
 
     public HttpResponse executeTrace(String url) {
-        return execute(url, HttpUtils.createRequest(HttpUtils.REQUEST_TRACE));
+        return execute(url, new HttpRequestConfig(HttpUtils.REQUEST_TRACE));
     }
 
     public HttpResponse executePatch(String url) {
-        return execute(url, HttpUtils.createRequest(HttpUtils.REQUEST_PATCH));
+        return execute(url, new HttpRequestConfig(HttpUtils.REQUEST_PATCH));
     }
 
     public HttpResponse execute(String url, HttpRequestConfig requestConfig) {
+        if (url == null) {
+            throw new NullPointerException("url");
+        }
+
+        if (requestConfig == null) {
+            throw new NullPointerException("requestConfig");
+        }
+
         url = HttpUtils.getProtocol(url) + "://" + HttpUtils.trim(url) + "/";
 
         try {
@@ -68,14 +76,14 @@ public final class HttpClient {
             byte[] callbackArray = InputUtils.toByteArray(connection.getInputStream());
             String callback = new String(callbackArray, 0, callbackArray.length, StandardCharsets.UTF_8);
 
-            HttpResponse httpResponse = HttpResponse.create(connection.getResponseCode(), callback, null);
+            HttpResponse httpResponse = HttpResponse.create(connection.getContentLength(), connection.getResponseCode(), callback, null);
 
             // Shutdown http connection.
             connection.disconnect();
             return httpResponse;
         }
         catch (Exception exception) {
-            return HttpResponse.create(HttpURLConnection.HTTP_BAD_REQUEST, null, exception);
+            return HttpResponse.create(0, HttpURLConnection.HTTP_BAD_REQUEST, null, exception);
         }
     }
 

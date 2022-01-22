@@ -1,6 +1,6 @@
 package org.itzstonlex.recon.http.util;
 
-import org.itzstonlex.recon.http.HttpRequestConfig;
+import org.itzstonlex.recon.http.client.HttpRequestConfig;
 
 import java.net.InetSocketAddress;
 import java.net.URI;
@@ -17,7 +17,7 @@ public final class HttpUtils {
     public static final String REQUEST_TRACE    = "TRACE";
     public static final String REQUEST_PATCH    = "PATCH";
 
-    public static HttpRequestConfig createRequest(String method) {
+    public static HttpRequestConfig createRequestConfig(String method) {
         return new HttpRequestConfig(method);
     }
 

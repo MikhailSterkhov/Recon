@@ -1,6 +1,9 @@
 package org.itzstonlex.recon.http;
 
-public class HttpTest {
+import org.itzstonlex.recon.http.client.HttpClient;
+import org.itzstonlex.recon.http.client.HttpResponse;
+
+public class HttpClientTest {
 
     public static final String URL
             = "https://gitlab.65apps.com/65gb/static/raw/master/testTask.json";
