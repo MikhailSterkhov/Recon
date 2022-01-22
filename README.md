@@ -1,18 +1,9 @@
-<div style="letter-spacing: 10px" align="center">
+<div style="letter-spacing: 3px" align="center">
 
 # RECON
+###### Protocol and Remote Connection management
 
 [![MIT License](https://img.shields.io/github/license/pl3xgaming/Purpur?&logo=github)](LICENSE)
-
- <div style="letter-spacing: 3px">
-
-#### Protocol & Connection Library
-
-   <div style="color: red">
-      The Library in development... <br> For contact me see "Feedback" 
-   </div>
-
- </div>
 
 ---
 </div>
