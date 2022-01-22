@@ -7,11 +7,11 @@ import org.itzstonlex.recon.minecraft.api.ReconMinecraftApi;
 import org.itzstonlex.recon.minecraft.api.ReconMinecraftRegistry;
 import org.itzstonlex.recon.minecraft.core.player.CorePlayer;
 import org.itzstonlex.recon.minecraft.core.server.CoreServer;
+import org.itzstonlex.recon.minecraft.core.server.impl.Bukkit;
+import org.itzstonlex.recon.minecraft.core.server.impl.Proxy;
 import org.itzstonlex.recon.minecraft.packet.MinecraftPacket;
 import org.itzstonlex.recon.minecraft.packet.PlayerChat;
 import org.itzstonlex.recon.minecraft.packet.PlayerRedirect;
-import org.itzstonlex.recon.minecraft.core.server.impl.Bukkit;
-import org.itzstonlex.recon.minecraft.core.server.impl.Proxy;
 import org.itzstonlex.recon.minecraft.server.MinecraftServersGroup;
 
 import java.net.InetSocketAddress;

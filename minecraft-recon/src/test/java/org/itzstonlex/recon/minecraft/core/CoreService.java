@@ -1,15 +1,15 @@
 package org.itzstonlex.recon.minecraft.core;
 
 import org.itzstonlex.recon.RemoteChannel;
+import org.itzstonlex.recon.minecraft.core.player.CorePlayer;
+import org.itzstonlex.recon.minecraft.core.server.CoreServer;
+import org.itzstonlex.recon.minecraft.core.server.impl.Bukkit;
+import org.itzstonlex.recon.minecraft.core.server.impl.Proxy;
 import org.itzstonlex.recon.minecraft.packet.handshake.HandshakeInitializer;
 import org.itzstonlex.recon.minecraft.packet.handshake.impl.PlayerHandshake;
 import org.itzstonlex.recon.minecraft.packet.handshake.impl.ServerHandshake;
-import org.itzstonlex.recon.minecraft.core.player.CorePlayer;
 import org.itzstonlex.recon.minecraft.player.PlayerManager;
-import org.itzstonlex.recon.minecraft.core.server.CoreServer;
 import org.itzstonlex.recon.minecraft.server.ServerManager;
-import org.itzstonlex.recon.minecraft.core.server.impl.Bukkit;
-import org.itzstonlex.recon.minecraft.core.server.impl.Proxy;
 import org.itzstonlex.recon.minecraft.service.MinecraftManagementService;
 
 import java.net.InetSocketAddress;

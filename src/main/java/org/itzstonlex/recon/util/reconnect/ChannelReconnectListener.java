@@ -6,8 +6,8 @@ import org.itzstonlex.recon.RemoteConnection;
 import org.itzstonlex.recon.adapter.ChannelListenerAdapter;
 import org.itzstonlex.recon.exception.ReconRuntimeException;
 import org.itzstonlex.recon.factory.ReconThreadFactory;
-import org.itzstonlex.recon.thread.ReconClientThread;
 import org.itzstonlex.recon.side.Client;
+import org.itzstonlex.recon.thread.ReconClientThread;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;

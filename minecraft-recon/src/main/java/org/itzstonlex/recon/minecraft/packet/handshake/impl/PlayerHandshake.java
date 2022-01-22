@@ -1,8 +1,8 @@
 package org.itzstonlex.recon.minecraft.packet.handshake.impl;
 
 import org.itzstonlex.recon.ByteStream;
-import org.itzstonlex.recon.minecraft.util.BufferUtils;
 import org.itzstonlex.recon.minecraft.packet.handshake.Handshake;
+import org.itzstonlex.recon.minecraft.util.BufferUtils;
 
 import java.net.InetSocketAddress;
 import java.util.UUID;

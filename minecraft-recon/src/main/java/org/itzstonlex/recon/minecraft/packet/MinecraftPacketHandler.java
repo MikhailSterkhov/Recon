@@ -1,7 +1,6 @@
 package org.itzstonlex.recon.minecraft.packet;
 
 import org.itzstonlex.recon.RemoteChannel;
-import org.itzstonlex.recon.RemoteConnection;
 
 import java.lang.reflect.Method;
 

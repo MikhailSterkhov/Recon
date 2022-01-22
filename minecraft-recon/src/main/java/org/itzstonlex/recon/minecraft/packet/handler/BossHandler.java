@@ -10,8 +10,6 @@ import org.itzstonlex.recon.minecraft.packet.MinecraftPacketHandler;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 public final class BossHandler extends ChannelListenerAdapter {
 

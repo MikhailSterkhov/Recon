@@ -2,7 +2,6 @@ package org.itzstonlex.recon.minecraft.service;
 
 import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.minecraft.api.ReconMinecraftApi;
-import org.itzstonlex.recon.minecraft.api.ReconMinecraftRegistry;
 import org.itzstonlex.recon.minecraft.packet.handshake.HandshakeInitializer;
 import org.itzstonlex.recon.minecraft.packet.handshake.impl.PlayerHandshake;
 import org.itzstonlex.recon.minecraft.packet.handshake.impl.ServerHandshake;

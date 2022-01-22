@@ -1,7 +1,6 @@
 package org.itzstonlex.recon.minecraft.packet;
 
 import org.itzstonlex.recon.ByteStream;
-import org.itzstonlex.recon.factory.BufferFactory;
 
 public abstract class MinecraftPacket {
 

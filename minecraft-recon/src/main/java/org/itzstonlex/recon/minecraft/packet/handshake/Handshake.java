@@ -1,12 +1,11 @@
 package org.itzstonlex.recon.minecraft.packet.handshake;
 
 import org.itzstonlex.recon.ByteStream;
-import org.itzstonlex.recon.minecraft.util.MinecraftVersion;
-import org.itzstonlex.recon.minecraft.util.BufferUtils;
 import org.itzstonlex.recon.minecraft.packet.MinecraftPacket;
+import org.itzstonlex.recon.minecraft.util.BufferUtils;
+import org.itzstonlex.recon.minecraft.util.MinecraftVersion;
 
 import java.net.InetSocketAddress;
-import java.util.Arrays;
 
 public abstract class Handshake extends MinecraftPacket {
 
