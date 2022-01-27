@@ -70,7 +70,7 @@ public abstract class HttpContextHandler implements HttpHandler {
             return getAttachmentBytes(requestAttachmentPath);
         }
 
-        return contentStream.array();
+        return contentStream != null ? contentStream.array() : new byte[0];
     }
 
     private byte[] getAttachmentBytes(String filePath) {
@@ -86,10 +86,6 @@ public abstract class HttpContextHandler implements HttpHandler {
     @Override
     public final void handle(HttpExchange exchange)
     throws IOException, NullPointerException {
-
-        if (contentStream == null) {
-            throw new NullPointerException("Content cannot be null");
-        }
 
         // Send content
         String requestPath = exchange.getRequestURI().getPath();
@@ -118,14 +114,14 @@ public abstract class HttpContextHandler implements HttpHandler {
                 }
             }
 
+            // Handle http response exchange.
+            handleResponse(HttpResponseHandler.fromExchange(application, exchange));
+            exchange.getResponseBody().write(responseBytes);
+
             // Handle http request exchange.
             if (!requestPath.contains(".")) {
                 handleRequest(HttpRequestHandler.fromExchange(application, exchange));
             }
-
-            // Handle http response exchange.
-            handleResponse(HttpResponseHandler.fromExchange(application, exchange));
-            exchange.getResponseBody().write(responseBytes);
         }
 
         // Flush & closing exchange streams.

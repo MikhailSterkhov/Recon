@@ -19,7 +19,6 @@ public class HttpApplicationTest {
     }
 
     @HttpContextPath("/")
-    @HttpContextContent(filePath = "/index.html")
     private static class IndexContext extends HttpContextHandler {
 
         public IndexContext(HttpApplication httpApplication) {
@@ -28,6 +27,8 @@ public class HttpApplicationTest {
 
         @Override
         public void handleResponse(HttpResponseHandler httpResponseHandler) {
+            httpResponseHandler.write("<title>HttpRecon</title>");
+
             httpResponseHandler.write("<p>Recon Github: https://github.com/ItzStonlex/Recon</p>");
             httpResponseHandler.write("<a href=\"/greeting\">Greeting</a>");
 
