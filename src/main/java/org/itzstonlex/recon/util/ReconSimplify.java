@@ -8,8 +8,10 @@ import org.itzstonlex.recon.factory.ReconThreadFactory;
 import org.itzstonlex.recon.side.Client;
 import org.itzstonlex.recon.side.Server;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
@@ -51,6 +53,10 @@ public final class ReconSimplify {
 
         public ByteStream.Output output(byte[] array) {
             return BufferFactory.transformOutput(array);
+        }
+
+        public ByteStream.Output output(OutputStream outputStream) {
+            return BufferFactory.transformOutput(((ByteArrayOutputStream) outputStream).toByteArray());
         }
 
         public ByteStream.Output convert(InputStream inputStream) {
@@ -177,6 +183,10 @@ public final class ReconSimplify {
 
         public RemoteChannel connect(InetSocketAddress address, int timeout) {
             return new Client().connect(resolveInetAddress(address), timeout);
+        }
+
+        public RemoteChannel connect(InetSocketAddress address, Consumer<ChannelConfig> channelInitializer) {
+            return new Client().connect(resolveInetAddress(address), channelInitializer);
         }
 
         public RemoteChannel connect(InetSocketAddress address) {

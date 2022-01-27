@@ -31,11 +31,13 @@ public interface ByteStream {
 
     interface Input extends Buffer {
 
-        byte[] read(int length);
+        byte[] readBytes(int length);
 
         byte readByte();
 
         int readInt();
+
+        int readVarInt();
 
         long readLong();
 
@@ -45,9 +47,17 @@ public interface ByteStream {
 
         boolean readBoolean();
 
-        String readString(int length, Charset charset);
+        char readChar();
 
-        String readString(int length);
+        String readStringLE(int length, Charset charset);
+
+        String readStringLE(int length);
+
+        String readStringLE();
+
+        String readString(int max, Charset charset);
+
+        String readString(int max);
 
         String readString(Charset charset);
 
@@ -82,6 +92,8 @@ public interface ByteStream {
 
         void writeInt(int value);
 
+        void writeVarInt(int value);
+
         void writeLong(long value);
 
         void writeFloat(float value);
@@ -89,6 +101,8 @@ public interface ByteStream {
         void writeDouble(double value);
 
         void writeBoolean(boolean value);
+
+        void writeChar(char value);
 
         void writeString(String value, Charset charset);
 

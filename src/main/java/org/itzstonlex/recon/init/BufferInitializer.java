@@ -4,7 +4,7 @@ import org.itzstonlex.recon.ByteSerializable;
 import org.itzstonlex.recon.ByteStream;
 import org.itzstonlex.recon.exception.BufferReadException;
 import org.itzstonlex.recon.factory.BufferFactory;
-import org.itzstonlex.recon.util.NumberUtils;
+import org.itzstonlex.recon.util.PrimitiveByteUtils;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
@@ -18,9 +18,7 @@ import java.util.function.Supplier;
 
 public final class BufferInitializer {
 
-    public static class PooledOutput
-            implements ByteStream.Output {
-
+    public static class PooledOutput implements ByteStream.Output {
         private byte[] buffer;
 
         public PooledOutput() {
@@ -51,6 +49,11 @@ public final class BufferInitializer {
 
         @Override
         public void writeInt(int value) {
+            write( PrimitiveByteUtils.toByteArray(value) );
+        }
+
+        @Override
+        public void writeVarInt(int value) {
             while ((value & -128) != 0) {
                 writeByte((byte)(value & 127 | 128));
                 value >>>= 7;
@@ -61,23 +64,27 @@ public final class BufferInitializer {
 
         @Override
         public void writeLong(long value) {
-            writeInt((int) value);
+            write( PrimitiveByteUtils.toByteArray(value) );
         }
 
         @Override
         public void writeFloat(float value) {
-            writeDouble(value);
+            write( PrimitiveByteUtils.toByteArray(value) );
         }
 
         @Override
         public void writeDouble(double value) {
-            writeInt((int) value);
-            writeInt(NumberUtils.onlyDecimal(value));
+            write( PrimitiveByteUtils.toByteArray(value) );
         }
 
         @Override
         public void writeBoolean(boolean flag) {
             writeByte((byte)(flag ? 1 : 0));
+        }
+
+        @Override
+        public void writeChar(char value) {
+            write( PrimitiveByteUtils.toByteArray(value) );
         }
 
         @Override
@@ -192,9 +199,7 @@ public final class BufferInitializer {
         }
     }
 
-    public static class PooledInput
-            implements ByteStream.Input {
-
+    public static class PooledInput implements ByteStream.Input {
         private byte[] buffer;
         private int pointer = 0;
 
@@ -208,7 +213,7 @@ public final class BufferInitializer {
         }
 
         @Override
-        public byte[] read(int length) {
+        public byte[] readBytes(int length) {
             if (length < 0) {
                 throw new BufferReadException("read length must be >= 0");
             }
@@ -231,11 +236,17 @@ public final class BufferInitializer {
 
         @Override
         public byte readByte() {
-            return read(1)[0];
+            return readBytes(1)[0];
         }
 
-        private long readLong(int max) {
-            long result = 0;
+        @Override
+        public int readInt() {
+            return PrimitiveByteUtils.readInt( readBytes(Integer.BYTES) );
+        }
+
+        @Override
+        public int readVarInt() {
+            int result = 0;
             int numRead = 0;
 
             byte read;
@@ -244,7 +255,7 @@ public final class BufferInitializer {
                 read = readByte();
                 result |= (long) (read & 127) << numRead++ * 7;
 
-                if (numRead > max + 1) {
+                if (numRead > 5) {
                     throw new BufferReadException("VarInt is too big");
                 }
 
@@ -253,23 +264,39 @@ public final class BufferInitializer {
         }
 
         @Override
-        public int readInt() {
-            return (int) readLong(4);
-        }
-
-        @Override
         public long readLong() {
-            return readLong(8);
+            return PrimitiveByteUtils.readLong( readBytes(Long.BYTES) );
         }
 
         @Override
         public float readFloat() {
-            return (float) readDouble();
+            return PrimitiveByteUtils.readFloat( readBytes(Float.BYTES) );
         }
 
         @Override
         public double readDouble() {
-            return readInt() + Double.parseDouble("0." + readInt());
+            return PrimitiveByteUtils.readDouble( readBytes(Double.BYTES) );
+        }
+
+        @Override
+        public char readChar() {
+            return PrimitiveByteUtils.readChar( readBytes(Character.BYTES) );
+        }
+
+        @Override
+        public String readStringLE(int length, Charset charset) {
+            byte[] array = readBytes(length);
+            return new String(array, 0, array.length, charset);
+        }
+
+        @Override
+        public String readStringLE(int length) {
+            return readStringLE(length, StandardCharsets.UTF_8);
+        }
+
+        @Override
+        public String readStringLE() {
+            return readStringLE(readInt(), StandardCharsets.UTF_8);
         }
 
         @Override
@@ -278,20 +305,18 @@ public final class BufferInitializer {
         }
 
         @Override
-        public String readString(int length, Charset charset) {
-            int size = readInt();
-            byte[] array = read(size);
-
-            if (size > length) {
-                throw new BufferReadException("String value length must be <= %d", length);
+        public String readString(int max, Charset charset) {
+            int size = readVarInt();
+            if (size > max) {
+                throw new BufferReadException("String value length must be <= %d", max);
             }
 
-            return new String(array, 0, size, charset);
+            return readStringLE(size, charset);
         }
 
         @Override
-        public String readString(int length) {
-            return readString(length, StandardCharsets.UTF_8);
+        public String readString(int max) {
+            return readString(max, StandardCharsets.UTF_8);
         }
 
         @Override
@@ -424,7 +449,7 @@ public final class BufferInitializer {
 
         @Override
         public Output transform(Input input) {
-            return new PooledOutput(input.read(input.size()));
+            return new PooledOutput(input.readBytes(input.size()));
         }
 
         @Override

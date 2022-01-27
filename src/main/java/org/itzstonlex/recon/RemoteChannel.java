@@ -17,8 +17,6 @@ public interface RemoteChannel extends Closeable {
 
     ByteStream.Output buffer();
 
-    void write(int packetID);
-
     void write(ByteStream.Output buffer);
 
     void flush();

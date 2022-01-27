@@ -6,11 +6,11 @@ public interface ChannelListener {
 
     void onClosed(RemoteChannel channel, ContextHandler contextHandler);
 
-    void onRead(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Input buffer);
+    void onRead(RemoteChannel channel, ContextHandler contextHandler, ByteStream.Input buffer);
 
-    void onWrite(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Output buffer);
+    void onWrite(RemoteChannel channel, ContextHandler contextHandler, ByteStream.Output buffer);
 
-    void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable);
+    void onExceptionCaught(RemoteChannel channel, Throwable throwable);
 
     // Client events.
     void onConnected(RemoteChannel channel, ContextHandler contextHandler);
@@ -20,8 +20,8 @@ public interface ChannelListener {
     // Server Events.
     void onBind(RemoteChannel channel, ContextHandler contextHandler);
 
-    void onClientConnected(RemoteChannel remoteChannel, ContextHandler contextHandler);
+    void onClientConnected(RemoteChannel channel, ContextHandler contextHandler);
 
-    void onClientClosed(RemoteChannel remoteChannel, ContextHandler contextHandler);
+    void onClientClosed(RemoteChannel channel, ContextHandler contextHandler);
 
 }

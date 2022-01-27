@@ -87,14 +87,6 @@ public class ChannelInitializer implements RemoteChannel {
     }
 
     @Override
-    public void write(int packetID) {
-        ByteStream.Output buffer = BufferFactory.createPooledOutput();
-        buffer.writeInt(packetID);
-
-        this.write(buffer);
-    }
-
-    @Override
     public void write(ByteStream.Output buffer) {
         this.buffer = buffer;
     }

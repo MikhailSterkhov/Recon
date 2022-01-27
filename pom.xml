@@ -15,6 +15,7 @@
         <module>annotated-recon</module>
         <module>metrics-recon</module>
         <module>launcher-ui-recon</module>
+        <module>sql-database-recon</module>
     </modules>
 
     <name>Recon</name>
