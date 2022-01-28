@@ -129,7 +129,7 @@ public class HttpApplication implements RemoteConnection {
             }
 
             // Initialize context instance.
-            ContextInitUtils.initContextInstance(httpContextHandler);
+            ContextInitUtils.initContextInstance(contextPath, httpContextHandler);
 
             // Registering the context.
             HttpContext httpContext = httpServer.createContext(contextPath, httpContextHandler);
