@@ -33,16 +33,17 @@ public final class ContextInitUtils {
         return null;
     }
 
-    public static void initContextContent(HttpContextHandler httpContextHandler) {
+    public static void initContextContent(String path, HttpContextHandler httpContextHandler) {
         HttpContextContent contextContent = httpContextHandler.getClass().getAnnotation(HttpContextContent.class);
 
-        if (contextContent != null) {
-            InputStream contentStream = ContextInitUtils.getInputStream(httpContextHandler.getClass(),
-                    contextContent.level(), contextContent.filePath());
+        PathLevel pathLevel = contextContent != null ? contextContent.level() : PathLevel.CLASSPATH;
+        String filePath = contextContent != null ? contextContent.filePath() : path.concat(".html");
 
-            if (contentStream != null) {
-                httpContextHandler.setContentStream(contentStream);
-            }
+        InputStream contentStream = ContextInitUtils.getInputStream(httpContextHandler.getClass(),
+                pathLevel, filePath);
+
+        if (contentStream != null) {
+            httpContextHandler.setContentStream(contentStream);
         }
     }
 
@@ -63,8 +64,8 @@ public final class ContextInitUtils {
         }
     }
 
-    public static void initContextInstance(HttpContextHandler httpContextHandler) {
-        initContextContent(httpContextHandler);
+    public static void initContextInstance(String path, HttpContextHandler httpContextHandler) {
+        initContextContent(path, httpContextHandler);
         initContextAttachments(httpContextHandler);
     }
 

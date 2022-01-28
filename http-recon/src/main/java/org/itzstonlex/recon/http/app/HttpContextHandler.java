@@ -31,10 +31,6 @@ public abstract class HttpContextHandler implements HttpHandler {
         this.attachmentsStreamsMap = new HashMap<>();
     }
 
-    public final void addAttachmentStream(String filePath, InputStream stylesheetStream) {
-        attachmentsStreamsMap.put(filePath, ReconSimplify.BYTE_BUF.input(stylesheetStream));
-    }
-
     public final Authenticator getAuthenticator() {
         return authenticator;
     }
@@ -48,7 +44,20 @@ public abstract class HttpContextHandler implements HttpHandler {
     }
 
     public final void setContentStream(InputStream contentStream) {
+        if (contentStream == null) {
+            this.contentStream = null;
+            return;
+        }
+
         this.contentStream = ReconSimplify.BYTE_BUF.input(contentStream);
+    }
+
+    public final void addAttachmentStream(String filePath, InputStream stylesheetStream) {
+        if (filePath == null || stylesheetStream == null) {
+            return;
+        }
+
+        attachmentsStreamsMap.put(filePath, ReconSimplify.BYTE_BUF.input(stylesheetStream));
     }
 
     public void handleAuthentication(Authenticator.Result result) {
