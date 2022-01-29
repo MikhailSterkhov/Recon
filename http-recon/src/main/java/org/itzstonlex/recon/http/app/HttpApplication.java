@@ -265,6 +265,21 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
         HttpRequestHandler httpRequestHandler = HttpRequestHandler.fromExchange(this, exchange);
         HttpResponseHandler httpResponseHandler = HttpResponseHandler.fromExchange(this, exchange);
 
+        // Check HTTP errors.
+        if (exchange.getResponseCode() / 100 >= 4) {
+
+            if (httpErrorHandler != null) {
+                httpErrorHandler.handle(exchange.getResponseCode(), httpResponseHandler, httpRequestHandler);
+            }
+            else {
+                httpResponseHandler.write(ReconSimplify.BYTE_BUF.output(exchange.getResponseBody()).array());
+                httpResponseHandler.sendResponse(exchange.getResponseCode());
+            }
+
+            onCloseHandler.accept(httpResponseHandler, exchange);
+            return;
+        }
+
         // Send HTTP Content Attachments.
         if (requestPath.contains(".")) {
 
@@ -278,7 +293,7 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
                 printDebugWarn(DEBUG_ERROR_404, requestPath);
 
                 if (httpErrorHandler != null) {
-                    httpErrorHandler.handleError(HttpURLConnection.HTTP_NOT_FOUND, httpResponseHandler, httpRequestHandler);
+                    httpErrorHandler.handle(HttpURLConnection.HTTP_NOT_FOUND, httpResponseHandler, httpRequestHandler);
                 }
                 else {
                     httpResponseHandler.sendResponseMessage(HttpURLConnection.HTTP_NOT_FOUND, String.format("Error 404: Content \"%s\" not found!", requestPath));
@@ -296,7 +311,7 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
             printDebugWarn(DEBUG_ERROR_404, requestPath);
 
             if (httpErrorHandler != null) {
-                httpErrorHandler.handleError(HttpURLConnection.HTTP_NOT_FOUND, httpResponseHandler, httpRequestHandler);
+                httpErrorHandler.handle(HttpURLConnection.HTTP_NOT_FOUND, httpResponseHandler, httpRequestHandler);
             }
             else {
                 httpResponseHandler.sendResponseMessage(HttpURLConnection.HTTP_NOT_FOUND, String.format("Error 404: Content \"%s\" not found!", requestPath));
@@ -330,7 +345,7 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
                 printDebugWarn(DEBUG_ERROR_403);
 
                 if (httpErrorHandler != null) {
-                    httpErrorHandler.handleError(HttpURLConnection.HTTP_FORBIDDEN, httpResponseHandler, httpRequestHandler);
+                    httpErrorHandler.handle(HttpURLConnection.HTTP_FORBIDDEN, httpResponseHandler, httpRequestHandler);
                 }
                 else {
                     httpResponseHandler.sendResponseMessage(HttpURLConnection.HTTP_FORBIDDEN, "Error 403: Forbidden");

@@ -85,7 +85,7 @@ public final class HttpResponseHandler {
     }
 
     public void write(InputStream inputStream) {
-        write( InputUtils.toByteArray(inputStream) );
+        write(InputUtils.toByteArray(inputStream));
     }
 
     public void write(URL contentResource) {
@@ -111,8 +111,7 @@ public final class HttpResponseHandler {
     }
 
     public void write(Class<?> classLoader, PathLevel pathLevel, String contentPath) {
-        InputStream inputStream = HttpContentUtils.getInputStream(classLoader, pathLevel, contentPath);
-        write( inputStream );
+        write(HttpContentUtils.getInputStream(classLoader, pathLevel, contentPath));
     }
 
     public void sendResponseMessage(int errorCode, String responseText) {
@@ -124,6 +123,9 @@ public final class HttpResponseHandler {
         try {
             exchange.sendResponseHeaders(statusCode, responseBody.size());
             exchange.getResponseBody().write(responseBody.toByteArray());
+
+            responseBody.flush();
+            responseBody.close();
         }
         catch (IOException exception) {
             exception.printStackTrace();

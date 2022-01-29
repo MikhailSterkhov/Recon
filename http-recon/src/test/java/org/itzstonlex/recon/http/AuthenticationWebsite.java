@@ -34,7 +34,7 @@ public class AuthenticationWebsite {
     public static class ErrorHandler implements HttpErrorHandler {
 
         @Override
-        public void handleError(int responseCode, HttpResponseHandler response, HttpRequestHandler request) {
+        public void handle(int responseCode, HttpResponseHandler response, HttpRequestHandler request) {
             if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
 
                 response.write(AuthenticationWebsite.class, PathLevel.CLASSPATH, "/authentication/404.html");
