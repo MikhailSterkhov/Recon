@@ -296,7 +296,7 @@ public final class BufferInitializer {
 
         @Override
         public String readStringLE() {
-            return readStringLE(readInt(), StandardCharsets.UTF_8);
+            return readStringLE(size(), StandardCharsets.UTF_8);
         }
 
         @Override
