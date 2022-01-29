@@ -280,6 +280,9 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
                 if (httpErrorHandler != null) {
                     httpErrorHandler.handleError(HttpURLConnection.HTTP_NOT_FOUND, httpResponseHandler, httpRequestHandler);
                 }
+                else {
+                    httpResponseHandler.sendResponseMessage(HttpURLConnection.HTTP_NOT_FOUND, String.format("Error 404: Content \"%s\" not found!", requestPath));
+                }
             }
 
             onCloseHandler.accept(httpResponseHandler, exchange);
@@ -294,6 +297,9 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
 
             if (httpErrorHandler != null) {
                 httpErrorHandler.handleError(HttpURLConnection.HTTP_NOT_FOUND, httpResponseHandler, httpRequestHandler);
+            }
+            else {
+                httpResponseHandler.sendResponseMessage(HttpURLConnection.HTTP_NOT_FOUND, String.format("Error 404: Content \"%s\" not found!", requestPath));
             }
 
             onCloseHandler.accept(httpResponseHandler, exchange);
@@ -325,6 +331,9 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
 
                 if (httpErrorHandler != null) {
                     httpErrorHandler.handleError(HttpURLConnection.HTTP_FORBIDDEN, httpResponseHandler, httpRequestHandler);
+                }
+                else {
+                    httpResponseHandler.sendResponseMessage(HttpURLConnection.HTTP_FORBIDDEN, "Error 403: Forbidden");
                 }
 
                 onCloseHandler.accept(httpResponseHandler, exchange);
