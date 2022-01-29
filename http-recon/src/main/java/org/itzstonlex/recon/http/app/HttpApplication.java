@@ -26,6 +26,10 @@ import java.util.logging.Level;
 
 public class HttpApplication implements RemoteConnection, HttpHandler {
 
+    private static final String DEBUG_WRITE_200 = "[ReconHTTP] 200 (OK): Write content for \"%s\"";
+    private static final String DEBUG_ERROR_404 = "[ReconHTTP] 404 (Not Found): Content for \"%s\" is`nt found";
+    private static final String DEBUG_ERROR_403 = "[ReconHTTP] 403 (Forbidden): Failed to authenticate";
+
     public static final int HTTP_PORT = 80;
     public static final int HTTPS_PORT = 443;
 
@@ -100,7 +104,7 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
     }
 
     public void addAttachmentLink(String linkPath, PathLevel pathLevel, String filePath) {
-        printDebugInfo("[ReconHTTP] Attachment link %s is registered.", linkPath);
+        printDebugInfo("[ReconHTTP] Attachment link \"%s\" is registered.", linkPath);
         InputStream inputStream = HttpContentUtils.getInputStream(HttpApplication.class, pathLevel, filePath);
 
         attachmentLinksMap.put(linkPath, ReconSimplify.BYTE_BUF.input(inputStream));
@@ -161,8 +165,8 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
             HttpContextPath contextPath = httpContextHandler.getClass().getAnnotation(HttpContextPath.class);
             if (contextPath == null) {
 
-                printDebugError("[ReconHTTP] Context path for `%s` is`nt found", httpContextHandler.getClass());
-                throw new HttpApplicationException("Context path for `%s` cannot be null", httpContextHandler.getClass());
+                printDebugError("[ReconHTTP] Context path for \"%s\" is`nt found", httpContextHandler.getClass());
+                throw new HttpApplicationException("Context path for \"%s\" cannot be null", httpContextHandler.getClass());
             }
 
             // Initialize context instance.
@@ -173,7 +177,7 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
             }
 
             // Print debugs.
-            printDebugInfo("[ReconHTTP] Context %s is registered.", contextPath.context());
+            printDebugInfo("[ReconHTTP] Context \"%s\" is registered.", contextPath.context());
         });
 
         return httpServer;
@@ -188,7 +192,7 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
             HttpServer httpServer = initHttpServer(address);
             httpServer.start();
 
-            printDebugInfo("[ReconHTTP] Success started on [address=%s].", address);
+            printDebugInfo("[ReconHTTP] Success started on [address=\"%s\"].", address);
 
             cachedHttpServer = httpServer;
         }
@@ -265,13 +269,13 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
         if (requestPath.contains(".")) {
 
             if (attachmentLinksMap.containsKey(requestPath)) {
-                printDebugInfo("[ReconHTTP] Send cached Attachment link %s...", requestPath);
+                printDebugInfo(DEBUG_WRITE_200, requestPath);
 
                 httpResponseHandler.write(attachmentLinksMap.get(requestPath).array());
                 httpResponseHandler.sendResponse(HttpURLConnection.HTTP_OK);
             }
             else {
-                printDebugWarn("[ReconHTTP] Context Attachment for %s is not found!", requestPath);
+                printDebugWarn(DEBUG_ERROR_404, requestPath);
 
                 if (httpErrorHandler != null) {
                     httpErrorHandler.handleError(HttpURLConnection.HTTP_NOT_FOUND, httpResponseHandler, httpRequestHandler);
@@ -286,7 +290,7 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
         HttpContextHandler context = getContext(requestPath);
         if (context == null) {
 
-            printDebugWarn("[ReconHTTP] Context Path handler for %s is not found!", requestPath);
+            printDebugWarn(DEBUG_ERROR_404, requestPath);
 
             if (httpErrorHandler != null) {
                 httpErrorHandler.handleError(HttpURLConnection.HTTP_NOT_FOUND, httpResponseHandler, httpRequestHandler);
@@ -298,6 +302,7 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
 
         // Send HTTP Content Body
         if (context.getContentBuffer() != null) {
+            printDebugInfo(DEBUG_WRITE_200, requestPath);
 
             httpResponseHandler.write(context.getContentBuffer().array());
             httpResponseHandler.sendResponse(HttpURLConnection.HTTP_OK);
@@ -311,10 +316,12 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
 
         if (authenticator != null) {
             Authenticator.Result authenticationResult = authenticator.authenticate(exchange);
+
+            printDebugInfo("[ReconHTTP] Authentication Result: \"%s\"", authenticationResult.getClass().getName().toUpperCase());
             context.handleAuthentication(authenticationResult);
 
             if (!(authenticationResult instanceof Authenticator.Success)) {
-                printDebugWarn("[ReconHTTP] Authentication Result: " + authenticationResult.getClass().getName().toUpperCase());
+                printDebugWarn(DEBUG_ERROR_403);
 
                 if (httpErrorHandler != null) {
                     httpErrorHandler.handleError(HttpURLConnection.HTTP_FORBIDDEN, httpResponseHandler, httpRequestHandler);
