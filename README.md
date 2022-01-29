@@ -37,6 +37,7 @@ functionality.
 * MetricsRecon: [(Link)](metrics-recon)
 * MinecraftRecon: [(Link)](minecraft-recon)
 * UILauncherRecon: [(Link)](launcher-ui-recon)
+* SQLDatabaseRecon: [(Link)](sql-database-recon)
 
 ---
 
