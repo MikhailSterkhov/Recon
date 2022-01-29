@@ -8,6 +8,7 @@ import org.itzstonlex.recon.util.ReconSimplify;
 
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 public final class HttpRequestHandler {
 
@@ -60,6 +61,18 @@ public final class HttpRequestHandler {
 
     public String getMethod() {
         return method;
+    }
+
+    public void addHeader(String key, String value) {
+        exchange.getRequestHeaders().add(key, value);
+    }
+
+    public String getHeader(String key) {
+        return exchange.getRequestHeaders().getFirst(key);
+    }
+
+    public List<String> getHeadersList(String key) {
+        return exchange.getRequestHeaders().get(key);
     }
 
 }

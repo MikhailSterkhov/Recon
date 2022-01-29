@@ -1,32 +1,49 @@
 package org.itzstonlex.recon.http.app;
 
-import com.sun.net.httpserver.HttpContext;
-import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpsConfigurator;
-import com.sun.net.httpserver.HttpsServer;
+import com.sun.net.httpserver.*;
+import org.itzstonlex.recon.ByteStream;
 import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.RemoteConnection;
 import org.itzstonlex.recon.factory.ReconThreadFactory;
-import org.itzstonlex.recon.http.app.util.ContextInitUtils;
+import org.itzstonlex.recon.http.app.handler.HttpErrorHandler;
+import org.itzstonlex.recon.http.app.handler.HttpRequestHandler;
+import org.itzstonlex.recon.http.app.handler.HttpResponseHandler;
+import org.itzstonlex.recon.http.app.util.HttpContentUtils;
 import org.itzstonlex.recon.http.app.util.PathLevel;
 import org.itzstonlex.recon.log.ReconLog;
 import org.itzstonlex.recon.option.ChannelOption;
+import org.itzstonlex.recon.util.ReconSimplify;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
 import java.util.logging.Level;
 
-public class HttpApplication implements RemoteConnection {
+public class HttpApplication implements RemoteConnection, HttpHandler {
 
     public static final int HTTP_PORT = 80;
     public static final int HTTPS_PORT = 443;
+
+    // Flushing & closing HTTP Exchange streams.
+    private static final BiConsumer<HttpResponseHandler, HttpExchange> onCloseHandler = (response, exchange) -> {
+
+        try {
+            exchange.getRequestBody().close();
+
+            if (response.size() > 0) {
+                exchange.getResponseBody().flush();
+                exchange.getResponseBody().close();
+            }
+        }
+        catch (IOException exception) {
+            exception.printStackTrace();
+        }
+    };
 
     private int backlog = 50;
 
@@ -34,10 +51,12 @@ public class HttpApplication implements RemoteConnection {
     private boolean debugging;
 
     private HttpsConfigurator httpsConfigurator;
+    private HttpErrorHandler httpErrorHandler;
+
     private final ReconLog logger = new ReconLog("HttpApplication");
 
-    private final List<HttpContextHandler> contextPathsMap
-            = new ArrayList<>();
+    private final List<HttpContextHandler> contextsList = new ArrayList<>();
+    private final Map<String, ByteStream.Input> attachmentLinksMap = new HashMap<>();
 
     private final ExecutorService executor = Executors.newCachedThreadPool(
             ReconThreadFactory.asInstance("ReconHttpApp-%s")
@@ -45,6 +64,10 @@ public class HttpApplication implements RemoteConnection {
 
     private HttpChannel channel;
     private final Set<ChannelOption> optionSet = new HashSet<>();
+
+    public void setErrorHandler(HttpErrorHandler httpErrorHandler) {
+        this.httpErrorHandler = httpErrorHandler;
+    }
 
     private InetSocketAddress cachedAddress;
     public final InetSocketAddress getAddress() {
@@ -76,8 +99,30 @@ public class HttpApplication implements RemoteConnection {
         this.debugging = debugging;
     }
 
+    public void addAttachmentLink(String linkPath, PathLevel pathLevel, String filePath) {
+        printDebugInfo("[ReconHTTP] Attachment link %s is registered.", linkPath);
+        InputStream inputStream = HttpContentUtils.getInputStream(HttpApplication.class, pathLevel, filePath);
+
+        attachmentLinksMap.put(linkPath, ReconSimplify.BYTE_BUF.input(inputStream));
+    }
+
+    public final List<HttpContextHandler> getContextsList() {
+        return contextsList;
+    }
+
     public final void addContext(HttpContextHandler context) {
-        contextPathsMap.add(context);
+        contextsList.add(context);
+    }
+
+    public final HttpContextHandler getContext(String path) {
+        for (HttpContextHandler context : getContextsList()) {
+
+            if (context.getPath().equals(path)) {
+                return context;
+            }
+        }
+
+        return null;
     }
 
     public final void printDebug(Level level, String message, Object... replacement) {
@@ -98,16 +143,6 @@ public class HttpApplication implements RemoteConnection {
         this.printDebug(Level.WARNING, message, replacement);
     }
 
-    private String getContextPath(HttpContextHandler httpContextHandler) {
-        HttpContextPath contextPath = httpContextHandler.getClass().getAnnotation(HttpContextPath.class);
-
-        if (contextPath == null) {
-            return null;
-        }
-
-        return contextPath.value();
-    }
-
     private HttpServer initHttpServer(InetSocketAddress address)
     throws IOException {
 
@@ -118,24 +153,27 @@ public class HttpApplication implements RemoteConnection {
             ((HttpsServer) httpServer).setHttpsConfigurator(httpsConfigurator);
         }
 
-        contextPathsMap.forEach(httpContextHandler -> {
+        httpServer.createContext("/", this);
+
+        contextsList.forEach(httpContextHandler -> {
 
             // Getting a context path.
-            String contextPath = getContextPath(httpContextHandler);
+            HttpContextPath contextPath = httpContextHandler.getClass().getAnnotation(HttpContextPath.class);
             if (contextPath == null) {
 
-                printDebugError("[HttpContext] Context path for '%s' is`nt found", httpContextHandler.getClass());
-                throw new HttpApplicationException("Context path for '%s' cannot be null", httpContextHandler.getClass());
+                printDebugError("[ReconHTTP] Context path for `%s` is`nt found", httpContextHandler.getClass());
+                throw new HttpApplicationException("Context path for `%s` cannot be null", httpContextHandler.getClass());
             }
 
             // Initialize context instance.
-            ContextInitUtils.initContextInstance(contextPath, httpContextHandler);
+            HttpContentUtils.initContextContent(contextPath, httpContextHandler);
 
-            // Registering the context.
-            HttpContext httpContext = httpServer.createContext(contextPath, httpContextHandler);
-            httpContext.setAuthenticator(httpContextHandler.getAuthenticator());
+            if (httpContextHandler.getContentBuffer() != null) {
+                attachmentLinksMap.put(contextPath.contentPath(), httpContextHandler.getContentBuffer());
+            }
 
-            printDebugInfo("[HttpContext] Context path='%s' is registered.", contextPath);
+            // Print debugs.
+            printDebugInfo("[ReconHTTP] Context %s is registered.", contextPath.context());
         });
 
         return httpServer;
@@ -147,12 +185,10 @@ public class HttpApplication implements RemoteConnection {
         HttpChannel httpChannel = new HttpChannel(this);
 
         try {
-            printDebugInfo("[HttpServer] Start init process...");
-
             HttpServer httpServer = initHttpServer(address);
             httpServer.start();
 
-            printDebugInfo("[HttpServer] Success started on [address=%s].", address);
+            printDebugInfo("[ReconHTTP] Success started on [address=%s].", address);
 
             cachedHttpServer = httpServer;
         }
@@ -207,7 +243,91 @@ public class HttpApplication implements RemoteConnection {
         }
 
         if (cachedHttpServer != null) {
+            
+            printDebugInfo("[ReconHTTP] Handle shutdown process");
             cachedHttpServer.stop(0);
         }
     }
+
+    @Override
+    protected void finalize() {
+        shutdown();
+    }
+
+    @Override
+    public final void handle(HttpExchange exchange) {
+        String requestPath = exchange.getRequestURI().getPath();
+
+        HttpRequestHandler httpRequestHandler = HttpRequestHandler.fromExchange(this, exchange);
+        HttpResponseHandler httpResponseHandler = HttpResponseHandler.fromExchange(this, exchange);
+
+        // Send HTTP Content Attachments.
+        if (requestPath.contains(".")) {
+
+            if (attachmentLinksMap.containsKey(requestPath)) {
+                printDebugInfo("[ReconHTTP] Send cached Attachment link %s...", requestPath);
+
+                httpResponseHandler.write(attachmentLinksMap.get(requestPath).array());
+                httpResponseHandler.sendResponse(HttpURLConnection.HTTP_OK);
+            }
+            else {
+                printDebugWarn("[ReconHTTP] Context Attachment for %s is not found!", requestPath);
+
+                if (httpErrorHandler != null) {
+                    httpErrorHandler.handleError(HttpURLConnection.HTTP_NOT_FOUND, httpResponseHandler, httpRequestHandler);
+                }
+            }
+
+            onCloseHandler.accept(httpResponseHandler, exchange);
+            return;
+        }
+
+        // Check HTTP Content Body nullable state.
+        HttpContextHandler context = getContext(requestPath);
+        if (context == null) {
+
+            printDebugWarn("[ReconHTTP] Context Path handler for %s is not found!", requestPath);
+
+            if (httpErrorHandler != null) {
+                httpErrorHandler.handleError(HttpURLConnection.HTTP_NOT_FOUND, httpResponseHandler, httpRequestHandler);
+            }
+
+            onCloseHandler.accept(httpResponseHandler, exchange);
+            return;
+        }
+
+        // Send HTTP Content Body
+        if (context.getContentBuffer() != null) {
+
+            httpResponseHandler.write(context.getContentBuffer().array());
+            httpResponseHandler.sendResponse(HttpURLConnection.HTTP_OK);
+
+            onCloseHandler.accept(httpResponseHandler, exchange);
+            return;
+        }
+
+        // Handle Content Authentication.
+        Authenticator authenticator = context.getAuthenticator();
+
+        if (authenticator != null) {
+            Authenticator.Result authenticationResult = authenticator.authenticate(exchange);
+            context.handleAuthentication(authenticationResult);
+
+            if (!(authenticationResult instanceof Authenticator.Success)) {
+                printDebugWarn("[ReconHTTP] Authentication Result: " + authenticationResult.getClass().getName().toUpperCase());
+
+                if (httpErrorHandler != null) {
+                    httpErrorHandler.handleError(HttpURLConnection.HTTP_FORBIDDEN, httpResponseHandler, httpRequestHandler);
+                }
+
+                onCloseHandler.accept(httpResponseHandler, exchange);
+                return;
+            }
+        }
+
+        // Handle context HTTP request/response exchanges.
+        context.handleExchange(context.getPath(), httpRequestHandler, httpResponseHandler);
+        onCloseHandler.accept(httpResponseHandler, exchange);
+    }
+
 }
