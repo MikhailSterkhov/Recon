@@ -2,8 +2,8 @@ package org.itzstonlex.recon.sql.execute;
 
 import org.itzstonlex.recon.sql.ReconSqlConnection;
 import org.itzstonlex.recon.sql.ReconSqlExecutable;
-import org.itzstonlex.recon.sql.reqest.ReconSqlResponse;
-import org.itzstonlex.recon.sql.reqest.ReconSqlRequestStatement;
+import org.itzstonlex.recon.sql.request.ReconSqlResponse;
+import org.itzstonlex.recon.sql.request.ReconSqlRequestStatement;
 import org.itzstonlex.recon.sql.util.ThrowableSupplier;
 
 import java.sql.Connection;

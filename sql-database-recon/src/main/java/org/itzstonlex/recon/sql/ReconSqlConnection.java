@@ -2,8 +2,8 @@ package org.itzstonlex.recon.sql;
 
 import org.itzstonlex.recon.log.ReconLog;
 import org.itzstonlex.recon.sql.event.ReconSqlEventListener;
-import org.itzstonlex.recon.sql.reqest.ReconSqlRequestFactory;
-import org.itzstonlex.recon.sql.reqest.impl.CreateTableRequest;
+import org.itzstonlex.recon.sql.request.ReconSqlRequestFactory;
+import org.itzstonlex.recon.sql.request.impl.CreateTableRequest;
 
 import java.sql.Connection;
 import java.util.Map;

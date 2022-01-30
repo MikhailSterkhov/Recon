@@ -6,7 +6,6 @@ public final class StringRandom {
     private static final String REGEX_ALPHABETIC    = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
     private static final String REGEX_ALPHANUMERIC  = (REGEX_NUMERIC + REGEX_ALPHABETIC);
 
-
     public static String random(int length) {
         StringBuilder stringBuilder = new StringBuilder();
 

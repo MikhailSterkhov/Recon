@@ -1,6 +1,6 @@
-package org.itzstonlex.recon.sql.reqest.field.impl;
+package org.itzstonlex.recon.sql.request.field.impl;
 
-import org.itzstonlex.recon.sql.reqest.field.ReconSqlRequestField;
+import org.itzstonlex.recon.sql.request.field.ReconSqlRequestField;
 
 public class ValuedRequestField implements ReconSqlRequestField {
 

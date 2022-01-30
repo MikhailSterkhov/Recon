@@ -4,7 +4,7 @@ import org.itzstonlex.recon.sql.connection.HikariDatabaseConnection;
 import org.itzstonlex.recon.sql.connection.MysqlDatabaseConnection;
 import org.itzstonlex.recon.sql.connection.SqliteDatabaseConnection;
 import org.itzstonlex.recon.sql.exception.ReconSqlException;
-import org.itzstonlex.recon.sql.reqest.ReconSqlRequestFactory;
+import org.itzstonlex.recon.sql.request.ReconSqlRequestFactory;
 
 import java.io.File;
 import java.sql.SQLException;

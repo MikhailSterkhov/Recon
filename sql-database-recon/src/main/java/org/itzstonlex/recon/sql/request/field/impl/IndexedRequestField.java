@@ -1,7 +1,7 @@
-package org.itzstonlex.recon.sql.reqest.field.impl;
+package org.itzstonlex.recon.sql.request.field.impl;
 
-import org.itzstonlex.recon.sql.reqest.field.ReconSqlFieldType;
-import org.itzstonlex.recon.sql.reqest.field.ReconSqlRequestField;
+import org.itzstonlex.recon.sql.request.field.ReconSqlFieldType;
+import org.itzstonlex.recon.sql.request.field.ReconSqlRequestField;
 
 import java.util.ArrayList;
 import java.util.Arrays;

@@ -1,7 +1,7 @@
-package org.itzstonlex.recon.sql.reqest;
+package org.itzstonlex.recon.sql.request;
 
 import org.itzstonlex.recon.sql.ReconSqlConnection;
-import org.itzstonlex.recon.sql.reqest.field.ReconSqlRequestField;
+import org.itzstonlex.recon.sql.request.field.ReconSqlRequestField;
 
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;

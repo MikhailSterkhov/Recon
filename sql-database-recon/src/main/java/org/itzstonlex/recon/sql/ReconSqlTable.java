@@ -1,8 +1,8 @@
 package org.itzstonlex.recon.sql;
 
-import org.itzstonlex.recon.sql.reqest.ReconSqlRequestFactory;
-import org.itzstonlex.recon.sql.reqest.ReconSqlResponse;
-import org.itzstonlex.recon.sql.reqest.impl.InsertRequest;
+import org.itzstonlex.recon.sql.request.ReconSqlRequestFactory;
+import org.itzstonlex.recon.sql.request.ReconSqlResponse;
+import org.itzstonlex.recon.sql.request.impl.InsertRequest;
 
 import java.util.function.Consumer;
 

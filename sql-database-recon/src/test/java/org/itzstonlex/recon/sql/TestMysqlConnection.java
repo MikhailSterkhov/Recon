@@ -2,9 +2,9 @@ package org.itzstonlex.recon.sql;
 
 import org.itzstonlex.recon.sql.connection.MysqlDatabaseConnection;
 import org.itzstonlex.recon.sql.event.ReconSqlEventListenerAdapter;
-import org.itzstonlex.recon.sql.reqest.field.ReconSqlFieldType;
-import org.itzstonlex.recon.sql.reqest.field.impl.IndexedRequestField;
-import org.itzstonlex.recon.sql.reqest.field.impl.ValuedRequestField;
+import org.itzstonlex.recon.sql.request.field.ReconSqlFieldType;
+import org.itzstonlex.recon.sql.request.field.impl.IndexedRequestField;
+import org.itzstonlex.recon.sql.request.field.impl.ValuedRequestField;
 
 import java.sql.Timestamp;
 

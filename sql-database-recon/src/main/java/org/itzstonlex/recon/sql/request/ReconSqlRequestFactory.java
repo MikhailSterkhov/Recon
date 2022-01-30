@@ -1,6 +1,6 @@
-package org.itzstonlex.recon.sql.reqest;
+package org.itzstonlex.recon.sql.request;
 
-import org.itzstonlex.recon.sql.reqest.impl.*;
+import org.itzstonlex.recon.sql.request.impl.*;
 
 public final class ReconSqlRequestFactory {
 

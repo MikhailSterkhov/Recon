@@ -1,4 +1,4 @@
-package org.itzstonlex.recon.sql.reqest;
+package org.itzstonlex.recon.sql.request;
 
 import org.itzstonlex.recon.sql.ReconSql;
 

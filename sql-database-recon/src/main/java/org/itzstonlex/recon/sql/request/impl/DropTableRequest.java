@@ -1,7 +1,7 @@
-package org.itzstonlex.recon.sql.reqest.impl;
+package org.itzstonlex.recon.sql.request.impl;
 
-import org.itzstonlex.recon.sql.reqest.ReconSqlRequest;
-import org.itzstonlex.recon.sql.reqest.field.impl.IndexedRequestField;
+import org.itzstonlex.recon.sql.request.ReconSqlRequest;
+import org.itzstonlex.recon.sql.request.field.impl.IndexedRequestField;
 
 import java.util.LinkedList;
 

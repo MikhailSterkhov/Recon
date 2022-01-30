@@ -1,6 +1,6 @@
 package org.itzstonlex.recon.sql;
 
-import org.itzstonlex.recon.sql.reqest.ReconSqlResponse;
+import org.itzstonlex.recon.sql.request.ReconSqlResponse;
 
 import java.sql.Connection;
 import java.util.concurrent.CompletableFuture;

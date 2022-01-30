@@ -1,4 +1,4 @@
-package org.itzstonlex.recon.sql.reqest.field;
+package org.itzstonlex.recon.sql.request.field;
 
 public interface ReconSqlRequestField {
 
