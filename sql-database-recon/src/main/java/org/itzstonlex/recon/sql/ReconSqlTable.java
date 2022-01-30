@@ -8,8 +8,12 @@ import java.util.function.Consumer;
 
 public interface ReconSqlTable {
 
-    ReconSqlConnection getConnectionHandler();
+    ReconSqlConnection getConnection();
     String getName();
+
+    default ReconSqlRequestFactory createRequest() {
+        return new ReconSqlRequestFactory(getName());
+    }
 
     /**
      * Выполняет запрос в SQL базу функцией INSERT.
@@ -21,10 +25,10 @@ public interface ReconSqlTable {
      * @param queryHandler - Обработчик запроса
      */
     default void insert(Consumer<InsertRequest> queryHandler) {
-        InsertRequest insertRequest = newDatabaseQuery().insertQuery();
+        InsertRequest insertRequest = this.createRequest().insert();
         queryHandler.accept(insertRequest);
 
-        insertRequest.updateSync(getConnectionHandler());
+        insertRequest.updateSync(getConnection());
     }
 
     /**
@@ -34,7 +38,8 @@ public interface ReconSqlTable {
      * @param resultHandler - Обработчик запроса
      */
     default void selectAll(Consumer<ReconSqlResponse> resultHandler) {
-        newDatabaseQuery().selectQuery().getSyncResponse(getConnectionHandler())
+        this.createRequest().select()
+                .getResponseSync(getConnection())
                 .thenAccept(resultHandler);
     }
 
@@ -43,19 +48,14 @@ public interface ReconSqlTable {
      * данных в ней
      */
     default void clear() {
-        newDatabaseQuery().deleteQuery().updateSync(getConnectionHandler());
+        this.createRequest().delete().updateSync(getConnection());
     }
 
     /**
      * Удаление таблицы из базы
      */
     default void drop() {
-        newDatabaseQuery().dropTableQuery().updateSync(getConnectionHandler());
-
-        getConnectionHandler().getDatabaseTables().remove(getName().toLowerCase());
+        this.createRequest().deleteTable().updateSync(getConnection());
     }
 
-    default ReconSqlRequestFactory newDatabaseQuery() {
-        return new ReconSqlRequestFactory(getName());
-    }
 }

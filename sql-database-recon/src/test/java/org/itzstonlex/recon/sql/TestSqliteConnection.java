@@ -3,8 +3,8 @@ package org.itzstonlex.recon.sql;
 import org.itzstonlex.recon.sql.connection.SqliteDatabaseConnection;
 import org.itzstonlex.recon.sql.event.ReconSqlEventListenerAdapter;
 import org.itzstonlex.recon.sql.request.field.ReconSqlFieldType;
-import org.itzstonlex.recon.sql.request.field.impl.IndexedRequestField;
-import org.itzstonlex.recon.sql.request.field.impl.ValuedRequestField;
+import org.itzstonlex.recon.sql.request.field.impl.IndexedField;
+import org.itzstonlex.recon.sql.request.field.impl.ValuedField;
 
 import java.io.File;
 import java.sql.Timestamp;
@@ -22,13 +22,13 @@ public class TestSqliteConnection {
         // Get users table
         ReconSqlTable usersTable = connection.createOrGetTable("users", create -> {
 
-            create.push(IndexedRequestField.createPrimaryNotNull(ReconSqlFieldType.INT, "Id")
-                    .putIndex(IndexedRequestField.IndexType.AUTO_INCREMENT));
+            create.push(IndexedField.createPrimaryNotNull(ReconSqlFieldType.INT, "Id")
+                    .index(IndexedField.IndexType.AUTO_INCREMENT));
 
-            create.push(IndexedRequestField.createNotNull(ReconSqlFieldType.VAR_CHAR, "FirstName"));
-            create.push(IndexedRequestField.createNotNull(ReconSqlFieldType.VAR_CHAR, "LastName"));
+            create.push(IndexedField.createNotNull(ReconSqlFieldType.VAR_CHAR, "FirstName"));
+            create.push(IndexedField.createNotNull(ReconSqlFieldType.VAR_CHAR, "LastName"));
 
-            create.push(IndexedRequestField.create(ReconSqlFieldType.TIMESTAMP, "Birthday"));
+            create.push(IndexedField.create(ReconSqlFieldType.TIMESTAMP, "Birthday"));
         });
 
         // Remove all values in table.
@@ -37,10 +37,10 @@ public class TestSqliteConnection {
         // Insert new field to users table.
         usersTable.insert(insert -> {
 
-            insert.push(ValuedRequestField.create("FirstName", "Misha"));
-            insert.push(ValuedRequestField.create("LastName", "Leyn"));
+            insert.push(ValuedField.create("FirstName", "Misha"));
+            insert.push(ValuedField.create("LastName", "Leyn"));
 
-            insert.push(ValuedRequestField.create("Birthday", new Timestamp(System.currentTimeMillis())));
+            insert.push(ValuedField.create("Birthday", new Timestamp(System.currentTimeMillis())));
         });
 
         // Getting a first table response field.

@@ -9,7 +9,7 @@ import org.itzstonlex.recon.sql.ReconSqlExecutable;
 import org.itzstonlex.recon.sql.ReconSqlTable;
 import org.itzstonlex.recon.sql.event.ReconSqlEventListener;
 import org.itzstonlex.recon.sql.execute.ReconSqlConnectionExecutor;
-import org.itzstonlex.recon.sql.table.ReconSqlTableData;
+import org.itzstonlex.recon.sql.table.TableDecorator;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -23,7 +23,7 @@ public final class MysqlDatabaseConnection implements ReconSqlConnection {
 
     private final ReconSqlCredentials credentials;
 
-    private final Map<String, ReconSqlTable> databaseTables = new HashMap<>();
+    private final Map<String, ReconSqlTable> loadedTablesMap = new HashMap<>();
 
     private final ReconLog logger = new ReconLog("ReconMySQL");
 
@@ -62,7 +62,7 @@ public final class MysqlDatabaseConnection implements ReconSqlConnection {
 
     @Override
     public ReconSqlTable getTable(String tableName) {
-        return databaseTables.get(tableName.toLowerCase());
+        return loadedTablesMap.get(tableName.toLowerCase());
     }
 
     @Override
@@ -71,8 +71,8 @@ public final class MysqlDatabaseConnection implements ReconSqlConnection {
     }
 
     @Override
-    public Map<String, ReconSqlTable> getDatabaseTables() {
-        return databaseTables;
+    public Map<String, ReconSqlTable> getLoadedTablesMap() {
+        return loadedTablesMap;
     }
 
     @Override
@@ -104,12 +104,12 @@ public final class MysqlDatabaseConnection implements ReconSqlConnection {
 
             // Load database tables.
             Objects.requireNonNull(executable.getResponse(true, "SHOW TABLES;"))
-                    .thenAccept(result -> {
+                    .thenAccept(response -> {
 
-                        while (result.next()) {
+                        while (response.next()) {
 
-                            String table = result.getString(1);
-                            databaseTables.put(table.toLowerCase(), new ReconSqlTableData(this, table));
+                            String table = response.getString(1);
+                            loadedTablesMap.put(table.toLowerCase(), new TableDecorator(this, table));
                         }
                     });
 

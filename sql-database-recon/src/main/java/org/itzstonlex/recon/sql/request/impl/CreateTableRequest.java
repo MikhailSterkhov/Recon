@@ -3,22 +3,22 @@ package org.itzstonlex.recon.sql.request.impl;
 import org.itzstonlex.recon.sql.ReconSqlConnection;
 import org.itzstonlex.recon.sql.request.ReconSqlRequest;
 import org.itzstonlex.recon.sql.request.ReconSqlResponse;
-import org.itzstonlex.recon.sql.request.field.impl.IndexedRequestField;
-import org.itzstonlex.recon.sql.table.ReconSqlTableData;
+import org.itzstonlex.recon.sql.request.field.impl.IndexedField;
+import org.itzstonlex.recon.sql.table.TableDecorator;
 
 import java.util.LinkedList;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
-public final class CreateTableRequest extends ReconSqlRequest<IndexedRequestField> {
+public final class CreateTableRequest extends ReconSqlRequest<IndexedField> {
 
-    private final String databaseTable;
+    private final String table;
 
     private boolean checkExists;
     private boolean temporary;
 
-    public CreateTableRequest(String databaseTable) {
-        this.databaseTable = databaseTable;
+    public CreateTableRequest(String table) {
+        this.table = table;
     }
 
     public CreateTableRequest checkExists(boolean checkExists) {
@@ -37,52 +37,49 @@ public final class CreateTableRequest extends ReconSqlRequest<IndexedRequestFiel
     }
 
     @Override
-    protected void append(StringBuilder queryBuilder, LinkedList<IndexedRequestField> queryRows) {
+    protected void append(StringBuilder requestBuilder, LinkedList<IndexedField> fieldsList) {
         if (checkExists) {
-            queryBuilder.append("IF NOT EXISTS ");
+            requestBuilder.append("IF NOT EXISTS ");
         }
 
-        queryBuilder.append("`");
-        queryBuilder.append(databaseTable);
-        queryBuilder.append("` (");
+        requestBuilder.append("`").append(table).append("`");
 
-        queryBuilder.append(String.join(", ", queryRows.stream()
-                .map(IndexedRequestField::toString)
+        requestBuilder.append(String.join(", ", fieldsList.stream()
+                .map(IndexedField::toString)
                 .collect(Collectors.toCollection(LinkedList::new))));
 
-        queryBuilder.append(")");
+        requestBuilder.append(")");
+    }
+
+    private void addCachedTable(ReconSqlConnection connection) {
+        connection.getLoadedTablesMap().put(table.toLowerCase(), new TableDecorator(connection, table));
     }
 
     @Override
-    public void updateSync(ReconSqlConnection connectionHandler) {
-        addConnectionTable(connectionHandler);
+    public void updateSync(ReconSqlConnection connection) {
+        addCachedTable(connection);
 
-        super.updateSync(connectionHandler);
+        super.updateSync(connection);
     }
 
     @Override
-    public void updateAsync(ReconSqlConnection connectionHandler) {
-        addConnectionTable(connectionHandler);
+    public void updateAsync(ReconSqlConnection connection) {
+        addCachedTable(connection);
 
-        super.updateAsync(connectionHandler);
+        super.updateAsync(connection);
     }
 
     @Override
-    public CompletableFuture<ReconSqlResponse> getSyncResponse(ReconSqlConnection connectionHandler) {
-        addConnectionTable(connectionHandler);
+    public CompletableFuture<ReconSqlResponse> getResponseSync(ReconSqlConnection connection) {
+        addCachedTable(connection);
 
-        return super.getSyncResponse(connectionHandler);
+        return super.getResponseSync(connection);
     }
 
     @Override
-    public CompletableFuture<ReconSqlResponse> getAsyncResponse(ReconSqlConnection connectionHandler) {
-        addConnectionTable(connectionHandler);
+    public CompletableFuture<ReconSqlResponse> getResponseAsync(ReconSqlConnection connection) {
+        addCachedTable(connection);
 
-        return super.getAsyncResponse(connectionHandler);
+        return super.getResponseAsync(connection);
     }
-
-    private void addConnectionTable(ReconSqlConnection connectionHandler) {
-        connectionHandler.getDatabaseTables().put(databaseTable.toLowerCase(), new ReconSqlTableData(connectionHandler, databaseTable));
-    }
-
 }

@@ -23,25 +23,24 @@ public abstract class ReconSqlRequest<RequestField extends ReconSqlRequestField>
         connection.getExecution().update(false, this.toString(), fieldsList.stream().map(RequestField::value).toArray());
     }
 
-    public CompletableFuture<ReconSqlResponse> getSyncResponse(ReconSqlConnection connection) {
+    public CompletableFuture<ReconSqlResponse> getResponseSync(ReconSqlConnection connection) {
         return connection.getExecution().getResponse(true, this.toString(), fieldsList.stream().map(RequestField::value).toArray());
     }
 
-    public CompletableFuture<ReconSqlResponse> getAsyncResponse(ReconSqlConnection connection) {
+    public CompletableFuture<ReconSqlResponse> getResponseAsync(ReconSqlConnection connection) {
         return connection.getExecution().getResponse(false, this.toString(), fieldsList.stream().map(RequestField::value).toArray());
     }
 
     protected abstract String getRequestCommand();
 
-    protected abstract void append(StringBuilder queryBuilder, LinkedList<RequestField> queryRows);
+    protected abstract void append(StringBuilder requestBuilder, LinkedList<RequestField> fieldsList);
 
     @Override
     public String toString() {
-        StringBuilder stringBuilder = new StringBuilder(getRequestCommand());
-        stringBuilder.append(" ");
+        StringBuilder requestBuilder = new StringBuilder(getRequestCommand())
+                .append(" ");
 
-        append(stringBuilder, fieldsList);
-
-        return stringBuilder.toString();
+        append(requestBuilder, fieldsList);
+        return requestBuilder.toString();
     }
 }

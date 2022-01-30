@@ -5,6 +5,7 @@ import org.itzstonlex.recon.sql.connection.MysqlDatabaseConnection;
 import org.itzstonlex.recon.sql.connection.SqliteDatabaseConnection;
 import org.itzstonlex.recon.sql.exception.ReconSqlException;
 import org.itzstonlex.recon.sql.request.ReconSqlRequestFactory;
+import org.itzstonlex.recon.sql.util.SQLExceptionHandler;
 
 import java.io.File;
 import java.sql.SQLException;
@@ -65,7 +66,7 @@ public final class ReconSql {
 
     public void handleExceptions(SQLExceptionHandler sqlHandler) {
         try {
-            sqlHandler.handle();
+            sqlHandler.execute();
         }
         catch (SQLException sqlException) {
             sqlException.printStackTrace();

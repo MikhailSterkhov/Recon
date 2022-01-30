@@ -2,20 +2,20 @@ package org.itzstonlex.recon.sql.request.field.impl;
 
 import org.itzstonlex.recon.sql.request.field.ReconSqlRequestField;
 
-public class ValuedRequestField implements ReconSqlRequestField {
+public class ValuedField implements ReconSqlRequestField {
 
-    public static ValuedRequestField create(String name, Object value) {
-        return new ValuedRequestField(name, value);
+    public static ValuedField create(String name, Object value) {
+        return new ValuedField(name, value);
     }
 
-    public static ValuedRequestField create(String name) {
-        return new ValuedRequestField(name, null);
+    public static ValuedField create(String name) {
+        return new ValuedField(name, null);
     }
 
     private final String name;
     private Object value;
 
-    public ValuedRequestField(String name, Object value) {
+    public ValuedField(String name, Object value) {
         this.name = name;
         this.value = value;
     }

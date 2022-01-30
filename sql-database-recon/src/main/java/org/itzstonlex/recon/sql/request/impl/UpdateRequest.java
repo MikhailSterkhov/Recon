@@ -1,18 +1,18 @@
 package org.itzstonlex.recon.sql.request.impl;
 
 import org.itzstonlex.recon.sql.request.ReconSqlRequest;
-import org.itzstonlex.recon.sql.request.field.impl.ValuedRequestField;
+import org.itzstonlex.recon.sql.request.field.impl.ValuedField;
 
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 
-public final class UpdateRequest extends ReconSqlRequest<ValuedRequestField> {
+public final class UpdateRequest extends ReconSqlRequest<ValuedField> {
 
-    private final String databaseTable;
-    private final LinkedList<ValuedRequestField> whereRowsList = new LinkedList<>();
+    private final String table;
+    private final LinkedList<ValuedField> whereRowsList = new LinkedList<>();
 
-    public UpdateRequest(String databaseTable) {
-        this.databaseTable = databaseTable;
+    public UpdateRequest(String table) {
+        this.table = table;
     }
 
     @Override
@@ -20,29 +20,27 @@ public final class UpdateRequest extends ReconSqlRequest<ValuedRequestField> {
         return "UPDATE";
     }
 
-    public UpdateRequest where(ValuedRequestField valuedRequestField) {
-        whereRowsList.add(valuedRequestField);
+    public UpdateRequest where(ValuedField valuedField) {
+        whereRowsList.add(valuedField);
         return this;
     }
 
     @Override
-    protected void append(StringBuilder queryBuilder, LinkedList<ValuedRequestField> queryRows) {
-        queryBuilder.append("`");
-        queryBuilder.append(databaseTable);
-        queryBuilder.append("`");
+    protected void append(StringBuilder requestBuilder, LinkedList<ValuedField> fieldsList) {
+        requestBuilder.append("`").append(table).append("`");
 
-        if (!queryRows.isEmpty()) {
+        if (!fieldsList.isEmpty()) {
 
-            queryBuilder.append(" SET ");
-            queryBuilder.append(String.join(" AND ", queryRows.stream().map(row -> "`" + row.name() + "`=?").collect(Collectors.toSet())));
+            requestBuilder.append(" SET ");
+            requestBuilder.append(String.join(" AND ", fieldsList.stream().map(field -> "`" + field.name() + "`=?").collect(Collectors.toSet())));
         }
 
         if (!whereRowsList.isEmpty()) {
 
-            queryBuilder.append(" WHERE ");
-            queryBuilder.append(String.join(" AND ", whereRowsList.stream().map(row -> "`" + row.name() + "`=?").collect(Collectors.toSet())));
+            requestBuilder.append(" WHERE ");
+            requestBuilder.append(String.join(" AND ", whereRowsList.stream().map(field -> "`" + field.name() + "`=?").collect(Collectors.toSet())));
         }
 
-        queryRows.addAll(whereRowsList);
+        fieldsList.addAll(whereRowsList);
     }
 }

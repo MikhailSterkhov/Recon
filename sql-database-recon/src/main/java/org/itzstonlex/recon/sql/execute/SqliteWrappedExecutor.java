@@ -7,12 +7,12 @@ import org.itzstonlex.recon.sql.request.ReconSqlResponse;
 import java.sql.Connection;
 import java.util.concurrent.CompletableFuture;
 
-public final class SqliteExecutor implements ReconSqlExecutable {
+public final class SqliteWrappedExecutor implements ReconSqlExecutable {
 
-    private final ReconSqlConnectionExecutor defaultExecutor;
+    private final ReconSqlConnectionExecutor impl;
 
-    public SqliteExecutor(ReconSqlConnection databaseConnection) {
-        this.defaultExecutor = new ReconSqlConnectionExecutor(databaseConnection);
+    public SqliteWrappedExecutor(ReconSqlConnection connection) {
+        this.impl = new ReconSqlConnectionExecutor(connection);
     }
 
     public String remakeSqliteRequest(String request) {
@@ -29,17 +29,17 @@ public final class SqliteExecutor implements ReconSqlExecutable {
 
     @Override
     public Connection getConnection() {
-        return defaultExecutor.getConnection();
+        return impl.getConnection();
     }
 
     @Override
     public void update(boolean sync, String sql, Object... values) {
-        defaultExecutor.update(sync, this.remakeSqliteRequest(sql), values);
+        impl.update(sync, this.remakeSqliteRequest(sql), values);
     }
 
     @Override
     public CompletableFuture<ReconSqlResponse> getResponse(boolean sync, String sql, Object... values) {
-        return defaultExecutor.getResponse(sync, this.remakeSqliteRequest(sql), values);
+        return impl.getResponse(sync, this.remakeSqliteRequest(sql), values);
     }
 
 }

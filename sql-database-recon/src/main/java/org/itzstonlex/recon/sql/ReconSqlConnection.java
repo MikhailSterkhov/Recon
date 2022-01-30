@@ -24,7 +24,7 @@ public interface ReconSqlConnection {
 
     ReconSqlEventListener getEventHandler();
 
-    Map<String, ReconSqlTable> getDatabaseTables();
+    Map<String, ReconSqlTable> getLoadedTablesMap();
 
     ReconSqlTable getTable(String tableName);
 
@@ -58,8 +58,8 @@ public interface ReconSqlConnection {
             return reconSqlTable;
         }
 
-        CreateTableRequest createTableRequest = createRequest(tableName)
-                .createTableQuery()
+        CreateTableRequest createTableRequest = this.createRequest(tableName)
+                .createTable()
                 .checkExists(true);
 
         requestHandler.accept(createTableRequest);

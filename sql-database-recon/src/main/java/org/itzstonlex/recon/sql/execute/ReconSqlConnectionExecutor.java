@@ -12,27 +12,27 @@ import java.util.concurrent.CompletableFuture;
 
 public final class ReconSqlConnectionExecutor implements ReconSqlExecutable {
 
-    private final ReconSqlConnection databaseConnection;
+    private final ReconSqlConnection connection;
 
-    public ReconSqlConnectionExecutor(ReconSqlConnection databaseConnection) {
-        this.databaseConnection = databaseConnection;
+    public ReconSqlConnectionExecutor(ReconSqlConnection connection) {
+        this.connection = connection;
     }
 
     @Override
     public Connection getConnection() {
-        return databaseConnection.getConnection();
+        return connection.getConnection();
     }
 
     @Override
     public void update(boolean sync, String sql, Object... values) {
         Runnable command = () -> {
-            databaseConnection.reconnect();
+            connection.reconnect();
 
             try (ReconSqlRequestStatement queryStatement = new ReconSqlRequestStatement(sync, getConnection(), sql, values)) {
                 queryStatement.executeUpdate();
 
-                if (databaseConnection.getEventHandler() != null) {
-                    databaseConnection.getEventHandler().onExecute(databaseConnection, sql);
+                if (connection.getEventHandler() != null) {
+                    connection.getEventHandler().onExecute(connection, sql);
                 }
             }
 
@@ -42,7 +42,7 @@ public final class ReconSqlConnectionExecutor implements ReconSqlExecutable {
         };
 
         if (!sync) {
-            databaseConnection.getThreadExecutor().submit(command);
+            connection.getThreadExecutor().submit(command);
             return;
         }
 
@@ -51,11 +51,11 @@ public final class ReconSqlConnectionExecutor implements ReconSqlExecutable {
 
     @Override
     public CompletableFuture<ReconSqlResponse> getResponse(boolean sync, String sql, Object... values) {
-        databaseConnection.reconnect();
+        connection.reconnect();
 
         try (ReconSqlRequestStatement queryStatement = new ReconSqlRequestStatement(false, getConnection(), sql, values)) {
-            if (databaseConnection.getEventHandler() != null) {
-                databaseConnection.getEventHandler().onExecute(databaseConnection, sql);
+            if (connection.getEventHandler() != null) {
+                connection.getEventHandler().onExecute(connection, sql);
             }
 
             return sync

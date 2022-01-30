@@ -4,34 +4,34 @@ import org.itzstonlex.recon.sql.request.impl.*;
 
 public final class ReconSqlRequestFactory {
 
-    private final String databaseTable;
+    private final String tableName;
 
-    public ReconSqlRequestFactory(String databaseTable) {
-        this.databaseTable = databaseTable;
+    public ReconSqlRequestFactory(String tableName) {
+        this.tableName = tableName;
     }
 
-    public CreateTableRequest createTableQuery() {
-        return new CreateTableRequest(databaseTable);
+    public CreateTableRequest createTable() {
+        return new CreateTableRequest(tableName);
     }
 
-    public DropTableRequest dropTableQuery() {
-        return new DropTableRequest(databaseTable);
+    public DropTableRequest deleteTable() {
+        return new DropTableRequest(tableName);
     }
 
-    public InsertRequest insertQuery() {
-        return new InsertRequest(databaseTable);
+    public InsertRequest insert() {
+        return new InsertRequest(tableName);
     }
 
-    public SelectRequest selectQuery() {
-        return new SelectRequest(databaseTable);
+    public SelectRequest select() {
+        return new SelectRequest(tableName);
     }
 
-    public DeleteRequest deleteQuery() {
-        return new DeleteRequest(databaseTable);
+    public DeleteRequest delete() {
+        return new DeleteRequest(tableName);
     }
 
-    public UpdateRequest updateQuery() {
-        return new UpdateRequest(databaseTable);
+    public UpdateRequest update() {
+        return new UpdateRequest(tableName);
     }
 
 }

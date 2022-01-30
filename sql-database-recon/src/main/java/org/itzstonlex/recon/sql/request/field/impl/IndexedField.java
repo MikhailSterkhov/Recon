@@ -7,26 +7,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class IndexedRequestField implements ReconSqlRequestField {
+public class IndexedField implements ReconSqlRequestField {
 
-    public static IndexedRequestField create(ReconSqlFieldType type, String name) {
-        return new IndexedRequestField(type, name);
+    public static IndexedField create(ReconSqlFieldType type, String name) {
+        return new IndexedField(type, name);
     }
 
-    public static IndexedRequestField createUnique(ReconSqlFieldType type, String name) {
-        return new IndexedRequestField(type, name).putIndex(IndexType.UNIQUE);
+    public static IndexedField createUnique(ReconSqlFieldType type, String name) {
+        return new IndexedField(type, name).index(IndexType.UNIQUE);
     }
 
-    public static IndexedRequestField createNotNull(ReconSqlFieldType type, String name) {
-        return new IndexedRequestField(type, name).putIndex(IndexType.NOT_NULL);
+    public static IndexedField createNotNull(ReconSqlFieldType type, String name) {
+        return new IndexedField(type, name).index(IndexType.NOT_NULL);
     }
 
-    public static IndexedRequestField createPrimary(ReconSqlFieldType type, String name) {
-        return new IndexedRequestField(type, name).putIndex(IndexType.PRIMARY);
+    public static IndexedField createPrimary(ReconSqlFieldType type, String name) {
+        return new IndexedField(type, name).index(IndexType.PRIMARY);
     }
 
-    public static IndexedRequestField createPrimaryNotNull(ReconSqlFieldType type, String name) {
-        return new IndexedRequestField(type, name).putIndexes(IndexType.PRIMARY, IndexType.NOT_NULL);
+    public static IndexedField createPrimaryNotNull(ReconSqlFieldType type, String name) {
+        return new IndexedField(type, name).indexes(IndexType.PRIMARY, IndexType.NOT_NULL);
     }
 
     private final ReconSqlFieldType type;
@@ -34,17 +34,17 @@ public class IndexedRequestField implements ReconSqlRequestField {
 
     private final Collection<IndexType> indexTypes = new ArrayList<>();
     
-    public IndexedRequestField(ReconSqlFieldType type, String name) {
+    public IndexedField(ReconSqlFieldType type, String name) {
         this.type = type;
         this.name = name;
     }
 
-    public IndexedRequestField putIndex(IndexType index) {
+    public IndexedField index(IndexType index) {
         indexTypes.add(index);
         return this;
     }
 
-    public IndexedRequestField putIndexes(IndexType... indexes) {
+    public IndexedField indexes(IndexType... indexes) {
         indexTypes.addAll(Arrays.asList(indexes));
         return this;
     }

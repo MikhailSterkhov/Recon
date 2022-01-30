@@ -1,17 +1,17 @@
 package org.itzstonlex.recon.sql.request.impl;
 
 import org.itzstonlex.recon.sql.request.ReconSqlRequest;
-import org.itzstonlex.recon.sql.request.field.impl.ValuedRequestField;
+import org.itzstonlex.recon.sql.request.field.impl.ValuedField;
 
 import java.util.LinkedList;
 import java.util.stream.Collectors;
 
-public final class DeleteRequest extends ReconSqlRequest<ValuedRequestField> {
+public final class DeleteRequest extends ReconSqlRequest<ValuedField> {
 
-    private final String databaseTable;
+    private final String table;
 
-    public DeleteRequest(String databaseTable) {
-        this.databaseTable = databaseTable;
+    public DeleteRequest(String table) {
+        this.table = table;
     }
 
     @Override
@@ -20,16 +20,13 @@ public final class DeleteRequest extends ReconSqlRequest<ValuedRequestField> {
     }
 
     @Override
-    protected void append(StringBuilder queryBuilder, LinkedList<ValuedRequestField> queryRows) {
+    protected void append(StringBuilder requestBuilder, LinkedList<ValuedField> fieldsList) {
+        requestBuilder.append("`").append(table).append("`");
 
-        queryBuilder.append("`");
-        queryBuilder.append(databaseTable);
-        queryBuilder.append("`");
+        if (!fieldsList.isEmpty()) {
 
-        if (!queryRows.isEmpty()) {
-
-            queryBuilder.append(" WHERE ");
-            queryBuilder.append(String.join(" AND ", queryRows.stream().map(row -> "`" + row.name() + "`=?").collect(Collectors.toSet())));
+            requestBuilder.append(" WHERE ");
+            requestBuilder.append(String.join(" AND ", fieldsList.stream().map(field -> "`" + field.name() + "`=?").collect(Collectors.toSet())));
         }
     }
 

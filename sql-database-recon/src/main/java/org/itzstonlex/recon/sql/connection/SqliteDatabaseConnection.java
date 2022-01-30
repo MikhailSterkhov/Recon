@@ -7,7 +7,7 @@ import org.itzstonlex.recon.sql.ReconSqlCredentials;
 import org.itzstonlex.recon.sql.ReconSqlExecutable;
 import org.itzstonlex.recon.sql.ReconSqlTable;
 import org.itzstonlex.recon.sql.event.ReconSqlEventListener;
-import org.itzstonlex.recon.sql.execute.SqliteExecutor;
+import org.itzstonlex.recon.sql.execute.SqliteWrappedExecutor;
 
 import java.io.File;
 import java.sql.Connection;
@@ -22,7 +22,7 @@ public final class SqliteDatabaseConnection implements ReconSqlConnection {
 
     private final File storage;
 
-    private final Map<String, ReconSqlTable> databaseTables = new HashMap<>();
+    private final Map<String, ReconSqlTable> loadedTablesMap = new HashMap<>();
 
     private final ReconLog logger = new ReconLog("ReconMySQL");
 
@@ -65,7 +65,7 @@ public final class SqliteDatabaseConnection implements ReconSqlConnection {
 
     @Override
     public ReconSqlTable getTable(String tableName) {
-        return databaseTables.get(tableName.toLowerCase());
+        return loadedTablesMap.get(tableName.toLowerCase());
     }
 
     @Override
@@ -74,8 +74,8 @@ public final class SqliteDatabaseConnection implements ReconSqlConnection {
     }
 
     @Override
-    public Map<String, ReconSqlTable> getDatabaseTables() {
-        return databaseTables;
+    public Map<String, ReconSqlTable> getLoadedTablesMap() {
+        return loadedTablesMap;
     }
 
     @Override
@@ -92,7 +92,7 @@ public final class SqliteDatabaseConnection implements ReconSqlConnection {
     public void connect() {
         try {
             connection = DriverManager.getConnection("jdbc:sqlite:" + storage.getAbsolutePath());
-            executable = new SqliteExecutor(this);
+            executable = new SqliteWrappedExecutor(this);
 
             // Handle event.
             if (eventHandler != null) {
