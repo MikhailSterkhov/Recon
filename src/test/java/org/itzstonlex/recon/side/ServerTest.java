@@ -28,18 +28,18 @@ public class ServerTest {
 
         @Override
         public void onThreadActive(RemoteChannel channel, ContextHandler contextHandler) {
-            channel.connection().logger().info("[Server] Connection was success bind on "
+            channel.logger().info("[Server] Connection was success bind on "
                     + contextHandler.channel().address());
         }
 
         @Override
         public void onClosed(RemoteChannel channel, ContextHandler contextHandler) {
-            channel.connection().logger().info("[Server] Connection is closed!");
+            channel.logger().info("[Server] Connection is closed!");
         }
 
         @Override
         public void onClientConnected(RemoteChannel channel, ContextHandler contextHandler) {
-            channel.connection().logger().info("New client connection: " + channel.address());
+            channel.logger().info("New client connection: " + channel.address());
 
             // Write a test bytes.
             ByteStream.Output output = BufferFactory.createPooledOutput();
@@ -52,12 +52,12 @@ public class ServerTest {
 
         @Override
         public void onClientClosed(RemoteChannel channel, ContextHandler contextHandler) {
-            channel.connection().logger().info("Client connection " + channel.address() + " was disconnected");
+            channel.logger().info("Client connection " + channel.address() + " was disconnected");
         }
 
         @Override
         public void onExceptionCaught(RemoteChannel channel, Throwable throwable) {
-            channel.connection().logger().severe(throwable.getMessage());
+            channel.logger().severe(throwable.getMessage());
 
             throwable.printStackTrace();
         }

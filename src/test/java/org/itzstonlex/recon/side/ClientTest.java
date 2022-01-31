@@ -38,25 +38,25 @@ public class ClientTest {
 
         @Override
         public void onThreadActive(RemoteChannel channel, ContextHandler contextHandler) {
-            channel.connection().logger().info("[Client] Connecting... ");
+            channel.logger().info("[Client] Connecting... ");
         }
 
         @Override
         public void onConnected(RemoteChannel channel, ContextHandler contextHandler) {
-            channel.connection().logger().info("[Client] Connection was success connected on "
+            channel.logger().info("[Client] Connection was success connected on "
                     + contextHandler.channel().address());
         }
 
         @Override
         public void onClosed(RemoteChannel channel, ContextHandler contextHandler) {
-            channel.connection().logger().info("[Client] Connection is closed!");
+            channel.logger().info("[Client] Connection is closed!");
         }
 
         @Override
         public void onRead(RemoteChannel channel, ContextHandler contextHandler, ByteStream.Input buffer) {
-            channel.connection().logger().info("Bytes receiving:");
-            channel.connection().logger().info(" * String value: " + buffer.readString());
-            channel.connection().logger().info(" * Boolean value: " + buffer.readBoolean());
+            channel.logger().info("Bytes receiving:");
+            channel.logger().info(" * String value: " + buffer.readString());
+            channel.logger().info(" * Boolean value: " + buffer.readBoolean());
         }
 
         @Override
@@ -69,7 +69,7 @@ public class ClientTest {
             }
 
             // throw exceptions.
-            channel.connection().logger().severe(throwable.getMessage());
+            channel.logger().severe(throwable.getMessage());
             throwable.printStackTrace();
         }
     }
