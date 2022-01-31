@@ -14,7 +14,7 @@ public final class ReconSqlRequestFactory {
         return new AlterAddRequest(tableName);
     }
 
-    public AlterDropRequest alterDrop() {
+    public AlterDropRequest alterDelete() {
         return new AlterDropRequest(tableName);
     }
 
