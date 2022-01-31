@@ -175,7 +175,7 @@ public final class BufferInitializer {
 
         @Override
         public ByteStream.Output copy() {
-            return BufferFactory.transformOutput(buffer);
+            return BufferFactory.createPooledOutput(buffer);
         }
 
         @Override

@@ -1,5 +1,6 @@
 package org.itzstonlex.recon.util;
 
+import org.itzstonlex.recon.ByteSerializable;
 import org.itzstonlex.recon.ByteStream;
 import org.itzstonlex.recon.ChannelConfig;
 import org.itzstonlex.recon.RemoteChannel;
@@ -15,7 +16,10 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -27,6 +31,10 @@ public final class ReconSimplify {
     public static final Buf BYTE_BUF    = new Buf();
     public static final Web WEB         = new Web();
     public static final Remote REMOTE   = new Remote();
+
+    public static OutputBufBuilder newOutputBufBuilder() {
+        return new OutputBufBuilder();
+    }
 
     public static final class Buf {
         private Buf() { }
@@ -52,11 +60,11 @@ public final class ReconSimplify {
         }
 
         public ByteStream.Output output(byte[] array) {
-            return BufferFactory.transformOutput(array);
+            return BufferFactory.createPooledOutput(array);
         }
 
         public ByteStream.Output output(OutputStream outputStream) {
-            return BufferFactory.transformOutput(((ByteArrayOutputStream) outputStream).toByteArray());
+            return BufferFactory.createPooledOutput(((ByteArrayOutputStream) outputStream).toByteArray());
         }
 
         public ByteStream.Output convert(InputStream inputStream) {
@@ -69,6 +77,116 @@ public final class ReconSimplify {
 
         public void write(RemoteChannel channel, byte[] bytes) {
             channel.write(output(bytes));
+        }
+    }
+    
+    public static final class OutputBufBuilder {
+        private OutputBufBuilder() { }
+        
+        private final ByteStream.Output buffer = BufferFactory.createPooledOutput();
+
+        public OutputBufBuilder write(byte[] bytes) {
+            buffer.write(bytes);
+            return this;
+        }
+
+        public OutputBufBuilder writeByte(byte value) {
+            buffer.writeByte(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeInt(int value) {
+            buffer.writeInt(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeVarInt(int value) {
+            buffer.writeVarInt(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeLong(long value) {
+            buffer.writeLong(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeFloat(float value) {
+            buffer.writeFloat(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeDouble(double value) {
+            buffer.writeDouble(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeBoolean(boolean value) {
+            buffer.writeBoolean(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeChar(char value) {
+            buffer.writeChar(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeString(String value, Charset charset) {
+            buffer.writeString(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeString(String value) {
+            buffer.writeString(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeStringList(List<String> value) {
+            buffer.writeStringList(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeIntArray(int... value) {
+            buffer.writeIntArray(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeLongArray(long... value) {
+            buffer.writeLongArray(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeFloatArray(float... value) {
+            buffer.writeFloatArray(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeDoubleArray(double... value) {
+            buffer.writeDoubleArray(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeBooleanArray(boolean... value) {
+            buffer.writeBooleanArray(value);
+            return this;
+        }
+
+        public <R> OutputBufBuilder writeCollection(Collection<R> collection, BiConsumer<R, ByteStream.Output> writer) {
+            buffer.writeCollection(collection, writer);
+            return this;
+        }
+
+        public <R> OutputBufBuilder writeArray(R[] array, BiConsumer<R, ByteStream.Output> writer) {
+            buffer.writeArray(array, writer);
+            return this;
+        }
+
+        public OutputBufBuilder writeObject(ByteSerializable<?> value) {
+            buffer.writeObject(value);
+            return this;
+        }
+
+        public ByteStream.Output build() {
+            return buffer;
         }
     }
 

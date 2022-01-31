@@ -12,11 +12,11 @@ public final class BufferFactory {
         return BYTESTREAM.newInput(bytes);
     }
 
-    public static ByteStream.Output transformOutput(byte[] bytes) {
+    public static ByteStream.Output createPooledOutput(byte[] bytes) {
         return BYTESTREAM.transform(bytes);
     }
 
-    public static ByteStream.Output transformOutput(ByteStream.Input input) {
+    public static ByteStream.Output createPooledOutput(ByteStream.Input input) {
         return BYTESTREAM.transform(input);
     }
 
