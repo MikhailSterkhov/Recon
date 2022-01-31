@@ -7,7 +7,6 @@ import org.itzstonlex.recon.factory.BufferFactory;
 import org.itzstonlex.recon.util.PrimitiveByteUtils;
 
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -213,13 +212,13 @@ public final class BufferInitializer {
         }
 
         @Override
-        public byte[] readBytes(int length) {
+        public byte[] readArray(int length) {
             if (length < 0) {
                 throw new BufferReadException("read length must be >= 0");
             }
 
             byte[] read = Arrays.copyOfRange(buffer, pointer, pointer + length);
-            pointer += length;
+            this.pointer += length;
 
             return read;
         }
@@ -236,12 +235,12 @@ public final class BufferInitializer {
 
         @Override
         public byte readByte() {
-            return readBytes(1)[0];
+            return readArray(1)[0];
         }
 
         @Override
         public int readInt() {
-            return PrimitiveByteUtils.readInt( readBytes(Integer.BYTES) );
+            return PrimitiveByteUtils.readInt( this.readArray(Integer.BYTES) );
         }
 
         @Override
@@ -265,27 +264,27 @@ public final class BufferInitializer {
 
         @Override
         public long readLong() {
-            return PrimitiveByteUtils.readLong( readBytes(Long.BYTES) );
+            return PrimitiveByteUtils.readLong( readArray(Long.BYTES) );
         }
 
         @Override
         public float readFloat() {
-            return PrimitiveByteUtils.readFloat( readBytes(Float.BYTES) );
+            return PrimitiveByteUtils.readFloat( readArray(Float.BYTES) );
         }
 
         @Override
         public double readDouble() {
-            return PrimitiveByteUtils.readDouble( readBytes(Double.BYTES) );
+            return PrimitiveByteUtils.readDouble( readArray(Double.BYTES) );
         }
 
         @Override
         public char readChar() {
-            return PrimitiveByteUtils.readChar( readBytes(Character.BYTES) );
+            return PrimitiveByteUtils.readChar( readArray(Character.BYTES) );
         }
 
         @Override
         public String readStringLE(int length, Charset charset) {
-            return PrimitiveByteUtils.readString(this.readBytes(length), charset);
+            return PrimitiveByteUtils.readString(this.readArray(length), charset);
         }
 
         @Override
@@ -295,7 +294,7 @@ public final class BufferInitializer {
 
         @Override
         public String readStringLE() {
-            return PrimitiveByteUtils.readString(this.readBytes(size()));
+            return PrimitiveByteUtils.readString(this.readArray(size()));
         }
 
         @Override
@@ -448,7 +447,7 @@ public final class BufferInitializer {
 
         @Override
         public Output transform(Input input) {
-            return new PooledOutput(input.readBytes(input.size()));
+            return new PooledOutput(input.readArray(input.size()));
         }
 
         @Override

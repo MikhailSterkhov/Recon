@@ -31,7 +31,7 @@ public interface ByteStream {
 
     interface Input extends Buffer {
 
-        byte[] readBytes(int length);
+        byte[] readArray(int length);
 
         byte readByte();
 
