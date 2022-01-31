@@ -32,6 +32,8 @@ public class IndexedField implements ReconSqlRequestField {
     private final ReconSqlFieldType type;
     private final String name;
 
+    private Object defaultValue;
+
     private final Collection<IndexType> indexTypes = new ArrayList<>();
     
     public IndexedField(ReconSqlFieldType type, String name) {
@@ -49,6 +51,11 @@ public class IndexedField implements ReconSqlRequestField {
         return this;
     }
 
+    public IndexedField defaults(Object defaultValue) {
+        this.defaultValue = defaultValue;
+        return this;
+    }
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder(String.format("`%s`", name));
@@ -62,6 +69,10 @@ public class IndexedField implements ReconSqlRequestField {
 
             stringBuilder.append(" ");
             stringBuilder.append(indexType.getFormattedName());
+        }
+
+        if (defaultValue != null) {
+            stringBuilder.append(" DEFAULT ").append(defaultValue);
         }
 
         return stringBuilder.toString();
