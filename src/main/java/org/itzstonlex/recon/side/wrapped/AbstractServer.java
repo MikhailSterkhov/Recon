@@ -13,8 +13,13 @@ public abstract class AbstractServer {
     protected final Server server = new Server();
 
     public AbstractServer(InetSocketAddress address) {
-        // unresolved addresses fix.
-        this.address = new InetSocketAddress(address.getHostString(), address.getPort());
+        if (address.isUnresolved()) {
+            this.address = new InetSocketAddress(address.getHostString(), address.getPort());
+
+        } else {
+
+            this.address = address;
+        }
     }
 
     public AbstractServer(String host, int port) {
@@ -25,10 +30,8 @@ public abstract class AbstractServer {
         this("127.0.0.1", port);
     }
 
-
-    public abstract void initChannel (
-            ReconLog logger,
-            ChannelConfig channelConfig
+    public abstract void initChannel(
+            ReconLog logger, ChannelConfig channelConfig
     );
 
     public RemoteChannel bind() {

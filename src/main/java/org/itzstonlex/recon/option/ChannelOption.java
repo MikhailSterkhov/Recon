@@ -33,7 +33,6 @@ public class ChannelOption {
         this.value = value;
     }
 
-
     public void apply(ServerSocket serverSocket) {
         type.apply(serverSocket, value);
     }
@@ -49,7 +48,6 @@ public class ChannelOption {
     public void apply(SocketChannel channel) {
         type.apply(channel, value);
     }
-
 
     @SuppressWarnings("all")
     public enum Type {

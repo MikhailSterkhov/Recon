@@ -8,7 +8,7 @@ import org.itzstonlex.recon.option.ChannelOption;
 import java.net.InetSocketAddress;
 import java.util.function.Consumer;
 
-public class ChannelInitializer implements RemoteChannel {
+public final class ChannelInitializer implements RemoteChannel {
 
     private static class Config implements ChannelConfig {
         private final RemoteConnection connection;
