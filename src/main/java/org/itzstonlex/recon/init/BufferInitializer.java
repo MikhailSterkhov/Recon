@@ -97,7 +97,7 @@ public final class BufferInitializer {
 
         @Override
         public void writeString(String value) {
-            writeString(value, StandardCharsets.UTF_8);
+            writeString(value, Charset.defaultCharset());
         }
 
         @Override
@@ -285,18 +285,17 @@ public final class BufferInitializer {
 
         @Override
         public String readStringLE(int length, Charset charset) {
-            byte[] array = readBytes(length);
-            return new String(array, 0, array.length, charset);
+            return PrimitiveByteUtils.readString(this.readBytes(length), charset);
         }
 
         @Override
         public String readStringLE(int length) {
-            return readStringLE(length, StandardCharsets.UTF_8);
+            return readStringLE(length, Charset.defaultCharset());
         }
 
         @Override
         public String readStringLE() {
-            return readStringLE(size(), StandardCharsets.UTF_8);
+            return PrimitiveByteUtils.readString(this.readBytes(size()));
         }
 
         @Override
@@ -316,7 +315,7 @@ public final class BufferInitializer {
 
         @Override
         public String readString(int max) {
-            return readString(max, StandardCharsets.UTF_8);
+            return readString(max, Charset.defaultCharset());
         }
 
         @Override
@@ -326,7 +325,7 @@ public final class BufferInitializer {
 
         @Override
         public String readString() {
-            return readString(StandardCharsets.UTF_8);
+            return readString(Charset.defaultCharset());
         }
 
         @Override

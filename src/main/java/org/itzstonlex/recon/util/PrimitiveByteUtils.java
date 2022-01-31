@@ -114,7 +114,7 @@ public final class PrimitiveByteUtils {
     }
 
     public static String readString(byte[] bytes) {
-        return readString(bytes, StandardCharsets.UTF_8);
+        return readString(bytes, Charset.defaultCharset());
     }
 
 }
