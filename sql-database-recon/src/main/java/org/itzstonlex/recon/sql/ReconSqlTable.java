@@ -2,7 +2,6 @@ package org.itzstonlex.recon.sql;
 
 import org.itzstonlex.recon.sql.request.ReconSqlRequestFactory;
 import org.itzstonlex.recon.sql.request.ReconSqlResponse;
-import org.itzstonlex.recon.sql.request.impl.InsertRequest;
 
 import java.util.function.Consumer;
 
@@ -16,31 +15,30 @@ public interface ReconSqlTable {
     }
 
     /**
-     * Выполняет запрос в SQL базу функцией INSERT.
-     * <p>
-     * P.S.: Выполнять запрос в обработке НЕ НУЖНО!
-     * так как он выполняется уже в процессе
-     * этого метода
+     * Выполняет запрос в SQL базу функцией SELECT,
+     * получая все данные из таблицы .
      *
-     * @param queryHandler - Обработчик запроса
+     * @param responseHandler - Обработчик запроса
      */
-    default void insert(Consumer<InsertRequest> queryHandler) {
-        InsertRequest insertRequest = this.createRequest().insert();
-        queryHandler.accept(insertRequest);
-
-        insertRequest.updateSync(getConnection());
+    default void selectAll(Consumer<ReconSqlResponse> responseHandler) {
+        this.createRequest()
+                .select()
+                .getResponseSync(getConnection())
+                .thenAccept(responseHandler);
     }
 
     /**
      * Выполняет запрос в SQL базу функцией SELECT,
      * получая все данные из таблицы .
      *
-     * @param resultHandler - Обработчик запроса
+     * @param responseHandler - Обработчик запроса
      */
-    default void selectAll(Consumer<ReconSqlResponse> resultHandler) {
-        this.createRequest().select()
+    default void selectAll(int limit, Consumer<ReconSqlResponse> responseHandler) {
+        this.createRequest()
+                .select()
+                .limit(limit)
                 .getResponseSync(getConnection())
-                .thenAccept(resultHandler);
+                .thenAccept(responseHandler);
     }
 
     /**
@@ -48,14 +46,18 @@ public interface ReconSqlTable {
      * данных в ней
      */
     default void clear() {
-        this.createRequest().delete().updateSync(getConnection());
+        this.createRequest()
+                .delete()
+                .updateSync(getConnection());
     }
 
     /**
      * Удаление таблицы из базы
      */
     default void drop() {
-        this.createRequest().deleteTable().updateSync(getConnection());
+        this.createRequest()
+                .deleteTable()
+                .updateSync(getConnection());
     }
 
 }
