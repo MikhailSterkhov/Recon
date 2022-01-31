@@ -10,6 +10,18 @@ public final class ReconSqlRequestFactory {
         this.tableName = tableName;
     }
 
+    public AlterAddRequest alterAdd() {
+        return new AlterAddRequest(tableName);
+    }
+
+    public AlterDropRequest alterDrop() {
+        return new AlterDropRequest(tableName);
+    }
+
+    public AlterModifyRequest alterModify() {
+        return new AlterModifyRequest(tableName);
+    }
+
     public CreateTableRequest createTable() {
         return new CreateTableRequest(tableName);
     }
