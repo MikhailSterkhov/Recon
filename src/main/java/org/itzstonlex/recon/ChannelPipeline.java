@@ -18,6 +18,8 @@ public interface ChannelPipeline {
 
     <Handler extends ChannelListener> Handler get(Class<Handler> clazz);
 
+    <Handler extends ChannelListener> Handler[] nodes(Class<Handler> clazz);
+
     ChannelListener[] nodes();
 
     ChannelListener first();

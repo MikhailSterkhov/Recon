@@ -9,6 +9,7 @@ import org.itzstonlex.recon.exception.TimeoutException;
 import org.itzstonlex.recon.factory.ContextFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -129,6 +130,12 @@ public final class PipelineInitializer
         }
 
         return null;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public <Handler extends ChannelListener> Handler[] nodes(Class<Handler> clazz) {
+        return (Handler[]) Arrays.stream(nodes()).filter(handler -> handler.getClass().equals(clazz)).toArray(ChannelListener[]::new);
     }
 
     @Override
