@@ -38,13 +38,14 @@ public class TestHikariConnection {
         usersTable.clear();
 
         // Insert new field to users table.
-        usersTable.insert(insert -> {
+        usersTable.createRequest()
+                .insert()
 
-            insert.push(ValuedField.create("FirstName", "Misha"));
-            insert.push(ValuedField.create("LastName", "Leyn"));
+                .push(ValuedField.create("FirstName", "Misha"))
+                .push(ValuedField.create("LastName", "Leyn"))
 
-            insert.push(ValuedField.create("Birthday", new Timestamp(System.currentTimeMillis())));
-        });
+                .push(ValuedField.create("Birthday", new Timestamp(System.currentTimeMillis())))
+                .updateSync(connection);
 
         // Getting a first table response field.
         usersTable.selectAll(response -> {
