@@ -62,7 +62,10 @@ public interface ReconSqlConnection {
                 .createTable()
                 .checkExists(true);
 
-        requestHandler.accept(createTableRequest);
+        if (requestHandler != null) {
+            requestHandler.accept(createTableRequest);
+        }
+
         createTableRequest.updateSync(this);
 
         return getTable(tableName);
