@@ -17,7 +17,7 @@ public class ServerTest {
 
             ChannelPipeline channelPipeline = config.pipeline();
 
-            channelPipeline.addLast("connection-listener", new ConnectionListener(server));
+            channelPipeline.addLast("connection-listener", new ConnectionListener());
             channelPipeline.addAfter("connection-listener", "packet-handler", new PacketHandler());
 
             server.logger().info("[ChannelInitializer]: Init Channel " + config.address());
@@ -26,24 +26,20 @@ public class ServerTest {
 
     public static class ConnectionListener extends ChannelListenerAdapter {
 
-        public ConnectionListener(RemoteConnection connection) {
-            super(connection);
-        }
-
         @Override
         public void onThreadActive(RemoteChannel channel, ContextHandler contextHandler) {
-            connection.logger().info("[Server] Connection was success bind on "
+            channel.connection().logger().info("[Server] Connection was success bind on "
                     + contextHandler.channel().address());
         }
 
         @Override
         public void onClosed(RemoteChannel channel, ContextHandler contextHandler) {
-            connection.logger().info("[Server] Connection is closed!");
+            channel.connection().logger().info("[Server] Connection is closed!");
         }
 
         @Override
-        public void onClientConnected(RemoteChannel remoteChannel, ContextHandler contextHandler) {
-            connection.logger().info("New client connection: " + remoteChannel.address());
+        public void onClientConnected(RemoteChannel channel, ContextHandler contextHandler) {
+            channel.connection().logger().info("New client connection: " + channel.address());
 
             // Write a test bytes.
             ByteStream.Output output = BufferFactory.createPooledOutput();
@@ -51,17 +47,17 @@ public class ServerTest {
             output.writeString("ItzStonlex");
             output.writeBoolean(true);
 
-            remoteChannel.write(output);
+            channel.write(output);
         }
 
         @Override
-        public void onClientClosed(RemoteChannel remoteChannel, ContextHandler contextHandler) {
-            connection.logger().info("Client connection " + remoteChannel.address() + " was disconnected");
+        public void onClientClosed(RemoteChannel channel, ContextHandler contextHandler) {
+            channel.connection().logger().info("Client connection " + channel.address() + " was disconnected");
         }
 
         @Override
-        public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {
-            connection.logger().severe(throwable.getMessage());
+        public void onExceptionCaught(RemoteChannel channel, Throwable throwable) {
+            channel.connection().logger().severe(throwable.getMessage());
 
             throwable.printStackTrace();
         }

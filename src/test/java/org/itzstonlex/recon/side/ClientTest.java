@@ -26,7 +26,7 @@ public class ClientTest {
             ClientReconnectionUtils.addReconnector(config.pipeline(), 5, TimeUnit.SECONDS);
 
             // Init other pipeline listeners.
-            config.pipeline().addLast("connection-listener", new ConnectionListener(client));
+            config.pipeline().addLast("connection-listener", new ConnectionListener());
             config.pipeline().addAfter("connection-listener", "packet-handler", new PacketHandler());
 
             client.logger().info("[ChannelInitializer]: Init Channel " + config.address());
@@ -36,44 +36,40 @@ public class ClientTest {
 
     public static class ConnectionListener extends ChannelListenerAdapter {
 
-        public ConnectionListener(RemoteConnection connection) {
-            super(connection);
-        }
-
         @Override
         public void onThreadActive(RemoteChannel channel, ContextHandler contextHandler) {
-            connection.logger().info("[Client] Connecting... ");
+            channel.connection().logger().info("[Client] Connecting... ");
         }
 
         @Override
         public void onConnected(RemoteChannel channel, ContextHandler contextHandler) {
-            connection.logger().info("[Client] Connection was success connected on "
+            channel.connection().logger().info("[Client] Connection was success connected on "
                     + contextHandler.channel().address());
         }
 
         @Override
         public void onClosed(RemoteChannel channel, ContextHandler contextHandler) {
-            connection.logger().info("[Client] Connection is closed!");
+            channel.connection().logger().info("[Client] Connection is closed!");
         }
 
         @Override
-        public void onRead(RemoteChannel remoteChannel, ContextHandler contextHandler, ByteStream.Input buffer) {
-            connection.logger().info("Bytes receiving:");
-            connection.logger().info(" * String value: " + buffer.readString());
-            connection.logger().info(" * Boolean value: " + buffer.readBoolean());
+        public void onRead(RemoteChannel channel, ContextHandler contextHandler, ByteStream.Input buffer) {
+            channel.connection().logger().info("Bytes receiving:");
+            channel.connection().logger().info(" * String value: " + buffer.readString());
+            channel.connection().logger().info(" * Boolean value: " + buffer.readBoolean());
         }
 
         @Override
-        public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {
+        public void onExceptionCaught(RemoteChannel channel, Throwable throwable) {
 
             // Check reconnect status.
-            ChannelReconnectListener reconnectListener = remoteChannel.pipeline().get(ChannelReconnectListener.class);
+            ChannelReconnectListener reconnectListener = channel.pipeline().get(ChannelReconnectListener.class);
             if (reconnectListener != null && reconnectListener.isThreadAlive()) {
                 return;
             }
 
             // throw exceptions.
-            connection.logger().severe(throwable.getMessage());
+            channel.connection().logger().severe(throwable.getMessage());
             throwable.printStackTrace();
         }
     }

@@ -37,17 +37,18 @@ public final class ChannelReconnectListener
     private final ScheduledExecutorService reconnectTaskService
             = Executors.newSingleThreadScheduledExecutor(ReconThreadFactory.asInstance(THREAD_NAME_FORMAT));
 
+    private final RemoteConnection connection;
     public final ReconnectTaskSettings reconnectInfo;
+
     private ScheduledFuture<?> reconnectTask;
 
-    public ChannelReconnectListener(RemoteConnection connection,
-                                    long delay, TimeUnit unit, boolean debug) {
-        super(connection);
-        this.reconnectInfo = new ReconnectTaskSettings(delay, unit, debug);
-
+    public ChannelReconnectListener(RemoteConnection connection, long delay, TimeUnit unit, boolean debug) {
         if (!(connection instanceof RemoteConnection.Connector)) {
             throw new ReconRuntimeException("That connection is`nt instance by RemoteConnection.Connector");
         }
+
+        this.connection = connection;
+        this.reconnectInfo = new ReconnectTaskSettings(delay, unit, debug);
     }
 
     public boolean isThreadAlive() {
@@ -59,7 +60,7 @@ public final class ChannelReconnectListener
             return;
         }
 
-        // Debug the reconnect handle.
+        // Debug to reconnect handle.
         if (reconnectInfo.hasDebug) {
             connection.logger().info(String.format("[Reconnect] Failed to connect! Wait for %d seconds...",
                     reconnectInfo.unit.convert(reconnectInfo.delay, TimeUnit.SECONDS)));

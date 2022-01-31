@@ -11,7 +11,7 @@ public final class ContextFactory {
         ContextHandler contextHandler
                 = new EventContextHandler(channel, isSuccess, error);
 
-        if (error != null) {
+        if (listener != null && error != null) {
             listener.onExceptionCaught(channel, error);
         }
 

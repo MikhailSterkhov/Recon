@@ -5,21 +5,6 @@ import org.itzstonlex.recon.*;
 public abstract class ChannelListenerAdapter
         implements ChannelListener {
 
-    protected final RemoteConnection connection;
-
-    public ChannelListenerAdapter(RemoteConnection connection) {
-        this.connection = connection;
-    }
-
-    public ChannelListenerAdapter() {
-        this(null);
-    }
-
-
-    public RemoteConnection getConnection() {
-        return connection;
-    }
-
     @Override
     public void onThreadActive(RemoteChannel channel, ContextHandler contextHandler) {
         // override me.
