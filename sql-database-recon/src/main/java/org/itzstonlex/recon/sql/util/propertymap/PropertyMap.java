@@ -19,4 +19,6 @@ public interface PropertyMap<Value> {
     Set<String> keys();
 
     Map<String, Value> map();
+
+    void reset();
 }

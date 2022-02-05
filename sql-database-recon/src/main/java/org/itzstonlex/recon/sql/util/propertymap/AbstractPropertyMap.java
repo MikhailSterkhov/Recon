@@ -43,4 +43,9 @@ public abstract class AbstractPropertyMap<Value> implements PropertyMap<Value> {
     public Map<String, Value> map() {
         return propertyMap;
     }
+
+    @Override
+    public void reset() {
+        propertyMap.clear();
+    }
 }
