@@ -21,4 +21,6 @@ public interface PropertyMap<Value> {
     Map<String, Value> map();
 
     void reset();
+
+    void setProperties(PropertyMap<Value> propertyMap);
 }

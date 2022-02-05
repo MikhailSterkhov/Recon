@@ -48,4 +48,10 @@ public abstract class AbstractPropertyMap<Value> implements PropertyMap<Value> {
     public void reset() {
         propertyMap.clear();
     }
+
+    @Override
+    public void setProperties(PropertyMap<Value> propertyMap) {
+        this.propertyMap.putAll(propertyMap.map());
+    }
+
 }
