@@ -6,6 +6,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface SqlObjectWorker {
 
+    int getID(SqlObjectDescription<?> description);
+
     boolean contains(SqlObjectDescription<?> description);
 
     void insert(SqlObjectDescription<?> description);

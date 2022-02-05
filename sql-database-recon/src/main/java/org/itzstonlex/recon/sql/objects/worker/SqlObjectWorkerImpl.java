@@ -25,6 +25,13 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
     }
 
     @Override
+    public int getID(SqlObjectDescription<?> description) {
+        return executeWithResponse(description, "SELECT * FROM ${rtable} WHERE `name`=${name}")
+                .thenApply(response -> response.next() ? response.getInt("id") : -1)
+                .join();
+    }
+
+    @Override
     public boolean contains(SqlObjectDescription<?> description) {
         return this.executeWithResponse(description, String.format("SELECT * FROM `${rtable}` WHERE %s", description.propertiesListToRequest(" AND ")))
                 .thenApply(ReconSqlResponse::next)

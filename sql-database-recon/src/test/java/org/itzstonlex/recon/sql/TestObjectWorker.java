@@ -59,9 +59,7 @@ public class TestObjectWorker {
                 worker.insert(sqlUser);
             }
 
-            int userID = worker.executeWithResponse(sqlUser, "SELECT * FROM ${rtable} WHERE `name`=${name}")
-                    .thenApply(response -> response.next() ? response.getInt("id") : 0).join();
-
+            int userID = worker.getID(sqlUser);
             System.out.println("User ID: " + userID);
         }
         else {
