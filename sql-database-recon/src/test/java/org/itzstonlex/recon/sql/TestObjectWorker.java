@@ -93,7 +93,7 @@ public class TestObjectWorker {
         }
 
         // Check `users` table content.
-        connection.getTable("users").selectWhere(ValuedField.create("name", "Misha Leyn"))
+        connection.getTable("users").selectWhere(ValuedField.create("name", user.username))
                         .thenAccept(response -> {
 
             if (!response.next()) {
