@@ -54,8 +54,8 @@ public class TestObjectWorker {
 
         // Insert user object to database and getting a user id.
         if (sqlUser != null) {
-            if (!worker.exists(sqlUser)) {
-                worker.create(sqlUser);
+            if (!worker.contains(sqlUser)) {
+                worker.insert(sqlUser);
             }
 
             int userID = worker.executeWithResponse(sqlUser, "SELECT * FROM ${rtable} WHERE `name`=${name}")

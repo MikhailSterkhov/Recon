@@ -6,9 +6,9 @@ import java.util.concurrent.CompletableFuture;
 
 public interface SqlObjectWorker {
 
-    boolean exists(SqlObjectDescription<?> description);
+    boolean contains(SqlObjectDescription<?> description);
 
-    void create(SqlObjectDescription<?> description);
+    void insert(SqlObjectDescription<?> description);
 
     void delete(SqlObjectDescription<?> description);
 

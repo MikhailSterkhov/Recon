@@ -25,14 +25,14 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
     }
 
     @Override
-    public boolean exists(SqlObjectDescription<?> description) {
+    public boolean contains(SqlObjectDescription<?> description) {
         return this.executeWithResponse(description, String.format("SELECT * FROM `${rtable}` WHERE %s", description.propertiesListToRequest(" AND ")))
                 .thenApply(ReconSqlResponse::next)
                 .join();
     }
 
     @Override
-    public void create(SqlObjectDescription<?> description) {
+    public void insert(SqlObjectDescription<?> description) {
         this.execute(description, String.format("INSERT INTO `${rtable}` (%s)", description.propertiesListToRequest(", ", ") VALUES (")));
     }
 
