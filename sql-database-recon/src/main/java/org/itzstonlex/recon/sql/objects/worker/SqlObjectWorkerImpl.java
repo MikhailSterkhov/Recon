@@ -74,34 +74,6 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
         return connection.getExecution().getResponse(true, description.remakeRequest(sql));
     }
 
-    private ReconSqlTable createSqlTable(PropertyMap<Object> fieldProperties, String table) {
-        return connection.createOrGetTable(table, request -> {
-
-            request.push(IndexedField.createPrimaryNotNull(ReconSqlFieldType.INT, "id")
-                    .index(IndexedField.IndexType.AUTO_INCREMENT));
-
-            fieldProperties.keys()
-                    .stream()
-                    .distinct()
-                    .forEach(field -> {
-
-                if (field.equalsIgnoreCase("id")) {
-                    throw new ReconSqlException("Field `id` already is exists!");
-                }
-
-                Object value = fieldProperties.getProperty(field);
-
-                ReconSqlFieldType fieldType = ReconSqlFieldType.fromAttachment(value.getClass());
-                if (fieldType == ReconSqlFieldType.UNKNOWN) {
-                    return;
-                }
-
-                IndexedField indexedField = IndexedField.create(fieldType, field);
-                request.push(indexedField);
-            });
-        });
-    }
-
     private PropertyMap<Object> createFieldProperties(Object instance, Class<?> instanceType) {
         PropertyMap<Object> fieldsProperty = new ObjectPropertyMap();
 
@@ -129,6 +101,64 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
         return fieldsProperty;
     }
 
+    private Map<String, FieldSql> getFieldsAnnotationsMap(Class<?> instanceType) {
+        Map<String, FieldSql> map = new HashMap<>();
+
+        for (Field field : instanceType.getDeclaredFields()) {
+            FieldSql fieldAnnotation = field.getDeclaredAnnotation(FieldSql.class);
+
+            if (fieldAnnotation != null) {
+                field.setAccessible(true);
+
+                try {
+                    String name = fieldAnnotation.name().isEmpty() ? field.getName() : fieldAnnotation.name();
+                    map.put(name, fieldAnnotation);
+
+                } catch (Exception ignored) {
+                } finally {
+                    field.setAccessible(false);
+                }
+            }
+        }
+
+        return map;
+    }
+
+    private ReconSqlTable createSqlTable(Map<String, FieldSql> fieldsAnnotationsMap,
+                                         PropertyMap<Object> fieldProperties, String table) {
+
+        return connection.createOrGetTable(table, request -> {
+
+            request.push(IndexedField.createPrimaryNotNull(ReconSqlFieldType.INT, "id")
+                    .index(IndexedField.IndexType.AUTO_INCREMENT));
+
+            fieldProperties.keys()
+                    .stream()
+                    .distinct()
+                    .forEach(field -> {
+
+                if (field.equalsIgnoreCase("id")) {
+                    throw new ReconSqlException("Field `id` already is exists!");
+                }
+
+                Object value = fieldProperties.getProperty(field);
+                ReconSqlFieldType fieldType = ReconSqlFieldType.fromAttachment(value.getClass());
+
+                if (fieldType != ReconSqlFieldType.UNKNOWN) {
+
+                    IndexedField indexedField = IndexedField.create(fieldType, field);
+                    FieldSql annotation = fieldsAnnotationsMap.get(field);
+
+                    if (annotation != null) {
+                        indexedField.indexes(annotation.indexes());
+                    }
+
+                    request.push(indexedField);
+                }
+            });
+        });
+    }
+
     private final Map<Integer, SqlObjectDescription<?>> memoryCachedObjectsDescriptionsMap
             = new HashMap<>();
 
@@ -143,7 +173,9 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
         }
 
         PropertyMap<Object> fieldsProperty = this.createFieldProperties(instance, instanceType);
-        ReconSqlTable table = this.createSqlTable(fieldsProperty, injectionAnnotation.table());
+
+        ReconSqlTable table = this.createSqlTable(this.getFieldsAnnotationsMap(instanceType),
+                fieldsProperty, injectionAnnotation.table());
 
         SqlObjectDescription<V> description;
         if (!memoryCachedObjectsDescriptionsMap.containsKey(instance.hashCode())) {
