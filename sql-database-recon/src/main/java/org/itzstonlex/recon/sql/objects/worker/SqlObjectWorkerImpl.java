@@ -13,6 +13,8 @@ import org.itzstonlex.recon.sql.util.propertymap.PropertyMap;
 import org.itzstonlex.recon.sql.util.propertymap.type.ObjectPropertyMap;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 public class SqlObjectWorkerImpl implements SqlObjectWorker {
@@ -23,34 +25,34 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
     }
 
     @Override
-    public boolean exists(SqlObjectDescription description) {
+    public boolean exists(SqlObjectDescription<?> description) {
         return this.executeWithResponse(description, String.format("SELECT * FROM `${rtable}` WHERE %s", description.propertiesListToRequest(" AND ")))
                 .thenApply(ReconSqlResponse::next)
                 .join();
     }
 
     @Override
-    public void create(SqlObjectDescription description) {
+    public void create(SqlObjectDescription<?> description) {
         this.execute(description, String.format("INSERT INTO `${rtable}` (%s)", description.propertiesListToRequest(", ", ") VALUES (")));
     }
 
     @Override
-    public void delete(SqlObjectDescription description) {
+    public void delete(SqlObjectDescription<?> description) {
         this.execute(description, "DELETE FROM `${rtable}` WHERE ${0}");
     }
 
     @Override
-    public void update(SqlObjectDescription description) {
+    public void update(SqlObjectDescription<?> description) {
         this.execute(description, String.format("UPDATE `${rtable}` SET %s WHERE ${0}", description.propertiesListToRequest(", ")));
     }
 
     @Override
-    public void execute(SqlObjectDescription description, String sql) {
+    public void execute(SqlObjectDescription<?> description, String sql) {
         connection.getExecution().update(true, description.remakeRequest(sql));
     }
 
     @Override
-    public CompletableFuture<ReconSqlResponse> executeWithResponse(SqlObjectDescription description, String sql) {
+    public CompletableFuture<ReconSqlResponse> executeWithResponse(SqlObjectDescription<?> description, String sql) {
         return connection.getExecution().getResponse(true, description.remakeRequest(sql));
     }
 
@@ -103,20 +105,36 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
         return fieldsProperty;
     }
 
+    private final Map<Integer, SqlObjectDescription<?>> memoryCachedObjectsDescriptionsMap
+            = new HashMap<>();
+
+    @SuppressWarnings("unchecked")
     @Override
-    public SqlObjectDescription createDescription(Object instance) {
-
+    public <V> SqlObjectDescription<V> injectObject(V instance) {
         Class<?> instanceType = instance.getClass();
-        InjectionSql injection = instanceType.getDeclaredAnnotation(InjectionSql.class);
+        InjectionSql injectionAnnotation = instanceType.getDeclaredAnnotation(InjectionSql.class);
 
-        if (injection == null) {
+        if (injectionAnnotation == null) {
             return null;
         }
 
         PropertyMap<Object> fieldsProperty = this.createFieldProperties(instance, instanceType);
-        ReconSqlTable table = this.createSqlTable(fieldsProperty, injection.table());
+        ReconSqlTable table = this.createSqlTable(fieldsProperty, injectionAnnotation.table());
 
-        return SqlObjectDescription.create(table, fieldsProperty);
+        SqlObjectDescription<V> description;
+        if (!memoryCachedObjectsDescriptionsMap.containsKey(instance.hashCode())) {
+
+            description = SqlObjectDescription.create(instance, table, fieldsProperty);
+            memoryCachedObjectsDescriptionsMap.put(instance.hashCode(), description);
+        }
+        else {
+            description = (SqlObjectDescription<V>) memoryCachedObjectsDescriptionsMap.get(instance.hashCode());
+
+            description.asProperty().reset();
+            description.asProperty().setProperties(fieldsProperty);
+        }
+
+        return description;
     }
 
 }

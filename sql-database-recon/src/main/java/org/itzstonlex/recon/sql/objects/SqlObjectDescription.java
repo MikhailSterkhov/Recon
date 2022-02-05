@@ -8,32 +8,44 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public final class SqlObjectDescription {
+public final class SqlObjectDescription<V> {
 
-    public static SqlObjectDescription create(ReconSqlTable table, PropertyMap<Object> fieldsProperty) {
-        return new SqlObjectDescription(table, fieldsProperty);
+    public static <V> SqlObjectDescription<V> create(V instance, ReconSqlTable table, PropertyMap<Object> fieldsProperty) {
+        return new SqlObjectDescription<>(instance, table, fieldsProperty);
     }
 
     private static final String PLACEHOLDER_FORMAT = ("${%s}");
 
+    private final V instance;
+
     private final ReconSqlTable table;
     private final PropertyMap<Object> fieldsProperty;
 
-    private SqlObjectDescription(ReconSqlTable table, PropertyMap<Object> fieldsProperty) {
+    private SqlObjectDescription(V instance, ReconSqlTable table, PropertyMap<Object> fieldsProperty) {
+        this.instance = instance;
         this.table = table;
         this.fieldsProperty = fieldsProperty;
     }
 
-    public ReconSqlTable getTable() {
-        return table;
+    public void reinject(SqlObjectWorker worker) {
+        fieldsProperty.reset();
+        fieldsProperty.setProperties(worker.injectObject(instance).fieldsProperty);
     }
 
-    public PropertyMap<Object> getFieldsProperty() {
+    public V asObject() {
+        return instance;
+    }
+
+    public PropertyMap<Object> asProperty() {
         return fieldsProperty;
     }
 
     public void setProperty(String field, Object value) {
         fieldsProperty.setProperty(field, value);
+    }
+
+    public ReconSqlTable getTable() {
+        return table;
     }
 
     private String formatValueObject(Object value) {
@@ -77,7 +89,7 @@ public final class SqlObjectDescription {
     public String propertiesListToRequest(String delimiter) {
         return fieldsProperty.keys()
                 .stream()
-                .map(f -> String.format("`%s`=", f) + this.formatValueObject(fieldsProperty.getProperty(f)))
+                .map(this::fieldToRequest)
                 .collect(Collectors.joining(delimiter));
     }
 
