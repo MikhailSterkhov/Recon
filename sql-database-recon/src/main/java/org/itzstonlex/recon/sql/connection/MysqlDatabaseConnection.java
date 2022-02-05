@@ -40,7 +40,6 @@ public final class MysqlDatabaseConnection implements ReconSqlConnection {
         this.credentials = credentials;
     }
 
-    @Override
     public ReconSqlCredentials getCredentials() {
         return credentials;
     }

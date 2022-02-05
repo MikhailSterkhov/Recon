@@ -18,7 +18,7 @@ public class TestMysqlConnection {
 
     public static void main(String[] args) {
         MysqlDatabaseConnection connection = ReconSql.getInstance().createMysqlConnection(DATABASE_CREDENTIALS);
-        connection.setEventHandler(new MysqlEventHandler());
+        connection.setEventHandler(new MysqlEventHandler(connection));
 
         connection.connect();
 
@@ -76,23 +76,29 @@ public class TestMysqlConnection {
 
     public static class MysqlEventHandler extends ReconSqlEventListenerAdapter {
 
+        private final MysqlDatabaseConnection connection;
+
+        public MysqlEventHandler(MysqlDatabaseConnection connection) {
+            this.connection = connection;
+        }
+
         @Override
-        public void onConnected(ReconSqlConnection connection) {
+        public void onConnected(ReconSqlConnection reconSqlConnection) {
             connection.getLogger().info("Success connected to " + connection.getCredentials());
         }
 
         @Override
-        public void onReconnect(ReconSqlConnection connection) {
+        public void onReconnect(ReconSqlConnection reconSqlConnection) {
             connection.getLogger().info("Try reconnect to " + connection.getCredentials());
         }
 
         @Override
-        public void onDisconnect(ReconSqlConnection connection) {
+        public void onDisconnect(ReconSqlConnection reconSqlConnection) {
             connection.getLogger().info(connection.getCredentials() + " was disconnected");
         }
 
         @Override
-        public void onExecute(ReconSqlConnection connection, String sql) {
+        public void onExecute(ReconSqlConnection reconSqlConnection, String sql) {
             connection.getLogger().info("Request sent: " + sql);
         }
     }

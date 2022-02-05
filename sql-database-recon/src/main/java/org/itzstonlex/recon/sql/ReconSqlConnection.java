@@ -12,8 +12,6 @@ import java.util.function.Consumer;
 
 public interface ReconSqlConnection {
 
-    ReconSqlCredentials getCredentials();
-
     ReconLog getLogger();
 
     ExecutorService getThreadExecutor();

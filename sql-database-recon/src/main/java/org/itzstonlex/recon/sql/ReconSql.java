@@ -4,6 +4,8 @@ import org.itzstonlex.recon.sql.connection.HikariDatabaseConnection;
 import org.itzstonlex.recon.sql.connection.MysqlDatabaseConnection;
 import org.itzstonlex.recon.sql.connection.SqliteDatabaseConnection;
 import org.itzstonlex.recon.sql.exception.ReconSqlException;
+import org.itzstonlex.recon.sql.objects.SqlObjectWorker;
+import org.itzstonlex.recon.sql.objects.worker.SqlObjectWorkerImpl;
 import org.itzstonlex.recon.sql.request.ReconSqlRequestFactory;
 import org.itzstonlex.recon.sql.util.SQLExceptionHandler;
 
@@ -18,6 +20,10 @@ public final class ReconSql {
         return instance;
     }
 
+    public SqlObjectWorker newObjectWorker(ReconSqlConnection connection) {
+        return new SqlObjectWorkerImpl(connection);
+    }
+
     public ReconSqlCredentials createCredentials(String host, String username, String password, String scheme) {
         return new ReconSqlCredentials(host, username, password, scheme);
     }
@@ -28,6 +34,14 @@ public final class ReconSql {
 
     public MysqlDatabaseConnection createMysqlConnection(ReconSqlCredentials credentials) {
         return new MysqlDatabaseConnection(credentials);
+    }
+
+    public HikariDatabaseConnection createHikariConnection(String driverClassname, String driverUrl, String username, String password) {
+        return new HikariDatabaseConnection(driverClassname, driverUrl, username, password);
+    }
+
+    public HikariDatabaseConnection createHikariConnection(String driverClassname, ReconSqlCredentials credentials) {
+        return new HikariDatabaseConnection(driverClassname, credentials);
     }
 
     public HikariDatabaseConnection createHikariConnection(ReconSqlCredentials credentials) {

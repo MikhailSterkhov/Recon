@@ -22,7 +22,13 @@ import java.util.concurrent.Executors;
 
 public final class HikariDatabaseConnection implements ReconSqlConnection {
 
-    private final ReconSqlCredentials credentials;
+    public static final String JDBC_MYSQL_DRIVER_CLASSNAME  = ("com.mysql.jdbc.Driver");
+    public static final String JDBC_MYSQL_URL_FORMAT        = ("jdbc:mysql://%s:%s/%s");
+
+    private final String driverClassname,
+            driverUrl,
+            username,
+            password;
 
     private final Map<String, ReconSqlTable> loadedTablesMap = new HashMap<>();
 
@@ -37,13 +43,37 @@ public final class HikariDatabaseConnection implements ReconSqlConnection {
     private ReconSqlExecutable executable;
     private ReconSqlEventListener eventHandler;
 
-    public HikariDatabaseConnection(ReconSqlCredentials credentials) {
-        this.credentials = credentials;
+    public HikariDatabaseConnection(String driverClassname, String driverUrl, String username, String password) {
+        this.driverClassname = driverClassname;
+        this.driverUrl = driverUrl;
+
+        this.username = username;
+        this.password = password;
     }
 
-    @Override
-    public ReconSqlCredentials getCredentials() {
-        return credentials;
+    public HikariDatabaseConnection(String driverClassname, ReconSqlCredentials credentials) {
+        this(driverClassname, String.format("jdbc:mysql://%s:%s/%s", credentials.getHost(), credentials.getPort(), credentials.getScheme()),
+                credentials.getUsername(), credentials.getPassword());
+    }
+
+    public HikariDatabaseConnection(ReconSqlCredentials credentials) {
+        this("com.mysql.jdbc.Driver", credentials);
+    }
+
+    public String getDriverUrl() {
+        return driverUrl;
+    }
+
+    public String getDriverClassname() {
+        return driverClassname;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getPassword() {
+        return password;
     }
 
     @Override
@@ -90,12 +120,11 @@ public final class HikariDatabaseConnection implements ReconSqlConnection {
     public void connect() {
         HikariConfig hikariConfig = new HikariConfig();
 
-        hikariConfig.setDriverClassName("com.mysql.jdbc.Driver");
-        hikariConfig.setJdbcUrl(String.format("jdbc:mysql://%s:%s/%s",
-                credentials.getHost(), credentials.getPort(), credentials.getScheme()));
+        hikariConfig.setDriverClassName(driverClassname);
+        hikariConfig.setJdbcUrl(driverUrl);
 
-        hikariConfig.setUsername(credentials.getUsername());
-        hikariConfig.setPassword(credentials.getPassword());
+        hikariConfig.setUsername(username);
+        hikariConfig.setPassword(password);
 
         hikariConfig.addDataSourceProperty("cachePrepStmts" , "true");
         hikariConfig.addDataSourceProperty("prepStmtCacheSize" , "250");

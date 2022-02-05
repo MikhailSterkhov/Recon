@@ -44,11 +44,6 @@ public final class SqliteDatabaseConnection implements ReconSqlConnection {
     }
 
     @Override
-    public ReconSqlCredentials getCredentials() {
-        return null;
-    }
-
-    @Override
     public ReconLog getLogger() {
         return logger;
     }

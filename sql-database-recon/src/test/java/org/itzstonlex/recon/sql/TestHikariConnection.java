@@ -10,16 +10,17 @@ import java.sql.Timestamp;
 
 public class TestHikariConnection {
 
-    public static final String EMPTY_RESPONSE_DEBUG = "Hikari Response is empty (0)!";
+    public static final String EMPTY_RESPONSE_DEBUG = ("Hikari Response is empty (0)!");
 
-    public static final ReconSqlCredentials DATABASE_CREDENTIALS = ReconSql.getInstance().createCredentials(
-            3306, "localhost", "root", "", "test"
-    );
+    public static final String H2_DRIVER_CLASSNAME  = ("org.h2.Driver");
+    public static final String H2_DRIVER_URL        = ("jdbc:h2:mem:test");
 
     public static void main(String[] args) {
-        HikariDatabaseConnection connection = ReconSql.getInstance().createHikariConnection(DATABASE_CREDENTIALS);
-        connection.setEventHandler(new HikariEventHandler());
+        HikariDatabaseConnection connection = ReconSql.getInstance().createHikariConnection(
+                H2_DRIVER_CLASSNAME, H2_DRIVER_URL, "root", ""
+        );
 
+        connection.setEventHandler(new HikariEventHandler(connection));
         connection.connect();
 
         // Get users table
@@ -69,30 +70,33 @@ public class TestHikariConnection {
                 connection.getLogger().info(" Birthday Time (ms): " + birthdayAsMillis);
             }
         });
-
-        // Delete a table from database.
-        usersTable.drop();
     }
 
     public static class HikariEventHandler extends ReconSqlEventListenerAdapter {
 
-        @Override
-        public void onConnected(ReconSqlConnection connection) {
-            connection.getLogger().info("Success connected to " + connection.getCredentials());
+        private final HikariDatabaseConnection connection;
+
+        public HikariEventHandler(HikariDatabaseConnection connection) {
+            this.connection = connection;
         }
 
         @Override
-        public void onReconnect(ReconSqlConnection connection) {
-            connection.getLogger().info("Try reconnect to " + connection.getCredentials());
+        public void onConnected(ReconSqlConnection reconSqlConnection) {
+            connection.getLogger().info("Success connected to " + connection.getDriverUrl());
         }
 
         @Override
-        public void onDisconnect(ReconSqlConnection connection) {
-            connection.getLogger().info(connection.getCredentials() + " was disconnected");
+        public void onReconnect(ReconSqlConnection reconSqlConnection) {
+            connection.getLogger().info("Try reconnect to " + connection.getDriverUrl());
         }
 
         @Override
-        public void onExecute(ReconSqlConnection connection, String sql) {
+        public void onDisconnect(ReconSqlConnection reconSqlConnection) {
+            connection.getLogger().info(connection.getDriverUrl() + " was disconnected");
+        }
+
+        @Override
+        public void onExecute(ReconSqlConnection reconSqlConnection, String sql) {
             connection.getLogger().info("Request sent: " + sql);
         }
     }

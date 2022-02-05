@@ -42,7 +42,7 @@ public final class CreateTableRequest extends ReconSqlRequest<IndexedField> {
             requestBuilder.append("IF NOT EXISTS ");
         }
 
-        requestBuilder.append("`").append(table).append("`");
+        requestBuilder.append("`").append(table).append("` (");
 
         requestBuilder.append(String.join(", ", fieldsList.stream()
                 .map(IndexedField::toString)
