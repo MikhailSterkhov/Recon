@@ -5,6 +5,7 @@ import org.itzstonlex.recon.sql.objects.SqlObjectDescription;
 import org.itzstonlex.recon.sql.objects.SqlObjectWorker;
 import org.itzstonlex.recon.sql.objects.annotation.FieldSql;
 import org.itzstonlex.recon.sql.objects.annotation.InjectionSql;
+import org.itzstonlex.recon.sql.request.field.impl.IndexedField;
 import org.itzstonlex.recon.sql.request.field.impl.ValuedField;
 
 public class TestObjectWorker {
@@ -12,10 +13,10 @@ public class TestObjectWorker {
     @InjectionSql(table = "users")
     public static class User {
 
-        @FieldSql(name = "name")
+        @FieldSql(name = "name", indexes = IndexedField.IndexType.NOT_NULL)
         private final String username;
 
-        @FieldSql
+        @FieldSql(indexes = IndexedField.IndexType.NOT_NULL)
         private int age;
 
         private User(String name, int age) {
