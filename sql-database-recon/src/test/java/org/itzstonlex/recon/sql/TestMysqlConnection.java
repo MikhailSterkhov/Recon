@@ -48,7 +48,7 @@ public class TestMysqlConnection {
                 .updateSync(connection);
 
         // Getting a first table response field.
-        usersTable.selectAll(response -> {
+        usersTable.selectAll().thenAccept(response -> {
 
             if (!response.next()) {
                 connection.getLogger().info(EMPTY_RESPONSE_DEBUG);

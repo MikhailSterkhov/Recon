@@ -5,6 +5,7 @@ import org.itzstonlex.recon.sql.objects.SqlObjectDescription;
 import org.itzstonlex.recon.sql.objects.SqlObjectWorker;
 import org.itzstonlex.recon.sql.objects.annotation.FieldSql;
 import org.itzstonlex.recon.sql.objects.annotation.InjectionSql;
+import org.itzstonlex.recon.sql.request.field.impl.ValuedField;
 
 public class TestObjectWorker {
 
@@ -68,11 +69,16 @@ public class TestObjectWorker {
         }
 
         // Check `users` table content.
-        connection.getTable("users").selectAll(response -> {
+        connection.getTable("users").selectAll().thenAccept(response -> {
             System.out.println("-------------------------------------------");
 
             while (response.next()) {
-                System.out.println("ID: " + response.getInt("id") + " | Name: " + response.getString("name") + " | Age: " + response.getInt("age"));
+                int userID = response.getInt("id");
+                int userAge = response.getInt("age");
+
+                String username = response.getString("name");
+
+                System.out.println("ID: " + userID + " | Name: " + username + " | Age: " + userAge);
             }
         });
 
@@ -87,12 +93,20 @@ public class TestObjectWorker {
         }
 
         // Check `users` table content.
-        connection.getTable("users").selectAll(response -> {
-            System.out.println("-------------------------------------------");
+        connection.getTable("users").selectWhere(ValuedField.create("name", "Misha Leyn"))
+                        .thenAccept(response -> {
 
-            while (response.next()) {
-                System.out.println("ID: " + response.getInt("id") + " | Name: " + response.getString("name") + " | Age: " + response.getInt("age"));
+            if (!response.next()) {
+                return;
             }
+
+            int userID = response.getInt("id");
+            int userAge = response.getInt("age");
+
+            String username = response.getString("name");
+
+            System.out.println("-------------------------------------------");
+            System.out.println("ID: " + userID + " | Name: " + username + " | Age: " + userAge);
         });
     }
 

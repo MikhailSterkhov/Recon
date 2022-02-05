@@ -2,7 +2,10 @@ package org.itzstonlex.recon.sql;
 
 import org.itzstonlex.recon.sql.request.ReconSqlRequestFactory;
 import org.itzstonlex.recon.sql.request.ReconSqlResponse;
+import org.itzstonlex.recon.sql.request.field.impl.ValuedField;
+import org.itzstonlex.recon.sql.request.impl.SelectRequest;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 public interface ReconSqlTable {
@@ -16,29 +19,59 @@ public interface ReconSqlTable {
 
     /**
      * Выполняет запрос в SQL базу функцией SELECT,
-     * получая все данные из таблицы .
-     *
-     * @param responseHandler - Обработчик запроса
+     * получая все данные из таблицы.
      */
-    default void selectAll(Consumer<ReconSqlResponse> responseHandler) {
-        this.createRequest()
+    default CompletableFuture<ReconSqlResponse> selectAll() {
+        return this.createRequest()
                 .select()
-                .getResponseSync(getConnection())
-                .thenAccept(responseHandler);
+                .getResponseSync(getConnection());
     }
 
     /**
      * Выполняет запрос в SQL базу функцией SELECT,
-     * получая все данные из таблицы .
+     * получая все данные из таблицы.
      *
-     * @param responseHandler - Обработчик запроса
+     * @param limit - Лимит количества получаемых данных.
      */
-    default void selectAll(int limit, Consumer<ReconSqlResponse> responseHandler) {
-        this.createRequest()
+    default CompletableFuture<ReconSqlResponse> selectAll(int limit) {
+        return this.createRequest()
                 .select()
                 .limit(limit)
-                .getResponseSync(getConnection())
-                .thenAccept(responseHandler);
+                .getResponseSync(getConnection());
+    }
+
+    /**
+     * Выполняет запрос в SQL базу функцией SELECT,
+     * получая данные по указанным переменным.
+     *
+     * @param fieldsWhere - Дополнения к подкоманде WHERE.
+     */
+    default CompletableFuture<ReconSqlResponse> selectWhere(ValuedField... fieldsWhere) {
+        SelectRequest select = this.createRequest().select();
+
+        for (ValuedField where : fieldsWhere) {
+            select.push(where);
+        }
+
+        return select.getResponseSync(getConnection());
+    }
+
+    /**
+     * Выполняет запрос в SQL базу функцией SELECT,
+     * получая данные по указанным переменным.
+     *
+     * @param limit       - Лимит количества получаемых данных.
+     * @param fieldsWhere - Дополнения к подкоманде WHERE.
+     */
+    default CompletableFuture<ReconSqlResponse> selectWhere(int limit, ValuedField... fieldsWhere) {
+        SelectRequest select = this.createRequest().select()
+                .limit(limit);
+
+        for (ValuedField where : fieldsWhere) {
+            select.push(where);
+        }
+
+        return select.getResponseSync(getConnection());
     }
 
     /**
