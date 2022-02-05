@@ -115,7 +115,9 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
                     String name = fieldAnnotation.name().isEmpty() ? field.getName() : fieldAnnotation.name();
                     Object value = field.get(instance);
 
-                    fieldsProperty.setProperty(name, value);
+                    if (ReconSqlFieldType.fromAttachment(value.getClass()) != ReconSqlFieldType.UNKNOWN) {
+                        fieldsProperty.setProperty(name, value);
+                    }
 
                 } catch (Exception ignored) {
                 } finally {
