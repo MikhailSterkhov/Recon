@@ -24,7 +24,7 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
 
     @Override
     public boolean exists(SqlObjectDescription description) {
-        return this.executeWithResponse(description, "SELECT * FROM `${rtable}` WHERE ${0}")
+        return this.executeWithResponse(description, String.format("SELECT * FROM `${rtable}` WHERE %s", description.propertiesListToRequest(" AND ")))
                 .thenApply(ReconSqlResponse::next)
                 .join();
     }
