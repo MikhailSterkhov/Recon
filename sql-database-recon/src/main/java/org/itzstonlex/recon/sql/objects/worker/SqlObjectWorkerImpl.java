@@ -2,6 +2,7 @@ package org.itzstonlex.recon.sql.objects.worker;
 
 import org.itzstonlex.recon.sql.ReconSqlConnection;
 import org.itzstonlex.recon.sql.ReconSqlTable;
+import org.itzstonlex.recon.sql.exception.ReconSqlException;
 import org.itzstonlex.recon.sql.objects.SqlObjectDescription;
 import org.itzstonlex.recon.sql.objects.SqlObjectWorker;
 import org.itzstonlex.recon.sql.objects.annotation.FieldSql;
@@ -26,16 +27,22 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
 
     @Override
     public int getID(SqlObjectDescription<?> description) {
-        return executeWithResponse(description, "SELECT * FROM ${rtable} WHERE `name`=${name}")
+        int idByFirstField = this.executeWithResponse(description, "SELECT * FROM ${rtable} WHERE ${0}")
                 .thenApply(response -> response.next() ? response.getInt("id") : -1)
                 .join();
+
+        if (idByFirstField < 0) {
+            return this.executeWithResponse(description, String.format("SELECT * FROM ${rtable} WHERE %s", description.propertiesListToRequest(" AND ")))
+                    .thenApply(response -> response.next() ? response.getInt("id") : -1)
+                    .join();
+        }
+
+        return idByFirstField;
     }
 
     @Override
     public boolean contains(SqlObjectDescription<?> description) {
-        return this.executeWithResponse(description, String.format("SELECT * FROM `${rtable}` WHERE %s", description.propertiesListToRequest(" AND ")))
-                .thenApply(ReconSqlResponse::next)
-                .join();
+        return this.getID(description) > 0;
     }
 
     @Override
@@ -45,12 +52,16 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
 
     @Override
     public void delete(SqlObjectDescription<?> description) {
-        this.execute(description, "DELETE FROM `${rtable}` WHERE ${0}");
+        if (this.contains(description)) {
+            this.execute(description, String.format("DELETE FROM `${rtable}` WHERE `id`=%s", this.getID(description)));
+        }
     }
 
     @Override
     public void update(SqlObjectDescription<?> description) {
-        this.execute(description, String.format("UPDATE `${rtable}` SET %s WHERE ${0}", description.propertiesListToRequest(", ")));
+        if (this.contains(description)) {
+            this.execute(description, String.format("UPDATE `${rtable}` SET %s WHERE `id`=%d", description.propertiesListToRequest(", "), this.getID(description)));
+        }
     }
 
     @Override
@@ -69,9 +80,13 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
             request.push(IndexedField.createPrimaryNotNull(ReconSqlFieldType.INT, "id")
                     .index(IndexedField.IndexType.AUTO_INCREMENT));
 
-            fieldProperties.keys().forEach(field -> {
+            fieldProperties.keys()
+                    .stream()
+                    .distinct()
+                    .forEach(field -> {
+
                 if (field.equalsIgnoreCase("id")) {
-                    return;
+                    throw new ReconSqlException("Field `id` already is exists!");
                 }
 
                 Object value = fieldProperties.getProperty(field);
