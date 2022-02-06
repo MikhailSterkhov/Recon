@@ -10,6 +10,7 @@ import org.itzstonlex.recon.sql.objects.annotation.InjectionSql;
 import org.itzstonlex.recon.sql.request.ReconSqlResponse;
 import org.itzstonlex.recon.sql.request.field.ReconSqlFieldType;
 import org.itzstonlex.recon.sql.request.field.impl.IndexedField;
+import org.itzstonlex.recon.sql.util.GsonUtils;
 import org.itzstonlex.recon.sql.util.propertymap.PropertyMap;
 import org.itzstonlex.recon.sql.util.propertymap.type.ObjectPropertyMap;
 
@@ -89,6 +90,9 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
 
                     if (ReconSqlFieldType.fromAttachment(value.getClass()) != ReconSqlFieldType.UNKNOWN) {
                         fieldsProperty.setProperty(name, value);
+                    }
+                    else {
+                        fieldsProperty.setProperty(name, GsonUtils.toJsonString(value));
                     }
 
                 } catch (Exception ignored) {

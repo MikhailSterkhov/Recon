@@ -1,5 +1,7 @@
 package org.itzstonlex.recon.sql.request;
 
+import org.itzstonlex.recon.sql.util.GsonUtils;
+
 import java.io.InputStream;
 import java.io.Reader;
 import java.math.BigDecimal;
@@ -2021,4 +2023,13 @@ public class ReconSqlResponse implements ResultSet {
             return false;
         }
     }
+
+    public <R> R getJsonObject(String columnLabel, Class<R> returnType) {
+        return GsonUtils.fromJsonString(this.getString(columnLabel), returnType);
+    }
+
+    public <R> R getJsonObject(int columnIndex, Class<R> returnType) {
+        return GsonUtils.fromJsonString(this.getString(columnIndex), returnType);
+    }
+
 }

@@ -10,8 +10,12 @@ import org.itzstonlex.recon.sql.request.field.impl.ValuedField;
 
 public class TestObjectWorker {
 
+    @SuppressWarnings("unused")
     @InjectionSql(table = "users")
     public static class User {
+
+        @FieldSql // For objects storage tests.
+        private final User currentUser;
 
         @FieldSql(name = "name", indexes = IndexedField.IndexType.NOT_NULL)
         private final String username;
@@ -22,6 +26,8 @@ public class TestObjectWorker {
         private User(String name, int age) {
             this.username = name;
             this.age = age;
+
+            this.currentUser = this;
         }
 
         public String getName() {
@@ -106,7 +112,11 @@ public class TestObjectWorker {
 
             System.out.println("-------------------------------------------");
             System.out.println("ID: " + userID + " | Name: " + username + " | Age: " + userAge);
+            System.out.println("User: " + response.getJsonObject("currentUser", User.class).getName());
         });
+
+        System.out.println("-------------------------------------------");
+        System.out.println("Table size: " + connection.getTable("users").requestCount());
     }
 
 }
