@@ -33,17 +33,18 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
             return cachedID;
         }
 
-        int idByFirstField = this.executeWithResponse(description, "SELECT * FROM ${rtable} WHERE ${0}")
+        int requestID = this.executeWithResponse(description, "SELECT * FROM ${rtable} WHERE ${0}")
                 .thenApply(response -> response.next() ? response.getInt("id") : -1)
                 .join();
 
-        if (idByFirstField < 0) {
+        if (requestID < 0) {
             return this.executeWithResponse(description, String.format("SELECT * FROM ${rtable} WHERE %s", description.propertiesListToRequest(" AND ")))
                     .thenApply(response -> response.next() ? response.getInt("id") : -1)
                     .join();
         }
 
-        return idByFirstField;
+        description.setCachedID(requestID);
+        return requestID;
     }
 
     @Override
