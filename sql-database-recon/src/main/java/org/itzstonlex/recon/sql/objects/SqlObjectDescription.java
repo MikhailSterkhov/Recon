@@ -16,6 +16,8 @@ public final class SqlObjectDescription<V> {
 
     private static final String PLACEHOLDER_FORMAT = ("${%s}");
 
+    private int cachedID = -1;
+
     private final V instance;
 
     private final ReconSqlTable table;
@@ -27,9 +29,16 @@ public final class SqlObjectDescription<V> {
         this.fieldsProperty = fieldsProperty;
     }
 
-    public void reinject(SqlObjectWorker worker) {
-        fieldsProperty.reset();
-        fieldsProperty.setProperties(worker.injectObject(instance).fieldsProperty);
+    public int getCachedID() {
+        return cachedID;
+    }
+
+    public void setCachedID(int cachedID) {
+        this.cachedID = cachedID;
+    }
+
+    public ReconSqlTable getTable() {
+        return table;
     }
 
     public V asObject() {
@@ -44,8 +53,9 @@ public final class SqlObjectDescription<V> {
         fieldsProperty.setProperty(field, value);
     }
 
-    public ReconSqlTable getTable() {
-        return table;
+    public void reinject(SqlObjectWorker worker) {
+        fieldsProperty.reset();
+        fieldsProperty.setProperties(worker.injectObject(instance).fieldsProperty);
     }
 
     private String formatValueObject(Object value) {

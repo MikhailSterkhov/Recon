@@ -28,6 +28,11 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
 
     @Override
     public int getID(SqlObjectDescription<?> description) {
+        int cachedID = description.getCachedID();
+        if (cachedID >= 0) {
+            return cachedID;
+        }
+
         int idByFirstField = this.executeWithResponse(description, "SELECT * FROM ${rtable} WHERE ${0}")
                 .thenApply(response -> response.next() ? response.getInt("id") : -1)
                 .join();
@@ -49,6 +54,7 @@ public class SqlObjectWorkerImpl implements SqlObjectWorker {
     @Override
     public void insert(SqlObjectDescription<?> description) {
         this.execute(description, String.format("INSERT INTO `${rtable}` (%s)", description.propertiesListToRequest(", ", ") VALUES (")));
+        description.setCachedID(getID(description));
     }
 
     @Override
