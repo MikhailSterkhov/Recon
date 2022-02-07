@@ -52,12 +52,12 @@ public final class HikariDatabaseConnection implements ReconSqlConnection {
     }
 
     public HikariDatabaseConnection(String driverClassname, ReconSqlCredentials credentials) {
-        this(driverClassname, String.format("jdbc:mysql://%s:%s/%s", credentials.getHost(), credentials.getPort(), credentials.getScheme()),
+        this(driverClassname, String.format(JDBC_MYSQL_URL_FORMAT, credentials.getHost(), credentials.getPort(), credentials.getScheme()),
                 credentials.getUsername(), credentials.getPassword());
     }
 
     public HikariDatabaseConnection(ReconSqlCredentials credentials) {
-        this("com.mysql.jdbc.Driver", credentials);
+        this(JDBC_MYSQL_DRIVER_CLASSNAME, credentials);
     }
 
     public String getDriverUrl() {

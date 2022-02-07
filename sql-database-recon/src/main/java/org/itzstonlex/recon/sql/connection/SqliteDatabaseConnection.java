@@ -3,7 +3,6 @@ package org.itzstonlex.recon.sql.connection;
 import org.itzstonlex.recon.factory.ReconThreadFactory;
 import org.itzstonlex.recon.log.ReconLog;
 import org.itzstonlex.recon.sql.ReconSqlConnection;
-import org.itzstonlex.recon.sql.ReconSqlCredentials;
 import org.itzstonlex.recon.sql.ReconSqlExecutable;
 import org.itzstonlex.recon.sql.ReconSqlTable;
 import org.itzstonlex.recon.sql.event.ReconSqlEventListener;

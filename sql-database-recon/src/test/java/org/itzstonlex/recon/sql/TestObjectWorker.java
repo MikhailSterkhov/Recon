@@ -56,7 +56,7 @@ public class TestObjectWorker {
         // Create object to request's parsing.
         User user = new User("Misha Leyn", 18);
 
-        // Inject sql-object services.
+        // Create & Inject sql-object services.
         SqlObjectWorker worker = ReconSql.getInstance().newObjectWorker(connection);
         SqlObjectDescription<User> sqlUser = worker.injectObject(user);
 
