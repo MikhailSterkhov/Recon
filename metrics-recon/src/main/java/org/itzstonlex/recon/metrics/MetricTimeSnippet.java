@@ -11,13 +11,13 @@ public final class MetricTimeSnippet {
     private final long value;
     private final TimeUnit unit;
 
-    private final String stringLine;
+    private final String toString;
 
     private MetricTimeSnippet(long value, TimeUnit unit) {
         this.value = value;
         this.unit = unit;
 
-        this.stringLine = String.format("@MetricTime={time=%s, unit=%s}", value, unit);
+        this.toString = String.format("@MetricTime={time=%s, unit=%s}", value, unit);
     }
 
     public long getTime() {
@@ -34,6 +34,6 @@ public final class MetricTimeSnippet {
 
     @Override
     public String toString() {
-        return stringLine;
+        return toString;
     }
 }
