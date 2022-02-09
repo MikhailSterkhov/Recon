@@ -4,7 +4,7 @@ import org.itzstonlex.recon.ChannelPipeline;
 import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.metrics.handler.PipelineMetricHandler;
 import org.itzstonlex.recon.metrics.handler.type.ReadMetricHandler;
-import org.itzstonlex.recon.metrics.handler.type.ServerConnectionsMetricHandler;
+import org.itzstonlex.recon.metrics.handler.type.ClientsConnectionsMetricHandler;
 import org.itzstonlex.recon.metrics.handler.type.WriteMetricHandler;
 
 import java.util.HashSet;
@@ -29,8 +29,7 @@ public final class ReconMetrics {
     private static void registerDefaults(ReconMetrics reconMetrics) {
         reconMetrics.addPipelineHandler(new ReadMetricHandler());
         reconMetrics.addPipelineHandler(new WriteMetricHandler());
-
-        reconMetrics.addPipelineHandler(new ServerConnectionsMetricHandler());
+        reconMetrics.addPipelineHandler(new ClientsConnectionsMetricHandler());
     }
 
     public static ReconMetrics newMetricInstance() {

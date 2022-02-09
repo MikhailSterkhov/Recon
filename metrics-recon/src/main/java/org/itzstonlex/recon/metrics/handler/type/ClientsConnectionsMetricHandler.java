@@ -5,10 +5,10 @@ import org.itzstonlex.recon.RemoteChannel;
 import org.itzstonlex.recon.metrics.ReconMetrics;
 import org.itzstonlex.recon.metrics.handler.PipelineMetricHandler;
 
-public final class ServerConnectionsMetricHandler extends PipelineMetricHandler {
+public final class ClientsConnectionsMetricHandler extends PipelineMetricHandler {
 
-    public ServerConnectionsMetricHandler() {
-        super("serverConnections_metric_handler");
+    public ClientsConnectionsMetricHandler() {
+        super("clientsConnections_metric_handler");
     }
 
     @Override
