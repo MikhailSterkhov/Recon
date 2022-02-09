@@ -108,6 +108,10 @@ public interface ByteStream {
 
         void writeString(String value);
 
+        void writeStringLE(String value, Charset charset);
+
+        void writeStringLE(String value);
+
         void writeStringList(List<String> value);
 
         void writeIntArray(int... value);

@@ -88,15 +88,23 @@ public final class BufferInitializer {
 
         @Override
         public void writeString(String value, Charset charset) {
-            byte[] bytes = value.getBytes(charset);
-
-            writeInt(bytes.length);
-            write(bytes);
+            writeInt(value.length());
+            writeStringLE(value);
         }
 
         @Override
         public void writeString(String value) {
             writeString(value, Charset.defaultCharset());
+        }
+
+        @Override
+        public void writeStringLE(String value, Charset charset) {
+            write(value.getBytes(charset));
+        }
+
+        @Override
+        public void writeStringLE(String value) {
+            writeStringLE(value, Charset.defaultCharset());
         }
 
         @Override

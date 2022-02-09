@@ -131,12 +131,22 @@ public final class ReconSimplify {
         }
 
         public OutputBufBuilder writeString(String value, Charset charset) {
-            buffer.writeString(value);
+            buffer.writeString(value, charset);
             return this;
         }
 
         public OutputBufBuilder writeString(String value) {
             buffer.writeString(value);
+            return this;
+        }
+
+        public OutputBufBuilder writeStringLE(String value, Charset charset) {
+            buffer.writeStringLE(value, charset);
+            return this;
+        }
+
+        public OutputBufBuilder writeStringLE(String value) {
+            buffer.writeStringLE(value);
             return this;
         }
 
