@@ -14,7 +14,7 @@ import org.itzstonlex.recon.side.wrapped.AbstractServer;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-public class MetricTests {
+public class MetricDataTests {
 
     public static void main(String[] args) {
         ReconMetrics reconMetrics = ReconMetrics.newMetricInstance();

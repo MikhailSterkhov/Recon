@@ -1,5 +1,7 @@
 package org.itzstonlex.recon.metrics;
 
+import org.itzstonlex.recon.metrics.exception.MetricSnippetException;
+
 import java.io.PrintStream;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -27,8 +29,14 @@ public final class MetricCounter {
         this.id = id;
         this.label = label;
 
-        // Metric Cache of Time.
+        // Init time-snippets for caching data.
         snippetsMap = new HashMap<>();
+
+        this.initDefaultSnippets();
+    }
+
+    private void initDefaultSnippets() {
+        snippetsMap.clear();
 
         // Seconds.
         snippetsMap.put(MetricTimeSnippet.of(1, TimeUnit.SECONDS), 0);
@@ -67,6 +75,10 @@ public final class MetricCounter {
 
     public void addSnippet(MetricTimeSnippet snippet) {
         assert snippet != null;
+
+        if (snippet.toMillis() < TimeUnit.SECONDS.toMillis(1)) {
+            throw new MetricSnippetException("Snippet time must be >= 1 sec.");
+        }
 
         // We check for the presence of a key with the
         // same time for caching to extract the possibility
