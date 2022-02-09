@@ -88,7 +88,7 @@ public final class BufferInitializer {
 
         @Override
         public void writeString(String value, Charset charset) {
-            writeInt(value.length());
+            writeVarInt(value.length());
             writeStringLE(value);
         }
 
@@ -243,12 +243,12 @@ public final class BufferInitializer {
 
         @Override
         public byte readByte() {
-            return readArray(1)[0];
+            return this.readArray(1)[0];
         }
 
         @Override
         public int readInt() {
-            return PrimitiveByteUtils.readInt( this.readArray(Integer.BYTES) );
+            return PrimitiveByteUtils.readInt(this.readArray(Integer.BYTES));
         }
 
         @Override
@@ -272,22 +272,22 @@ public final class BufferInitializer {
 
         @Override
         public long readLong() {
-            return PrimitiveByteUtils.readLong( readArray(Long.BYTES) );
+            return PrimitiveByteUtils.readLong(this.readArray(Long.BYTES));
         }
 
         @Override
         public float readFloat() {
-            return PrimitiveByteUtils.readFloat( readArray(Float.BYTES) );
+            return PrimitiveByteUtils.readFloat(this.readArray(Float.BYTES));
         }
 
         @Override
         public double readDouble() {
-            return PrimitiveByteUtils.readDouble( readArray(Double.BYTES) );
+            return PrimitiveByteUtils.readDouble(this.readArray(Double.BYTES));
         }
 
         @Override
         public char readChar() {
-            return PrimitiveByteUtils.readChar( readArray(Character.BYTES) );
+            return PrimitiveByteUtils.readChar(this.readArray(Character.BYTES));
         }
 
         @Override
@@ -297,56 +297,56 @@ public final class BufferInitializer {
 
         @Override
         public String readStringLE(int length) {
-            return readStringLE(length, Charset.defaultCharset());
+            return this.readStringLE(length, Charset.defaultCharset());
         }
 
         @Override
         public String readStringLE() {
-            return PrimitiveByteUtils.readString(this.readArray(size()));
+            return this.readStringLE(this.size());
         }
 
         @Override
         public boolean readBoolean() {
-            return readByte() == 1;
+            return this.readByte() == 1;
         }
 
         @Override
         public String readString(int max, Charset charset) {
-            int size = readVarInt();
+            int size = this.readVarInt();
             if (size > max) {
                 throw new BufferReadException("String value length must be <= %d", max);
             }
 
-            return readStringLE(size, charset);
+            return this.readStringLE(size, charset);
         }
 
         @Override
         public String readString(int max) {
-            return readString(max, Charset.defaultCharset());
+            return this.readString(max, Charset.defaultCharset());
         }
 
         @Override
         public String readString(Charset charset) {
-            return readString(Short.MAX_VALUE, charset);
+            return this.readString(Short.MAX_VALUE, charset);
         }
 
         @Override
         public String readString() {
-            return readString(Charset.defaultCharset());
+            return this.readString(Charset.defaultCharset());
         }
 
         @Override
         public List<String> readStringList() {
-            return readCollection(ArrayList::new, ByteStream.Input::readString);
+            return this.readCollection(ArrayList::new, ByteStream.Input::readString);
         }
 
         @Override
         public int[] readIntArray() {
-            int size = readInt();
+            int size = this.readInt();
             int[] array = new int[size];
 
             for (int i = 0; i < size; i++) {
-                array[i] = readInt();
+                array[i] = this.readInt();
             }
 
             return array;
@@ -354,11 +354,11 @@ public final class BufferInitializer {
 
         @Override
         public long[] readLongArray() {
-            int size = readInt();
+            int size = this.readInt();
             long[] array = new long[size];
 
             for (int i = 0; i < size; i++) {
-                array[i] = readLong();
+                array[i] = this.readLong();
             }
 
             return array;
@@ -366,11 +366,11 @@ public final class BufferInitializer {
 
         @Override
         public float[] readFloatArray() {
-            int size = readInt();
+            int size = this.readInt();
             float[] array = new float[size];
 
             for (int i = 0; i < size; i++) {
-                array[i] = readFloat();
+                array[i] = this.readFloat();
             }
 
             return array;
@@ -378,11 +378,11 @@ public final class BufferInitializer {
 
         @Override
         public double[] readDoubleArray() {
-            int size = readInt();
+            int size = this.readInt();
             double[] array = new double[size];
 
             for (int i = 0; i < size; i++) {
-                array[i] = readDouble();
+                array[i] = this.readDouble();
             }
 
             return array;
@@ -390,11 +390,11 @@ public final class BufferInitializer {
 
         @Override
         public boolean[] readBooleanArray() {
-            int size = readInt();
+            int size = this.readInt();
             boolean[] array = new boolean[size];
 
             for (int i = 0; i < size; i++) {
-                array[i] = readBoolean();
+                array[i] = this.readBoolean();
             }
 
             return array;
@@ -404,10 +404,10 @@ public final class BufferInitializer {
         public <R, C extends Collection<R>> C readCollection(Supplier<C> collectionInstance,
                                                              Function<ByteStream.Input, R> reader) {
             C collection = collectionInstance.get();
-            int size = readInt();
+            int size = this.readInt();
 
             for (int i = 0; i < size; i++) {
-                collection.add( reader.apply(this) );
+                collection.add(reader.apply(this));
             }
 
             return collection;
@@ -416,7 +416,7 @@ public final class BufferInitializer {
         @SuppressWarnings("unchecked")
         @Override
         public <R> R[] readArray(Function<ByteStream.Input, R> reader) {
-            int size = readInt();
+            int size = this.readInt();
             R[] array = (R[]) new Object[size];
 
             for (int i = 0; i < size; i++) {
