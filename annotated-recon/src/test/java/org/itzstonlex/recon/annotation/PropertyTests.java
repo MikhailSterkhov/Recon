@@ -10,15 +10,17 @@ public class PropertyTests {
     @Property(key = "author", defaultValue = "ItzStonlex")
     private String author;
 
-    public static void main(String[] args) {
-
-        // Property init.
+    private static void initProperties() {
         ReconProperty reconProperty = new ReconProperty();
 
         reconProperty.set("github", "https://github.com/ItzStonlex/Recon");
         reconProperty.set("key", "value");
+    }
 
-        AnnotatedReconScanner.addProperty(reconProperty);
+    public static void main(String[] args) {
+
+        // Property init.
+        initProperties();
 
         // Instance fields tests.
         PropertyTests propertyTests = new PropertyTests();

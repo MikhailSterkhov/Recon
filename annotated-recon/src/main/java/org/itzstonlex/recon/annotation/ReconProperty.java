@@ -7,6 +7,10 @@ public class ReconProperty {
 
     private final Map<String, String> properties = new HashMap<>();
 
+    public ReconProperty() {
+        AnnotatedReconScanner.addProperty(this);
+    }
+
     public boolean contains(String key) {
         return properties.containsKey(key);
     }

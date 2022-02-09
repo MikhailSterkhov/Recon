@@ -51,6 +51,8 @@ final class AnnotationHandler {
 
             field.setAccessible(true);
             field.set(instance, value);
+
+            field.setAccessible(false);
         }
     }
 

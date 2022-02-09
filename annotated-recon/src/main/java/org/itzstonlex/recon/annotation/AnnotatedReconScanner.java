@@ -31,15 +31,15 @@ public final class AnnotatedReconScanner {
 
             for (Field field : instance.getClass().getDeclaredFields()) {
                 if (field.isAnnotationPresent(Property.class)) {
-                    annotationHandler.handle(field.getAnnotation(Property.class), instance, field);
+                    annotationHandler.handle(field.getDeclaredAnnotation(Property.class), instance, field);
                 }
 
                 if (field.isAnnotationPresent(ConnectClient.class)) {
-                    annotationHandler.handle(field.getAnnotation(ConnectClient.class), instance, field);
+                    annotationHandler.handle(field.getDeclaredAnnotation(ConnectClient.class), instance, field);
                 }
 
                 if (field.isAnnotationPresent(BindServer.class)) {
-                    annotationHandler.handle(field.getAnnotation(BindServer.class), instance, field);
+                    annotationHandler.handle(field.getDeclaredAnnotation(BindServer.class), instance, field);
                 }
             }
         }
