@@ -66,6 +66,13 @@ public enum MinecraftVersion {
     //--1.17--//
     V_1_17(755),
     V_1_17_1(756),
+
+    //--1.18--//
+    V_1_18(757),
+    V_1_18_1(757),
+
+    //--1.19--//
+    // V_1_19(758),
     ;
 
     public static MinecraftVersion getByVersionId(int versionId) {
