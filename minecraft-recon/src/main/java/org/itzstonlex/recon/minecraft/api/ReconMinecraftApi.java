@@ -51,13 +51,7 @@ public final class ReconMinecraftApi {
         }
     }
 
-    private final class ChannelConfigInitializer{
-
-        private void updateOptions(ChannelConfig config) {
-            config.option(ChannelOption.of(ChannelOption.Type.IP_TOS, 0x18));
-            config.option(ChannelOption.of(ChannelOption.Type.SO_SNDBUF, 262_144));
-            config.option(ChannelOption.of(ChannelOption.Type.TCP_NODELAY, true));
-        }
+    private final class ChannelConfigInitializer {
 
         private void registerHandshake() {
             registry.registerPacket(0, ServerHandshake::new);
@@ -65,9 +59,6 @@ public final class ReconMinecraftApi {
         }
 
         private void init(ServiceFactory serviceFactory, ChannelConfig config) {
-
-            // Change channel options.
-            updateOptions(config);
 
             // Add packet-handlers.
             BossHandler bossHandler = new BossHandler(registry);

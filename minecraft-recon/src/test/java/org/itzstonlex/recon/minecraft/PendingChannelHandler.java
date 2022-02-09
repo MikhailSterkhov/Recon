@@ -22,7 +22,6 @@ public final class PendingChannelHandler extends ChannelListenerAdapter {
         remoteChannel.logger().warning("Client connection closed: " + remoteChannel.address());
     }
 
-
     @Override
     public void onConnected(RemoteChannel channel, ContextHandler contextHandler) {
         pendingConnection.onConnected(channel);
@@ -37,7 +36,6 @@ public final class PendingChannelHandler extends ChannelListenerAdapter {
     public void onClosed(RemoteChannel channel, ContextHandler contextHandler) {
         pendingConnection.onDisconnected(channel);
     }
-
 
     @Override
     public void onExceptionCaught(RemoteChannel remoteChannel, Throwable throwable) {

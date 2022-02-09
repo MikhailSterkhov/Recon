@@ -22,6 +22,7 @@ public final class BukkitConnectorPlugin { // extends JavaPlugin
         this.version = MinecraftVersion.V_1_16_5.getVersionId();
         this.name = "Lobby-1";
 
+        // Getting from Bukkit server data.
         this.address = new InetSocketAddress("127.0.0.1", 25567);
 
         this.isProxy = false;

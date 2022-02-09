@@ -22,6 +22,7 @@ public final class ProxyConnectorPlugin { // extends Plugin
         this.version = MinecraftVersion.V_1_12_2.getVersionId();
         this.name = "Proxy-1";
 
+        // Getting from Proxy server data.
         this.address = new InetSocketAddress("127.0.0.1", 25565);
 
         this.isProxy = true;

@@ -6,6 +6,7 @@ import org.itzstonlex.recon.minecraft.util.BufferUtils;
 import org.itzstonlex.recon.minecraft.util.MinecraftVersion;
 
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 
 public abstract class Handshake extends MinecraftPacket {
 
@@ -38,7 +39,7 @@ public abstract class Handshake extends MinecraftPacket {
 
     @Override
     public void write(ByteStream.Output buffer) {
-        buffer.writeInt(version);
+        buffer.writeVarInt(version);
         buffer.writeString(name);
 
         BufferUtils.writeAddress(buffer, address);
@@ -48,7 +49,7 @@ public abstract class Handshake extends MinecraftPacket {
 
     @Override
     public void read(ByteStream.Input buffer) {
-        this.version = buffer.readInt();
+        this.version = buffer.readVarInt();
         this.name = buffer.readString();
 
         this.address = BufferUtils.readAddress(buffer);
