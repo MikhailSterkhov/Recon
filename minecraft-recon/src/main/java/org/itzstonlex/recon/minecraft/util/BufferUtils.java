@@ -17,21 +17,21 @@ public final class BufferUtils {
     }
 
     public static InetSocketAddress readAddress(ByteStream.Input buffer) {
-        return new InetSocketAddress(buffer.readString(), buffer.readInt());
+        return new InetSocketAddress(buffer.readString(), buffer.readVarInt());
     }
 
     public static void writeAddress(ByteStream.Output buffer, InetSocketAddress address) {
         buffer.writeString(address.getHostString());
-        buffer.writeInt(address.getPort());
+        buffer.writeVarInt(address.getPort());
     }
 
     public static <E extends Enum<?>> E readEnum(ByteStream.Input buffer, Class<E> enumClass) {
-        int ordinal = buffer.readInt();
+        int ordinal = buffer.readVarInt();
         return enumClass.getEnumConstants()[ordinal];
     }
 
     public static void writeEnum(ByteStream.Output buffer, Enum<?> value) {
-        buffer.writeInt(value.ordinal());
+        buffer.writeVarInt(value.ordinal());
     }
 
 }
