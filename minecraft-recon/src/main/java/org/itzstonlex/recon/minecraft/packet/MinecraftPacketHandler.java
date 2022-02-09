@@ -10,7 +10,7 @@ public abstract class MinecraftPacketHandler {
     throws Exception {
 
         for (Method method : getClass().getDeclaredMethods()) {
-            if (method.getAnnotation(PacketHandler.class) == null) {
+            if (method.getDeclaredAnnotation(PacketHandler.class) == null) {
                 continue;
             }
 
