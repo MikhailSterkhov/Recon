@@ -36,7 +36,7 @@ public final class BossHandler extends ChannelListenerAdapter {
             return;
         }
 
-        int packetID = buffer.readInt();
+        int packetID = buffer.readVarInt();
         MinecraftPacket minecraftPacket = registry.getRegisteredPacket(packetID);
 
         if (!minecraftPacket.isReadable()) {

@@ -169,7 +169,7 @@ public final class ReconMinecraftApi {
         }
 
         ByteStream.Output buffer = BufferFactory.createPooledOutput();
-        buffer.writeInt(packetID);
+        buffer.writeVarInt(packetID);
 
         packet.write(buffer);
 
