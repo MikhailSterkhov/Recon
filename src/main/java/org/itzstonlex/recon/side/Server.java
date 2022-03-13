@@ -22,7 +22,7 @@ public class Server implements RemoteConnection, RemoteConnection.Binder {
     private RemoteChannel channel;
 
     private final ExecutorService thread
-            = Executors.newSingleThreadExecutor();
+            = Executors.newCachedThreadPool();
 
     private final ReconLog logger = new ReconLog("Server");
     private final Set<ChannelOption> optionSet = new HashSet<>();

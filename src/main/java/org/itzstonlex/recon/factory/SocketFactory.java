@@ -48,7 +48,7 @@ public final class SocketFactory {
 
             try {
                 InetSocketAddress resolvedAddress = new InetSocketAddress(address.getHostString(), address.getPort());
-                socket.connect(resolvedAddress, timeout);
+                channel.connect(resolvedAddress);
             }
             catch (IOException ignored) {
                 // ignored exception.

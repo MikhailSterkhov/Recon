@@ -19,7 +19,7 @@ public interface RemoteChannel extends Closeable {
 
     void write(ByteStream.Output buffer);
 
-    void flush();
+    void resetBuf();
 
     void forceOpen();
 

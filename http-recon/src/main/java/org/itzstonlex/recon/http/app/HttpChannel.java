@@ -54,7 +54,7 @@ public class HttpChannel implements RemoteChannel {
     }
 
     @Override
-    public void flush() {
+    public void resetBuf() {
         write(null);
     }
 

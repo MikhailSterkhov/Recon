@@ -23,7 +23,7 @@ public class Client implements RemoteConnection, RemoteConnection.Connector {
     private int timeout = -1;
 
     private final ExecutorService thread
-            = Executors.newSingleThreadExecutor();
+            = Executors.newCachedThreadPool();
 
     private final ReconLog logger = new ReconLog("Client");
     private final Set<ChannelOption> optionSet = new HashSet<>();

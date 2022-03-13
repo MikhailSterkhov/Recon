@@ -10,6 +10,7 @@ import org.itzstonlex.recon.option.ChannelOption;
 import org.itzstonlex.recon.side.Client;
 import org.itzstonlex.recon.util.ReconThreadsStorage;
 
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -18,6 +19,8 @@ import java.nio.channels.SocketChannel;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public final class ReconServerThread
         extends Thread {
@@ -36,7 +39,9 @@ public final class ReconServerThread
     }
 
     private final Data data;
+
     private final Map<Socket, RemoteChannel> connected = new ConcurrentHashMap<>();
+    private final Map<Socket, ExecutorService> readExecutors = new ConcurrentHashMap<>();
 
     public ReconServerThread(Data data) {
         super("ReconServer-" + threadsCounter++);
@@ -59,7 +64,7 @@ public final class ReconServerThread
 
                 try {
                     Socket accept = serverSocket.accept();
-                    RemoteChannel clientChannel = newClientChannel((InetSocketAddress) accept.getRemoteSocketAddress());
+                    RemoteChannel clientChannel = this.newClientChannel((InetSocketAddress) accept.getRemoteSocketAddress());
 
                     for (ChannelOption channelOption : data.options) {
                         try {
@@ -71,9 +76,11 @@ public final class ReconServerThread
                     }
 
                     connected.put(accept, clientChannel);
-                    addSocketToAutoInactiveDetect(accept, clientChannel);
+                    readExecutors.put(accept, Executors.newCachedThreadPool());
 
                     data.channel.pipeline().fireClientConnectedEvent(clientChannel);
+
+                    this.addSocketToAutoInactiveDetect(accept, clientChannel);
 
                 } catch (Exception exception) {
                     data.channel.pipeline().fireExceptionCaughtEvent(new ReconThreadException(exception));
@@ -95,12 +102,12 @@ public final class ReconServerThread
                 if (readBuf >= 0) {
                     Thread.sleep(1500L);
 
-                    addSocketToAutoInactiveDetect(socket, channel);
+                    this.addSocketToAutoInactiveDetect(socket, channel);
                 }
             }
             catch (Exception ignored) {
                 try {
-                    disconnectChannel(socket);
+                    this.disconnectClient(socket);
                 }
                 catch (Exception exception) {
                     data.channel.pipeline().fireExceptionCaughtEvent(new ReconThreadException(exception));
@@ -109,9 +116,15 @@ public final class ReconServerThread
         });
     }
 
-    private void disconnectChannel(Socket socket)
+    private void disconnectClient(Socket socket)
     throws Exception {
+
         RemoteChannel channel = connected.remove(socket);
+        ExecutorService readExecutor = readExecutors.remove(socket);
+
+        if (readExecutor != null) {
+            readExecutor.shutdown();
+        }
 
         if (channel == null) {
             return;
@@ -123,11 +136,14 @@ public final class ReconServerThread
         socket.close();
     }
 
-    private void detectIncomingStream(SocketChannel socketChannel)
-            throws Exception {
-
-        ByteBuffer channelBuffer = ByteBuffer.wrap(new byte[8192]);
-        int size = socketChannel.read(channelBuffer);
+    private void detectIncomingStream0(ByteBuffer socketBuffer, SocketChannel socketChannel) {
+        int size = 0;
+        try {
+            size = socketChannel.read(socketBuffer);
+        }
+        catch (IOException ignored) {
+            // ignored exception.
+        }
 
         if (size <= 0) {
             return;
@@ -140,7 +156,7 @@ public final class ReconServerThread
             converter.writeByte((byte) readBuf);
         }
 
-        converter.write(Arrays.copyOf(channelBuffer.array(), size));
+        converter.write(Arrays.copyOf(socketBuffer.array(), size));
         readBuf = -1;
 
         // Read bytes handle.
@@ -149,34 +165,53 @@ public final class ReconServerThread
         );
 
         data.channel.pipeline().fireReadEvent(inputBuffer);
+
+        socketBuffer.clear();
+        this.detectIncomingStream0(socketBuffer, socketChannel);
+    }
+
+    private void detectIncomingStream(SocketChannel socketChannel) {
+        ExecutorService executorService = readExecutors.get(socketChannel.socket());
+        if (executorService == null) {
+            return;
+        }
+
+        ByteBuffer socketBuffer = ByteBuffer.allocate(8192);
+        executorService.execute(() -> this.detectIncomingStream0(socketBuffer, socketChannel));
     }
 
     private void detectOutgoingStream(SocketChannel socketChannel, RemoteChannel clientChannel)
-            throws Exception {
+    throws Exception {
 
         ByteStream.Output buffer = clientChannel.buffer();
 
         if (buffer != null) {
-            socketChannel.write( ByteBuffer.wrap(buffer.array()) );
+            socketChannel.write(ByteBuffer.wrap(buffer.array()));
 
             data.channel.pipeline().fireWriteEvent(buffer);
-            clientChannel.flush();
+            clientChannel.resetBuf();
         }
     }
 
     private void shutdown(ServerSocket serverSocket)
     throws Exception {
 
-        // Close a connections.
+        for (Socket client : connected.keySet()) {
+            this.disconnectClient(client);
+        }
+
+        // Close connections & threads.
+        data.channel.connection().getThread().shutdown();
         data.channel.close();
+
         serverSocket.close();
 
         // Call event of that connection closed.
         data.channel.pipeline().fireClosedEvent();
 
         // Stop the connection thread.
-        interrupt();
-        stop();
+        super.interrupt();
+        super.stop();
     }
 
     @Override
@@ -186,15 +221,14 @@ public final class ReconServerThread
 
         try {
             ServerSocket serverSocket = SocketFactory.createServerSocket(
-                    data.options,
-                    data.channel.address()
+                    data.options, data.channel.address()
             );
 
             // Call event of bind that socket.
             data.channel.pipeline().fireBindEvent();
 
             // Detect new client connections.
-            detectNewConnections(serverSocket);
+            this.detectNewConnections(serverSocket);
 
             // While server connection channel was active.
             while (!data.channel.isClosed()) {
@@ -207,10 +241,10 @@ public final class ReconServerThread
 
                     try {
                         // Detect received bytes from the client.
-                        detectIncomingStream(clientSocket.getChannel());
+                        this.detectIncomingStream(clientSocket.getChannel());
 
                         // Get filled buffer & send bytes to connection output.
-                        detectOutgoingStream(clientSocket.getChannel(), clientChannel);
+                        this.detectOutgoingStream(clientSocket.getChannel(), clientChannel);
                     }
                     catch (Exception exception) {
 
@@ -221,7 +255,7 @@ public final class ReconServerThread
                 }
             }
 
-            shutdown(serverSocket);
+            this.shutdown(serverSocket);
         }
 
         catch (Exception exception) {

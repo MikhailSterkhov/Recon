@@ -92,7 +92,7 @@ public final class ChannelInitializer implements RemoteChannel {
     }
 
     @Override
-    public void flush() {
+    public void resetBuf() {
         if (buffer == null) {
             return;
         }
