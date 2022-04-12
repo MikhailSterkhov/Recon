@@ -23,10 +23,10 @@ public final class SqliteDatabaseConnection implements ReconSqlConnection {
 
     private final Map<String, ReconSqlTable> loadedTablesMap = new HashMap<>();
 
-    private final ReconLog logger = new ReconLog("ReconMySQL");
+    private final ReconLog logger = new ReconLog("ReconSqlite");
 
     private final ExecutorService threadExecutor = Executors.newCachedThreadPool(
-            ReconThreadFactory.asInstance("ReconMySQL-%s")
+            ReconThreadFactory.asInstance("ReconSqlite-%s")
     );
 
     private Connection connection;
