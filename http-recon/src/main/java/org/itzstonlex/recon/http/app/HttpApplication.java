@@ -204,7 +204,7 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
     }
 
     public final HttpChannel bind(String host) {
-        return bind(host, (ssl ? HTTP_PORT : HTTPS_PORT));
+        return bind(host, (ssl ? HTTPS_PORT : HTTP_PORT));
     }
 
     public final HttpChannel bindLocal(int port) {
@@ -212,7 +212,7 @@ public class HttpApplication implements RemoteConnection, HttpHandler {
     }
 
     public final HttpChannel bindLocal() {
-        return bindLocal(ssl ? HTTP_PORT : HTTPS_PORT);
+        return bindLocal(ssl ? HTTPS_PORT : HTTP_PORT);
     }
 
     @Override
