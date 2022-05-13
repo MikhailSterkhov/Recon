@@ -16,9 +16,9 @@ public final class SelectRequest extends ReconSqlRequest<ValuedField> {
     private int limit = -1;
     private String[] selectedRows = {"*"};
 
-    private final Set<String> likeThenSet = new HashSet<>();
-    private final Set<String> moreThenSet = new HashSet<>();
-    private final Set<String> lessThenSet = new HashSet<>();
+    private final Set<ValuedField> likeThenSet = new HashSet<>();
+    private final Set<ValuedField> moreThenSet = new HashSet<>();
+    private final Set<ValuedField> lessThenSet = new HashSet<>();
 
     public SelectRequest(String table) {
         this.table = table;
@@ -35,21 +35,21 @@ public final class SelectRequest extends ReconSqlRequest<ValuedField> {
     }
 
     public SelectRequest pushLikeThen(ValuedField field) {
-        likeThenSet.add(field.name());
+        likeThenSet.add(field);
 
         super.push(field);
         return this;
     }
 
     public SelectRequest pushMoreThen(ValuedField field) {
-        moreThenSet.add(field.name());
+        moreThenSet.add(field);
 
         super.push(field);
         return this;
     }
 
     public SelectRequest pushLessThen(ValuedField field) {
-        lessThenSet.add(field.name());
+        lessThenSet.add(field);
 
         super.push(field);
         return this;
@@ -80,13 +80,13 @@ public final class SelectRequest extends ReconSqlRequest<ValuedField> {
 
                 String sign = ("=");
 
-                if (likeThenSet.contains(field.name())) {
+                if (likeThenSet.contains(field)) {
                     sign = (" LIKE ");
                 }
-                else if (moreThenSet.contains(field.name())) {
+                else if (moreThenSet.contains(field)) {
                     sign = ">";
                 }
-                else if (lessThenSet.contains(field.name())) {
+                else if (lessThenSet.contains(field)) {
                     sign = "<";
                 }
 
