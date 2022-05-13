@@ -60,7 +60,7 @@ public final class ReconSqlConnectionExecutor implements ReconSqlExecutable {
 
             return sync
                     ? CompletableFuture.completedFuture(queryStatement.executeQuery())
-                    : CompletableFuture.supplyAsync((ThrowableSupplier<ReconSqlResponse>) queryStatement::executeQuery);
+                    : CompletableFuture.supplyAsync((ThrowableSupplier<ReconSqlResponse>) queryStatement::executeQuery, connection.getThreadExecutor());
         }
 
         catch (SQLException exception) {
