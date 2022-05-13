@@ -14,6 +14,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,7 +22,7 @@ public final class SqliteDatabaseConnection implements ReconSqlConnection {
 
     private final File storage;
 
-    private final Map<String, ReconSqlTable> loadedTablesMap = new HashMap<>();
+    private final Map<String, ReconSqlTable> loadedTablesMap = new ConcurrentHashMap<>();
 
     private final ReconLog logger = new ReconLog("ReconSqlite");
 

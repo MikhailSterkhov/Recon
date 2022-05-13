@@ -17,6 +17,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -30,7 +31,7 @@ public final class HikariDatabaseConnection implements ReconSqlConnection {
             username,
             password;
 
-    private final Map<String, ReconSqlTable> loadedTablesMap = new HashMap<>();
+    private final Map<String, ReconSqlTable> loadedTablesMap = new ConcurrentHashMap<>();
 
     private final ReconLog logger = new ReconLog("ReconSqlite");
 
