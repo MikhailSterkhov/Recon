@@ -3,8 +3,8 @@ package org.itzstonlex.recon.sql.connection;
 import com.mysql.cj.jdbc.MysqlDataSource;
 import org.itzstonlex.recon.factory.ReconThreadFactory;
 import org.itzstonlex.recon.log.ReconLog;
-import org.itzstonlex.recon.sql.ReconSqlCredentials;
 import org.itzstonlex.recon.sql.ReconSqlConnection;
+import org.itzstonlex.recon.sql.ReconSqlCredentials;
 import org.itzstonlex.recon.sql.ReconSqlExecutable;
 import org.itzstonlex.recon.sql.ReconSqlTable;
 import org.itzstonlex.recon.sql.event.ReconSqlEventListener;
@@ -13,7 +13,6 @@ import org.itzstonlex.recon.sql.table.TableDecorator;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;

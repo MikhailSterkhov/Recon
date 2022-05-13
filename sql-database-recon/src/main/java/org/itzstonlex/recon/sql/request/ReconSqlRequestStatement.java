@@ -18,9 +18,6 @@ public class ReconSqlRequestStatement
     private final PreparedStatement preparedStatement;
     private ReconSqlResponse response;
 
-    /**
-     * Инициализация статемента
-     */
     public ReconSqlRequestStatement(boolean sync, Connection connection, String sql, Object... values)
     throws SQLException {
 
