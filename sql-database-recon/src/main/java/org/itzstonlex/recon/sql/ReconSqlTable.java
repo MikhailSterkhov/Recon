@@ -19,16 +19,6 @@ public interface ReconSqlTable {
     /**
      * Выполняет запрос в SQL базу функцией SELECT,
      * получая все данные из таблицы.
-     */
-    default CompletableFuture<ReconSqlResponse> selectAll() {
-        return this.createRequest()
-                .select()
-                .getResponseSync(getConnection());
-    }
-
-    /**
-     * Выполняет запрос в SQL базу функцией SELECT,
-     * получая все данные из таблицы.
      *
      * @param limit - Лимит количества получаемых данных.
      */
@@ -41,18 +31,10 @@ public interface ReconSqlTable {
 
     /**
      * Выполняет запрос в SQL базу функцией SELECT,
-     * получая данные по указанным переменным.
-     *
-     * @param fieldsWhere - Дополнения к подкоманде WHERE.
+     * получая все данные из таблицы.
      */
-    default CompletableFuture<ReconSqlResponse> selectWhere(ValuedField... fieldsWhere) {
-        SelectRequest select = this.createRequest().select();
-
-        for (ValuedField where : fieldsWhere) {
-            select.push(where);
-        }
-
-        return select.getResponseSync(getConnection());
+    default CompletableFuture<ReconSqlResponse> selectAll() {
+        return this.selectAll(-1);
     }
 
     /**
@@ -75,21 +57,12 @@ public interface ReconSqlTable {
 
     /**
      * Выполняет запрос в SQL базу функцией SELECT,
-     * получая количество записанных строк по
-     * указанным переменным.
+     * получая данные по указанным переменным.
      *
      * @param fieldsWhere - Дополнения к подкоманде WHERE.
      */
-    default int requestCount(ValuedField... fieldsWhere) {
-        SelectRequest select = this.createRequest().select();
-
-        for (ValuedField where : fieldsWhere) {
-            select.push(where);
-        }
-
-        return getConnection().getExecution().getResponse(true, select.toString().replace("*", "COUNT(*) AS `rcount`"))
-                .thenApply(response -> !response.next() ? 0 : response.getInt("rcount"))
-                .join();
+    default CompletableFuture<ReconSqlResponse> selectWhere(ValuedField... fieldsWhere) {
+        return this.selectWhere(-1, fieldsWhere);
     }
 
     /**
@@ -111,6 +84,17 @@ public interface ReconSqlTable {
         return getConnection().getExecution().getResponse(true, select.toString().replace("\\*", "COUNT(*) AS `rcount`"))
                 .thenApply(response -> response.next() ? 0 : response.getInt("rcount"))
                 .join();
+    }
+
+    /**
+     * Выполняет запрос в SQL базу функцией SELECT,
+     * получая количество записанных строк по
+     * указанным переменным.
+     *
+     * @param fieldsWhere - Дополнения к подкоманде WHERE.
+     */
+    default int requestCount(ValuedField... fieldsWhere) {
+        return this.requestCount(-1, fieldsWhere);
     }
 
     /**
