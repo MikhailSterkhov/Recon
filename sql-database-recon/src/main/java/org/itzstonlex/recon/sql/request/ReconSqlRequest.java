@@ -10,6 +10,10 @@ public abstract class ReconSqlRequest<RequestField extends ReconSqlRequestField>
 
     private final LinkedList<RequestField> fieldsList = new LinkedList<>();
 
+    public LinkedList<RequestField> getFieldsList() {
+        return fieldsList;
+    }
+
     public ReconSqlRequest<RequestField> push(RequestField field) {
         fieldsList.add(field);
         return this;
