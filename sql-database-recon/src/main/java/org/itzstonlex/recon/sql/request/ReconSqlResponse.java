@@ -2034,13 +2034,13 @@ public class ReconSqlResponse implements ResultSet {
         return GsonUtils.fromJsonString(this.getString(columnIndex), returnType);
     }
 
-    public void forEachOrdered(ThrowableConsumer<ResultSet> loopHandler) {
+    public void forEachOrdered(ThrowableConsumer<ReconSqlResponse> loopHandler) {
         while (next()) {
             loopHandler.accept(this);
         }
     }
 
-    public void doForEachOrdered(Consumer<ResultSet> loopHandler) {
+    public void doForEachOrdered(ThrowableConsumer<ReconSqlResponse> loopHandler) {
         do {
             loopHandler.accept(this);
         } while (next());
