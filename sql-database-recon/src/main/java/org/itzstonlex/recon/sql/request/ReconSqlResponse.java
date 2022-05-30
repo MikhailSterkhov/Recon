@@ -1,6 +1,7 @@
 package org.itzstonlex.recon.sql.request;
 
 import org.itzstonlex.recon.sql.util.GsonUtils;
+import org.itzstonlex.recon.sql.util.ThrowableConsumer;
 
 import java.io.InputStream;
 import java.io.Reader;
@@ -9,6 +10,7 @@ import java.net.URL;
 import java.sql.*;
 import java.util.Calendar;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class ReconSqlResponse implements ResultSet {
     
@@ -2030,6 +2032,18 @@ public class ReconSqlResponse implements ResultSet {
 
     public <R> R getJsonObject(int columnIndex, Class<R> returnType) {
         return GsonUtils.fromJsonString(this.getString(columnIndex), returnType);
+    }
+
+    public void forEachOrdered(ThrowableConsumer<ResultSet> loopHandler) {
+        while (next()) {
+            loopHandler.accept(this);
+        }
+    }
+
+    public void doForEachOrdered(Consumer<ResultSet> loopHandler) {
+        do {
+            loopHandler.accept(this);
+        } while (next());
     }
 
 }
