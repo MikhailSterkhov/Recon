@@ -1,5 +1,6 @@
 package org.itzstonlex.recon.sql;
 
+import org.itzstonlex.recon.sql.connection.ClickHouseDatabaseConnection;
 import org.itzstonlex.recon.sql.connection.HikariDatabaseConnection;
 import org.itzstonlex.recon.sql.connection.MysqlDatabaseConnection;
 import org.itzstonlex.recon.sql.connection.SqliteDatabaseConnection;
@@ -30,6 +31,10 @@ public final class ReconSql {
 
     public ReconSqlCredentials createCredentials(int port, String host, String username, String password, String scheme) {
         return new ReconSqlCredentials(port, host, username, password, scheme);
+    }
+
+    public ClickHouseDatabaseConnection createClickHouseConnection(ReconSqlCredentials credentials) {
+        return new ClickHouseDatabaseConnection(credentials);
     }
 
     public MysqlDatabaseConnection createMysqlConnection(ReconSqlCredentials credentials) {

@@ -1,7 +1,6 @@
 package org.itzstonlex.recon.sql.connection;
 
-import com.zaxxer.hikari.HikariConfig;
-import com.zaxxer.hikari.HikariDataSource;
+import com.clickhouse.jdbc.ClickHouseDriver;
 import org.itzstonlex.recon.factory.ReconThreadFactory;
 import org.itzstonlex.recon.log.ReconLog;
 import org.itzstonlex.recon.sql.ReconSqlConnection;
@@ -13,6 +12,7 @@ import org.itzstonlex.recon.sql.execute.ReconSqlConnectionExecutor;
 import org.itzstonlex.recon.sql.table.TableDecorator;
 
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Map;
 import java.util.Objects;
@@ -20,22 +20,17 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public final class HikariDatabaseConnection implements ReconSqlConnection {
+public final class ClickHouseDatabaseConnection implements ReconSqlConnection {
 
-    public static final String JDBC_MYSQL_DRIVER_CLASSNAME  = ("com.mysql.jdbc.Driver");
-    public static final String JDBC_MYSQL_URL_FORMAT        = ("jdbc:mysql://%s:%s/%s");
-
-    private final String driverClassname,
-            driverUrl,
-            username,
-            password;
+    public static final String JDBC_CLICKHOUSE_URL_FORMAT        = ("jdbc:clickhouse://%s:%s/%s");
 
     private final Map<String, ReconSqlTable> loadedTablesMap = new ConcurrentHashMap<>();
 
-    private final ReconLog logger = new ReconLog("ReconHikari");
+    private final ReconSqlCredentials credentials;
+    private final ReconLog logger = new ReconLog("ReconClickHouse");
 
     private final ExecutorService threadExecutor = Executors.newCachedThreadPool(
-            ReconThreadFactory.asInstance("ReconHikari-%s")
+            ReconThreadFactory.asInstance("ReconClickHouse-%s")
     );
 
     private Connection connection;
@@ -43,37 +38,12 @@ public final class HikariDatabaseConnection implements ReconSqlConnection {
     private ReconSqlExecutable executable;
     private ReconSqlEventListener eventHandler;
 
-    public HikariDatabaseConnection(String driverClassname, String driverUrl, String username, String password) {
-        this.driverClassname = driverClassname;
-        this.driverUrl = driverUrl;
-
-        this.username = username;
-        this.password = password;
+    public ClickHouseDatabaseConnection(ReconSqlCredentials credentials) {
+        this.credentials = credentials;
     }
 
-    public HikariDatabaseConnection(String driverClassname, ReconSqlCredentials credentials) {
-        this(driverClassname, String.format(JDBC_MYSQL_URL_FORMAT, credentials.getHost(), credentials.getPort(), credentials.getScheme()),
-                credentials.getUsername(), credentials.getPassword());
-    }
-
-    public HikariDatabaseConnection(ReconSqlCredentials credentials) {
-        this(JDBC_MYSQL_DRIVER_CLASSNAME, credentials);
-    }
-
-    public String getDriverUrl() {
-        return driverUrl;
-    }
-
-    public String getDriverClassname() {
-        return driverClassname;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
+    public ReconSqlCredentials getCredentials() {
+        return credentials;
     }
 
     @Override
@@ -118,20 +88,12 @@ public final class HikariDatabaseConnection implements ReconSqlConnection {
 
     @Override
     public void connect() {
-        HikariConfig hikariConfig = new HikariConfig();
-
-        hikariConfig.setDriverClassName(driverClassname);
-        hikariConfig.setJdbcUrl(driverUrl);
-
-        hikariConfig.setUsername(username);
-        hikariConfig.setPassword(password);
-
-        hikariConfig.addDataSourceProperty("cachePrepStmts" , "true");
-        hikariConfig.addDataSourceProperty("prepStmtCacheSize" , "250");
-        hikariConfig.addDataSourceProperty("prepStmtCacheSqlLimit" , "2048");
-
         try {
-            connection = new HikariDataSource(hikariConfig).getConnection();
+            Class.forName("com.clickhouse.jdbc.ClickHouseDriver");
+
+            connection = DriverManager.getConnection(String.format(JDBC_CLICKHOUSE_URL_FORMAT, credentials.getHost(), credentials.getPort(), credentials.getScheme()),
+                    credentials.getUsername(), credentials.getPassword());
+
             executable = new ReconSqlConnectionExecutor(this);
 
             // Load database tables.
@@ -150,7 +112,7 @@ public final class HikariDatabaseConnection implements ReconSqlConnection {
                 eventHandler.onConnected(this);
             }
         }
-        catch (SQLException exception) {
+        catch (Exception exception) {
             exception.printStackTrace();
         }
     }
