@@ -8,8 +8,11 @@ import org.itzstonlex.recon.minecraft.api.ReconMinecraftRegistry;
 import org.itzstonlex.recon.minecraft.packet.MinecraftPacket;
 import org.itzstonlex.recon.minecraft.packet.PlayerChat;
 import org.itzstonlex.recon.minecraft.packet.PlayerRedirect;
+import org.itzstonlex.recon.minecraft.packet.handshake.Handshake;
+import org.itzstonlex.recon.minecraft.packet.handshake.impl.ServerHandshake;
 import org.itzstonlex.recon.minecraft.server.MinecraftServersGroup;
 import org.itzstonlex.recon.minecraft.service.DefaultMinecraftManagementService;
+import org.itzstonlex.recon.minecraft.util.MinecraftVersion;
 import org.itzstonlex.recon.util.reconnect.ClientReconnectionUtils;
 
 import java.net.InetSocketAddress;
@@ -25,6 +28,23 @@ public class MinecraftConnector implements PendingConnection {
     public static final ReconMinecraftApi MINECRAFT_API = new ReconMinecraftApi();
 
 // ====================================================================================================================================== //
+
+    public static void main(String[] args) {
+
+        // Init variables.
+        int version = MinecraftVersion.V_1_16_5.getVersionId();
+
+        String name = "Lobby-1";
+        InetSocketAddress address = new InetSocketAddress("127.0.0.1", 25567);
+
+        boolean isProxy = false;
+
+        // Launch application.
+        MinecraftConnector minecraftConnector = new MinecraftConnector(name, address,
+                onConnected -> onConnected.sendPacket(new ServerHandshake(version, name, address, Handshake.Status.CONNECT, isProxy)));
+
+        minecraftConnector.launchConnector();
+    }
 
 
     private final String name;
