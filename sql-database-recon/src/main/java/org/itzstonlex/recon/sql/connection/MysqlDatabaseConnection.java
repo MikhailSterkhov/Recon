@@ -105,11 +105,11 @@ public final class MysqlDatabaseConnection implements ReconSqlConnection {
             Objects.requireNonNull(executable.getResponse(true, "SHOW TABLES;"))
                     .thenAccept(response -> {
 
-                        while (response.next()) {
+                        response.forEachOrdered(value -> {
 
-                            String table = response.getString(1);
+                            String table = value.getString(1);
                             loadedTablesMap.put(table.toLowerCase(), new TableDecorator(this, table));
-                        }
+                        });
                     });
 
             // Handle event.
