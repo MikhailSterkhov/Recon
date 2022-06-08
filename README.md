@@ -47,6 +47,24 @@ Download the necessary libraries from [this folder](target-compiled)
 and install them into your project through *artifacts*, 
 *local repositories*, or any other methods convenient for you.
 
+```xml
+<repository>
+    <id>github</id>
+    <name>ItzStonlex</name>
+    <url>https://maven.pkg.github.com/ItzStonlex/Recon</url>
+</repository>
+```
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>com.github.itzstonlex</groupId>
+        <artifactId>recon</artifactId>
+        <version>1.1.0</version>
+    </dependency>
+</dependencies>
+```
+
 ---
 
 # Documentation
