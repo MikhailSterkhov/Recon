@@ -15,7 +15,6 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import org.itzstonlex.recon.metrics.MetricCounter;
-import org.itzstonlex.recon.metrics.MetricTimeSnippet;
 import org.itzstonlex.recon.metrics.ReconMetrics;
 import org.itzstonlex.recon.ui.ReconUILauncher;
 import org.itzstonlex.recon.ui.scheduler.TaskScheduler;
@@ -76,6 +75,42 @@ public final class HomePageController extends AbstractPageController {
 
     @FXML
     private MenuItem settings_displaySide_right;
+
+    @FXML
+    private MenuButton settings_snippetTime;
+
+    @FXML
+    private MenuItem settings_snippets_lifetime;
+
+    @FXML
+    private MenuItem settings_snippets_5s;
+
+    @FXML
+    private MenuItem settings_snippets_10s;
+
+    @FXML
+    private MenuItem settings_snippets_15s;
+
+    @FXML
+    private MenuItem settings_snippets_30s;
+
+    @FXML
+    private MenuItem settings_snippets_40s;
+
+    @FXML
+    private MenuItem settings_snippets_50s;
+
+    @FXML
+    private MenuItem settings_snippets_1m;
+
+    @FXML
+    private MenuItem settings_snippets_3m;
+
+    @FXML
+    private MenuItem settings_snippets_5m;
+
+    @FXML
+    private MenuItem settings_snippets_10m;
 
     @FXML
     private CheckBox settings_stateColor;
@@ -182,11 +217,12 @@ public final class HomePageController extends AbstractPageController {
         }.runTimer(0, 1000, TimeUnit.MILLISECONDS);
     }
 
-
     private final Map<Integer, LineChart<String, Number>> graphicsMap
             = new HashMap<>();
 
     private void initGraphicsDisplaySettings() {
+        this.initGraphicsSnippetsSettings();
+
         settings_displaySide_left.setOnAction(event -> {
 
             for (LineChart<String, Number> lineChart : graphicsMap.values()) {
@@ -216,22 +252,109 @@ public final class HomePageController extends AbstractPageController {
         });
     }
 
-    private void updateGraphicNode(MetricCounter metricCounter,
-                                   XYChart.Series<String, Number> series) {
-        Platform.runLater(() -> {
+    private long metricTimeSnippetMillis = TimeUnit.SECONDS.toMillis(10);
+    private void initGraphicsSnippetsSettings() {
+        settings_snippetTime.setText("10 sec");
 
-            series.getData().clear();
-            metricCounter.timeKeys()
-                    .stream()
-                    .sorted(Collections.reverseOrder(Comparator.comparingLong(MetricTimeSnippet::toMillis)))
-                    .forEach(timeSnippet -> {
+        settings_snippets_lifetime.setOnAction(event -> {
 
-                        String value = timeSnippet.getTime() + Character.toString(timeSnippet.getUnit().name().charAt(0)).toLowerCase();
-                        XYChart.Data<String, Number> data = new XYChart.Data<>(value, metricCounter.valueOf(timeSnippet));
+            metricTimeSnippetMillis = TimeUnit.SECONDS.toMillis(1);
+            settings_snippetTime.setText("Lifetime");
 
-                        series.getData().add(data);
-                    });
+            this.startGraphicsUpdater();
         });
+
+        settings_snippets_5s.setOnAction(event -> {
+
+            metricTimeSnippetMillis = TimeUnit.SECONDS.toMillis(5);
+            settings_snippetTime.setText("5 sec");
+
+            this.startGraphicsUpdater();
+        });
+
+        settings_snippets_10s.setOnAction(event -> {
+
+            metricTimeSnippetMillis = TimeUnit.SECONDS.toMillis(10);
+            settings_snippetTime.setText("10 sec");
+
+            this.startGraphicsUpdater();
+        });
+
+        settings_snippets_15s.setOnAction(event -> {
+
+            metricTimeSnippetMillis = TimeUnit.SECONDS.toMillis(15);
+            settings_snippetTime.setText("15 sec");
+
+            this.startGraphicsUpdater();
+        });
+
+        settings_snippets_30s.setOnAction(event -> {
+
+            metricTimeSnippetMillis = TimeUnit.SECONDS.toMillis(30);
+            settings_snippetTime.setText("30 sec");
+
+            this.startGraphicsUpdater();
+        });
+
+        settings_snippets_40s.setOnAction(event -> {
+
+            metricTimeSnippetMillis = TimeUnit.SECONDS.toMillis(40);
+            settings_snippetTime.setText("40 sec");
+
+            this.startGraphicsUpdater();
+        });
+
+        settings_snippets_50s.setOnAction(event -> {
+
+            metricTimeSnippetMillis = TimeUnit.SECONDS.toMillis(50);
+            settings_snippetTime.setText("50 sec");
+
+            this.startGraphicsUpdater();
+        });
+
+        settings_snippets_1m.setOnAction(event -> {
+
+            metricTimeSnippetMillis = TimeUnit.MINUTES.toMillis(1);
+            settings_snippetTime.setText("1 min");
+
+            this.startGraphicsUpdater();
+        });
+
+        settings_snippets_3m.setOnAction(event -> {
+
+            metricTimeSnippetMillis = TimeUnit.MINUTES.toMillis(3);
+            settings_snippetTime.setText("3 min");
+
+            this.startGraphicsUpdater();
+        });
+
+        settings_snippets_5m.setOnAction(event -> {
+
+            metricTimeSnippetMillis = TimeUnit.MINUTES.toMillis(5);
+            settings_snippetTime.setText("5 min");
+
+            this.startGraphicsUpdater();
+        });
+
+        settings_snippets_10m.setOnAction(event -> {
+
+            metricTimeSnippetMillis = TimeUnit.MINUTES.toMillis(10);
+            settings_snippetTime.setText("10 min");
+
+            this.startGraphicsUpdater();
+        });
+    }
+
+    private void updateGraphicNode(MetricCounter metricCounter, XYChart.Series<String, Number> series) {
+        series.getData().clear();
+
+        for (int i = 1; i <= 30; i ++) {
+
+            String value = TimeUnit.MILLISECONDS.toSeconds(i * metricTimeSnippetMillis) + "s";
+            XYChart.Data<String, Number> data = new XYChart.Data<>(value, metricCounter.valueOf(i * metricTimeSnippetMillis));
+
+            series.getData().add(data);
+        }
     }
 
     private void updateGraphic(int row, MetricCounter metricCounter) {
@@ -262,34 +385,38 @@ public final class HomePageController extends AbstractPageController {
     }
 
     private void drawGraphicCharts(boolean isCreated) {
+        Platform.runLater(() -> {
 
-        if (!isCreated) {
-            createGraphics(0, "Read", ReconMetrics.TOTAL_BYTES_READ);
-            createGraphics(1, "Write", ReconMetrics.TOTAL_BYTES_WRITE);
-            createGraphics(2, "Bytes", ReconMetrics.TOTAL_BYTES);
-            createGraphics(3, "Clients", ReconMetrics.TOTAL_CLIENTS);
+            if (!isCreated) {
+                createGraphics(0, "Total Reads", ReconMetrics.TOTAL_BYTES_READ);
+                createGraphics(1, "Total Writes", ReconMetrics.TOTAL_BYTES_WRITE);
+                createGraphics(2, "Total Bytes", ReconMetrics.TOTAL_BYTES);
+                createGraphics(3, "Total Clients", ReconMetrics.TOTAL_CLIENTS);
 
-        } else {
+            } else {
 
-            updateGraphic(0, ReconMetrics.TOTAL_BYTES_READ);
-            updateGraphic(1, ReconMetrics.TOTAL_BYTES_WRITE);
-            updateGraphic(2, ReconMetrics.TOTAL_BYTES);
-            updateGraphic(3, ReconMetrics.TOTAL_CLIENTS);
-        }
+                updateGraphic(0, ReconMetrics.TOTAL_BYTES_READ);
+                updateGraphic(1, ReconMetrics.TOTAL_BYTES_WRITE);
+                updateGraphic(2, ReconMetrics.TOTAL_BYTES);
+                updateGraphic(3, ReconMetrics.TOTAL_CLIENTS);
+            }
+        });
     }
 
+    private boolean isGraphicsCreated;
     private void startGraphicsUpdater() {
-        new TaskScheduler("graphics_updater_recon") {
-            private boolean created;
+        String taskID = "graphics_updater_recon";
+
+        ReconUILauncher.getInstance().getSchedulerManager().cancelScheduler(taskID);
+        new TaskScheduler(taskID) {
 
             @Override
             public void run() {
-                drawGraphicCharts(created);
-
-                this.created = true;
+                drawGraphicCharts(isGraphicsCreated);
+                isGraphicsCreated = true;
             }
 
-        }.runTimer(0, 2, TimeUnit.SECONDS);
+        }.runTimer(1000, metricTimeSnippetMillis, TimeUnit.MILLISECONDS);
     }
 
     private void updateMemoryStatus(Runtime runtime) {

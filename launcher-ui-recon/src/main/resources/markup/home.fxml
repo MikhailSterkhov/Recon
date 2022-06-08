@@ -33,9 +33,26 @@
 -->
 
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
-<?import javafx.scene.text.*?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.ProgressBar?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
 <VBox prefHeight="600.0" prefWidth="900.0" styleClass="labels" stylesheets="@../css/home.css" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.itzstonlex.recon.ui.controller.HomePageController">
   <children>
     <MenuBar prefWidth="900.0" styleClass="frame" VBox.vgrow="NEVER">
@@ -166,7 +183,7 @@
                                     <Font name="Microsoft Tai Le" size="12.0" />
                                  </font>
                               </CheckBox>
-                              <MenuButton fx:id="settings_displaySide" layoutX="18.0" layoutY="183.0" mnemonicParsing="false" popupSide="TOP" text="Display Side" textFill="#433e3e">
+                              <MenuButton fx:id="settings_displaySide" layoutX="18.0" layoutY="183.0" mnemonicParsing="false" popupSide="TOP" prefHeight="25.0" prefWidth="103.0" text="Display Side" textFill="#433e3e">
                                 <items>
                                   <MenuItem fx:id="settings_displaySide_left" mnemonicParsing="false" text="Left" />
                                   <MenuItem fx:id="settings_displaySide_right" mnemonicParsing="false" text="Right" />
@@ -177,6 +194,30 @@
                               </MenuButton>
                               <Separator layoutX="17.0" layoutY="170.0" prefWidth="200.0" />
                               <Separator layoutX="17.0" layoutY="35.0" prefWidth="200.0" />
+                              <Separator layoutX="19.0" layoutY="101.0" prefWidth="200.0" />
+                              <Label contentDisplay="CENTER" layoutX="17.0" layoutY="104.0" prefHeight="27.0" prefWidth="201.0" text="Snippet time:" textFill="#727272" wrapText="true">
+                                 <font>
+                                    <Font name="Microsoft Tai Le" size="16.0" />
+                                 </font>
+                              </Label>
+                              <MenuButton fx:id="settings_snippetTime" layoutX="18.0" layoutY="131.0" mnemonicParsing="false" popupSide="TOP" prefHeight="25.0" prefWidth="103.0" textFill="#433e3e">
+                                 <items>
+                                    <MenuItem fx:id="settings_snippets_lifetime" mnemonicParsing="false" text="Lifetime" />
+                                    <MenuItem fx:id="settings_snippets_5s" mnemonicParsing="false" text="5 sec" />
+                                    <MenuItem fx:id="settings_snippets_10s" mnemonicParsing="false" text="10 sec" />
+                                    <MenuItem fx:id="settings_snippets_15s" mnemonicParsing="false" text="15 sec" />
+                                    <MenuItem fx:id="settings_snippets_30s" mnemonicParsing="false" text="30 sec" />
+                                    <MenuItem fx:id="settings_snippets_40s" mnemonicParsing="false" text="40 sec" />
+                                    <MenuItem fx:id="settings_snippets_50s" mnemonicParsing="false" text="50 sec" />
+                                    <MenuItem fx:id="settings_snippets_1m" mnemonicParsing="false" text="1 min" />
+                                    <MenuItem fx:id="settings_snippets_3m" mnemonicParsing="false" text="3 min" />
+                                    <MenuItem fx:id="settings_snippets_5m" mnemonicParsing="false" text="5 min" />
+                                    <MenuItem fx:id="settings_snippets_10m" mnemonicParsing="false" text="10 min" />
+                                 </items>
+                                 <font>
+                                    <Font name="Microsoft Tai Le" size="12.0" />
+                                 </font>
+                              </MenuButton>
                            </children>
                         </AnchorPane>
                         <AnchorPane layoutX="10.0" layoutY="10.0" minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">

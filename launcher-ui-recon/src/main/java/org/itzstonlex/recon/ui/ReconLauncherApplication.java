@@ -23,12 +23,12 @@ public class ReconLauncherApplication extends Application {
     private void runTestConnections() {
         Executors.newCachedThreadPool().submit(() -> {
             try {
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 5; i++) {
                     new Server().bindLocal(1000 + i, config -> ReconMetrics.newMetricInstance().initPipelines(config.pipeline()));
                     Thread.sleep(1000);
                 }
 
-                for (int i = 0; i < 10; i++) {
+                for (int i = 0; i < 5; i++) {
                     new Client().connectLocal(1000 + i, config -> ReconMetrics.newMetricInstance().initPipelines(config.pipeline()));
                     Thread.sleep(1000);
                 }
