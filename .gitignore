@@ -1,6 +1,7 @@
 .idea
 target
 Recon.iml
+settings.xml
 
 # Compiled class file
 *.class

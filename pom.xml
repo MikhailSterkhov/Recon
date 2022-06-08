@@ -5,18 +5,8 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.github.itzstonlex</groupId>
-    <artifactId>Recon</artifactId>
+    <artifactId>recon</artifactId>
     <version>1.1.0</version>
-    <packaging>pom</packaging>
-
-    <modules>
-        <module>minecraft-recon</module>
-        <module>http-recon</module>
-        <module>annotated-recon</module>
-        <module>metrics-recon</module>
-        <module>launcher-ui-recon</module>
-        <module>sql-database-recon</module>
-    </modules>
 
     <name>Recon</name>
     <url>https://github.com/ItzStonlex/Recon</url>
@@ -31,6 +21,14 @@
             <url>https://github.com/ItzStonlex</url>
         </developer>
     </developers>
+
+    <distributionManagement>
+        <repository>
+            <id>github</id>
+            <name>ItzStonlex</name>
+            <url>https://maven.pkg.github.com/ItzStonlex/Recon</url>
+        </repository>
+    </distributionManagement>
 
     <properties>
         <maven.compiler.source>8</maven.compiler.source>
