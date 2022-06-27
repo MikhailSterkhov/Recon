@@ -52,6 +52,10 @@ public final class HttpClient {
         return execute(url, new HttpRequestConfig(HttpUtils.REQUEST_PATCH));
     }
 
+    public HttpResponse executeWithProtocol(String url, HttpRequestConfig requestConfig) {
+        return execute(HttpUtils.getProtocol(url) + "://" + HttpUtils.trimProtocol(url) + "/", requestConfig);
+    }
+
     public HttpResponse execute(String url, HttpRequestConfig requestConfig) {
         if (url == null) {
             throw new NullPointerException("url");
@@ -60,8 +64,6 @@ public final class HttpClient {
         if (requestConfig == null) {
             throw new NullPointerException("requestConfig");
         }
-
-        url = HttpUtils.getProtocol(url) + "://" + HttpUtils.trim(url) + "/";
 
         try {
             HttpURLConnection http = ((HttpURLConnection) new URL(url).openConnection());

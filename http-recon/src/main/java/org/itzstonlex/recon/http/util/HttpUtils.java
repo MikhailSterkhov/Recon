@@ -7,6 +7,9 @@ import java.net.URI;
 
 public final class HttpUtils {
 
+    public static final int HTTP_PORT = 80;
+    public static final int HTTPS_PORT = 443;
+
     public static final String REQUEST_GET      = "GET";
     public static final String REQUEST_HEAD     = "HEAD";
     public static final String REQUEST_POST     = "POST";
@@ -21,7 +24,7 @@ public final class HttpUtils {
         return new HttpRequestConfig(method);
     }
 
-    public static String trim(String url) {
+    public static String trimProtocol(String url) {
         url = url.trim().replace("https://", "")
                 .replace("http://", "");
 
@@ -36,24 +39,24 @@ public final class HttpUtils {
         URI uri = URI.create(url);
         String scheme = uri.getScheme();
 
-        int port = scheme == null ? 80 : uri.getPort();
+        int port = scheme == null ? HTTP_PORT : uri.getPort();
 
         if (port < 0) {
 
             switch (uri.getScheme()) {
                 case "http": {
-                    port = 80;
+                    port = HTTP_PORT;
                     break;
                 }
 
                 case "https": {
-                    port = 443;
+                    port = HTTPS_PORT;
                     break;
                 }
             }
         }
 
-        return port == 80 ? "http" : "https";
+        return (port == HTTP_PORT ? "http" : "https");
     }
 
     public static boolean hasSSL(String url) {
@@ -65,10 +68,14 @@ public final class HttpUtils {
         return address.getAddress().getHostAddress();
     }
 
-    public static InetSocketAddress getInetAddress(boolean normalize, String url) {
-        url = trim(url);
+    public static String naturallyAddress(String url) {
+        return naturallyAddress(HTTP_PORT, url);
+    }
 
-        int port = hasSSL(url) ? 443 : 80;
+    public static InetSocketAddress getInetAddress(boolean normalize, String url) {
+        url = trimProtocol(url);
+
+        int port = hasSSL(url) ? HTTPS_PORT : HTTP_PORT;
         String host = normalize ? naturallyAddress(port, url) : url;
 
         return new InetSocketAddress(host, port);
