@@ -10,23 +10,31 @@ public final class HttpUtils {
     public static final int HTTP_PORT = 80;
     public static final int HTTPS_PORT = 443;
 
-    public static final String REQUEST_GET      = "GET";
-    public static final String REQUEST_HEAD     = "HEAD";
-    public static final String REQUEST_POST     = "POST";
-    public static final String REQUEST_PUT      = "PUT";
-    public static final String REQUEST_DELETE   = "DELETE";
-    public static final String REQUEST_CONNECT  = "CONNECT";
-    public static final String REQUEST_OPTIONS  = "OPTIONS";
-    public static final String REQUEST_TRACE    = "TRACE";
-    public static final String REQUEST_PATCH    = "PATCH";
+    public static final String HTTP_PREFIX = "http";
+    public static final String HTTPS_PREFIX = "https";
 
-    public static HttpRequestConfig createRequestConfig(String method) {
+    public static final String PROTOCOL_SPLITTER = "://";
+
+    public static final String HTTP_PROTOCOL_PREFIX = HTTP_PREFIX + PROTOCOL_SPLITTER;
+    public static final String HTTPS_PROTOCOL_PREFIX = HTTPS_PREFIX + PROTOCOL_SPLITTER;
+
+    public static final String REQUEST_GET = "GET";
+    public static final String REQUEST_HEAD = "HEAD";
+    public static final String REQUEST_POST = "POST";
+    public static final String REQUEST_PUT = "PUT";
+    public static final String REQUEST_DELETE = "DELETE";
+    public static final String REQUEST_CONNECT = "CONNECT";
+    public static final String REQUEST_OPTIONS = "OPTIONS";
+    public static final String REQUEST_TRACE = "TRACE";
+    public static final String REQUEST_PATCH = "PATCH";
+
+    public static HttpRequestConfig newConfig(String method) {
         return new HttpRequestConfig(method);
     }
 
     public static String trimProtocol(String url) {
-        url = url.trim().replace("https://", "")
-                .replace("http://", "");
+        url = url.trim().replace(HTTPS_PROTOCOL_PREFIX, "")
+                .replace(HTTP_PROTOCOL_PREFIX, "");
 
         if (url.endsWith("/")) {
             url = url.substring(0, url.length() - 1);
@@ -40,27 +48,26 @@ public final class HttpUtils {
         String scheme = uri.getScheme();
 
         int port = scheme == null ? HTTP_PORT : uri.getPort();
-
         if (port < 0) {
 
             switch (uri.getScheme()) {
-                case "http": {
+                case HTTP_PREFIX: {
                     port = HTTP_PORT;
                     break;
                 }
 
-                case "https": {
+                case HTTPS_PREFIX: {
                     port = HTTPS_PORT;
                     break;
                 }
             }
         }
 
-        return (port == HTTP_PORT ? "http" : "https");
+        return (port == HTTP_PORT ? HTTP_PREFIX : HTTPS_PREFIX);
     }
 
-    public static boolean hasSSL(String url) {
-        return getProtocol(url).equalsIgnoreCase("https");
+    public static boolean hasCertificate(String url) {
+        return getProtocol(url).equalsIgnoreCase(HTTPS_PREFIX);
     }
 
     public static String naturallyAddress(int port, String url) {
@@ -75,7 +82,7 @@ public final class HttpUtils {
     public static InetSocketAddress getInetAddress(boolean normalize, String url) {
         url = trimProtocol(url);
 
-        int port = hasSSL(url) ? HTTPS_PORT : HTTP_PORT;
+        int port = hasCertificate(url) ? HTTPS_PORT : HTTP_PORT;
         String host = normalize ? naturallyAddress(port, url) : url;
 
         return new InetSocketAddress(host, port);
