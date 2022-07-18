@@ -65,9 +65,11 @@ public class HttpRequest {
         return this;
     }
 
-    public HttpRequest modify(Consumer<HttpParameters> parametersConsumer) {
+    public HttpRequest modifyUrlParameters(Consumer<HttpParameters> parametersConsumer) {
         if (parametersConsumer != null) {
             parametersConsumer.accept(httpParameters);
+
+            this.url = httpParameters.appendParameters();
         }
 
         return this;
