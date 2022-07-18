@@ -1,7 +1,5 @@
 package org.itzstonlex.recon.http.util;
 
-import org.itzstonlex.recon.http.client.HttpRequestConfig;
-
 import java.net.InetSocketAddress;
 import java.net.URI;
 
@@ -17,20 +15,6 @@ public final class HttpUtils {
 
     public static final String HTTP_PROTOCOL_PREFIX = HTTP_PREFIX + PROTOCOL_SPLITTER;
     public static final String HTTPS_PROTOCOL_PREFIX = HTTPS_PREFIX + PROTOCOL_SPLITTER;
-
-    public static final String REQUEST_GET = "GET";
-    public static final String REQUEST_HEAD = "HEAD";
-    public static final String REQUEST_POST = "POST";
-    public static final String REQUEST_PUT = "PUT";
-    public static final String REQUEST_DELETE = "DELETE";
-    public static final String REQUEST_CONNECT = "CONNECT";
-    public static final String REQUEST_OPTIONS = "OPTIONS";
-    public static final String REQUEST_TRACE = "TRACE";
-    public static final String REQUEST_PATCH = "PATCH";
-
-    public static HttpRequestConfig newConfig(String method) {
-        return new HttpRequestConfig(method);
-    }
 
     public static String trimProtocol(String url) {
         url = url.trim().replace(HTTPS_PROTOCOL_PREFIX, "")

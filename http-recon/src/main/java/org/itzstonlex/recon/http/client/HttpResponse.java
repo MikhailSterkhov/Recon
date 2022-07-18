@@ -1,5 +1,7 @@
 package org.itzstonlex.recon.http.client;
 
+import java.nio.charset.Charset;
+
 public final class HttpResponse {
 
     public static HttpResponse create(int contentLength, int statusCode, String callback, Throwable error) {
@@ -10,16 +12,16 @@ public final class HttpResponse {
 
     private final int statusCode;
 
-    private final String callback;
-    private final Throwable error;
+    private final String body;
+    private final Throwable inprocessThrowable;
 
-    private HttpResponse(int contentLength, int statusCode, String callback, Throwable error) {
+    private HttpResponse(int contentLength, int statusCode, String body, Throwable inprocessThrowable) {
         this.contentLength = contentLength;
 
         this.statusCode = statusCode;
 
-        this.callback = callback;
-        this.error = error;
+        this.body = body;
+        this.inprocessThrowable = inprocessThrowable;
     }
 
     public int getContentLength() {
@@ -30,12 +32,24 @@ public final class HttpResponse {
         return statusCode;
     }
 
-    public String getCallback() {
-        return callback;
+    public Throwable getInprocessThrowable() {
+        return inprocessThrowable;
     }
 
-    public Throwable getError() {
-        return error;
+    public byte[] getBody() {
+        return body.getBytes();
+    }
+
+    public byte[] getBody(Charset charset) {
+        return body.getBytes(charset);
+    }
+
+    public String getBodyAsString() {
+        return body;
+    }
+
+    public <T> T getBodyFromJson(Class<T> type) {
+        return HttpClient.GSON.fromJson(body, type);
     }
 
 }
