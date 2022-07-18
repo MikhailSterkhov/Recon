@@ -65,7 +65,7 @@ public class HttpRequest {
         return this;
     }
 
-    public HttpRequest modifyUrlParameters(Consumer<HttpParameters> parametersConsumer) {
+    public HttpRequest modifyUrlParams(Consumer<HttpParameters> parametersConsumer) {
         if (parametersConsumer != null) {
             parametersConsumer.accept(httpParameters);
 
@@ -73,6 +73,10 @@ public class HttpRequest {
         }
 
         return this;
+    }
+
+    public HttpRequest addParamToUrl(String key, Object value) {
+        return modifyUrlParams(params -> params.addParameter(key, value));
     }
 
     public HttpRequest setContent(byte[] contentAsBytes) {
