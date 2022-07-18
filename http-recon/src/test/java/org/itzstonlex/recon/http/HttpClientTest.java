@@ -17,15 +17,8 @@ public class HttpClientTest {
                 .executeAsync()
                 .whenComplete((response, error) -> {
 
-                    Throwable inprocessError = response.getInprocessThrowable();
-
                     System.out.println("content-length: " + response.getContentLength());
                     System.out.println("status-code: " + response.getStatusCode());
-
-                    if (inprocessError != null) {
-                        inprocessError.printStackTrace();
-                        return;
-                    }
 
                     if (error != null) {
                         error.printStackTrace();

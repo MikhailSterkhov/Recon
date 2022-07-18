@@ -4,8 +4,8 @@ import java.nio.charset.Charset;
 
 public final class HttpResponse {
 
-    public static HttpResponse create(int contentLength, int statusCode, String callback, Throwable error) {
-        return new HttpResponse(contentLength, statusCode, callback, error);
+    public static HttpResponse create(int contentLength, int statusCode, String callback) {
+        return new HttpResponse(contentLength, statusCode, callback);
     }
 
     private final int contentLength;
@@ -13,15 +13,12 @@ public final class HttpResponse {
     private final int statusCode;
 
     private final String body;
-    private final Throwable inprocessThrowable;
 
-    private HttpResponse(int contentLength, int statusCode, String body, Throwable inprocessThrowable) {
+    private HttpResponse(int contentLength, int statusCode, String body) {
         this.contentLength = contentLength;
-
         this.statusCode = statusCode;
 
         this.body = body;
-        this.inprocessThrowable = inprocessThrowable;
     }
 
     public int getContentLength() {
@@ -30,10 +27,6 @@ public final class HttpResponse {
 
     public int getStatusCode() {
         return statusCode;
-    }
-
-    public Throwable getInprocessThrowable() {
-        return inprocessThrowable;
     }
 
     public byte[] getBody() {

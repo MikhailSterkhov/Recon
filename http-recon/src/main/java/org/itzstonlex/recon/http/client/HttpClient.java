@@ -71,7 +71,7 @@ public final class HttpClient {
                 byte[] callbackArray = InputUtils.toByteArray(inputStream);
                 String callback = new String(callbackArray, 0, callbackArray.length, StandardCharsets.UTF_8);
 
-                HttpResponse httpResponse = HttpResponse.create(http.getContentLength(), http.getResponseCode(), callback, null);
+                HttpResponse httpResponse = HttpResponse.create(http.getContentLength(), http.getResponseCode(), callback);
 
                 // Shutdown http connection.
                 http.disconnect();
@@ -79,7 +79,8 @@ public final class HttpClient {
             }
         }
         catch (Exception exception) {
-            return HttpResponse.create(0, HttpURLConnection.HTTP_BAD_REQUEST, null, exception);
+            exception.printStackTrace();
+            return null;
         }
     }
 
